@@ -1,6 +1,9 @@
 # Python virtual environment
 .venv/
 
+# Compiled Cython files
+*.pyc
+
 # Prerequisites
 *.d
 
