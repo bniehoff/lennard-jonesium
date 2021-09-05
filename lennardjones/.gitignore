@@ -1,2 +1,8 @@
 # CMake build directory
 build/
+
+# Scikit-build directory
+_skbuild/
+
+# Python egg info
+*.egg-info/
