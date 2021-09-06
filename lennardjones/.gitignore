@@ -4,5 +4,8 @@ build/
 # Scikit-build directory
 _skbuild/
 
-# Python egg info
+# Python dist directory
+dist/
+
+# Python .egg-info directory
 *.egg-info/
