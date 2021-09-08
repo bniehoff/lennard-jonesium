@@ -1,1 +1,1 @@
-from ._lennardjones import hello
+from ._lennardjones import hello_cython, hello_cpp
