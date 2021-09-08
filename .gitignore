@@ -1,6 +1,9 @@
 # Python virtual environment
 .venv/
 
+# vscode settings
+.vscode/
+
 # Compiled Cython files
 *.pyc
 
