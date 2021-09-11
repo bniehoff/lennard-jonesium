@@ -5,5 +5,5 @@
 #include <string>
 
 std::string greet(std::string name) {
-    return "Hello, " + name + ", and welcome to C++!";
+    return "Hello, " + name + ", welcome to C++!";
 }
