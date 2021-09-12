@@ -6,5 +6,5 @@ add_library(_lennardjones MODULE ${_lennardjones}
 )
 python_extension_module(_lennardjones)
 
-install(TARGETS _lennardjones LIBRARY DESTINATION src)
+install(TARGETS _lennardjones LIBRARY DESTINATION lennardjones)
 # endif()
