@@ -15,7 +15,7 @@ SCENARIO( "Interaction with the greeter" ) {
         THEN( "The greeter gives me a personalized greeting" ) {
             std::string greeting = greet(my_name);
 
-            REQUIRE( "Hello, Ben, welcome to C++!" == greeting);
+            REQUIRE( "Hello, Ben, and welcome to C++!" == greeting);
         }
     }
 }
