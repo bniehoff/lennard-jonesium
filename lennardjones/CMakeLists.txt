@@ -8,7 +8,7 @@ if(SKBUILD)
     find_package(PythonExtensions REQUIRED)
     find_package(Cython REQUIRED)
 
-    add_subdirectory(src)
+    add_subdirectory(lennardjones)
 else()
     set(CMAKE_SHARED_LIBRARY_PREFIX "")
     
@@ -19,7 +19,7 @@ else()
 
     add_executable(tests
         tests/greeter/test_greeter.cpp
-        src/greeter/greeter.cpp
+        lennardjones/greeter/greeter.cpp
     )
     target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
 

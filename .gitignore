@@ -4,6 +4,9 @@
 # vscode settings
 .vscode/
 
+# CMake build directory
+build/
+
 # Compiled Cython files
 *.pyc
 

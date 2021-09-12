@@ -6,7 +6,7 @@ cpdef void hello_cython(str strArg):
 # C++ greeter example
 from libcpp.string cimport string
 
-cdef extern from "<src/greeter/greeter.hpp>":
+cdef extern from "<lennardjones/greeter/greeter.hpp>":
     string greet(string s)
 
 cpdef void hello_cpp(str s):

@@ -4,7 +4,7 @@
 
 #include <catch2/catch.hpp>
 
-#include <src/greeter/greeter.hpp>
+#include <lennardjones/greeter/greeter.hpp>
 
 #include <string>
 
