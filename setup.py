@@ -16,7 +16,7 @@ setup(
     author='Ben Niehoff',
     license="GPL v3.0",
     packages=['lennardjones'],
-    # package_dir = {'lennardjones': 'src'},
+    package_dir = {'': 'src'},
     install_requires=['cython'],
     tests_require=['pytest'],
     setup_requires=setup_requires

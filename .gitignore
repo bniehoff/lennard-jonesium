@@ -10,8 +10,8 @@ build/
 # Scikit-build directory
 _skbuild/
 
-# Python .egg-info directory
-*.egg-info/
+# Python .egg-* files/directories
+*.egg-*
 
 # Compiled Cython files
 *.pyc
