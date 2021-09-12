@@ -2,13 +2,16 @@ cmake_minimum_required(VERSION 3.18)
 
 project(lennardjones VERSION 0.0.1)
 
-include_directories(${PROJECT_SOURCE_DIR})
+include_directories(
+    ${PROJECT_SOURCE_DIR}
+    ${PROJECT_SOURCE_DIR}/src
+)
 
 if(SKBUILD)
     find_package(PythonExtensions REQUIRED)
     find_package(Cython REQUIRED)
 
-    add_subdirectory(lennardjones)
+    add_subdirectory(src/lennardjones)
 else()
     set(CMAKE_SHARED_LIBRARY_PREFIX "")
     
@@ -18,8 +21,8 @@ else()
     find_package(Catch2 REQUIRED)
 
     add_executable(tests
-        tests/greeter/test_greeter.cpp
-        lennardjones/greeter/greeter.cpp
+        tests/lennardjones/greeter/test_greeter.cpp
+        src/lennardjones/greeter/greeter.cpp
     )
     target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
 
