@@ -7,6 +7,8 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/src
 )
 
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+
 if(SKBUILD)
     find_package(PythonExtensions REQUIRED)
     find_package(Cython REQUIRED)
@@ -24,7 +26,11 @@ else()
         tests/lennardjones/greeter/test_greeter.cpp
         src/lennardjones/greeter/greeter.cpp
     )
-    target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
+
+    target_link_libraries(tests
+        PRIVATE Eigen3::Eigen
+        PRIVATE Catch2::Catch2WithMain
+    )
 
     include(Catch)
     catch_discover_tests(tests)
