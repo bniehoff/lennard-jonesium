@@ -34,3 +34,32 @@ documentation.
 
 Our intent is to provide an updated and improved version, written in clean, modular, and readable
 C++ code, wrapped in a Python package which can be easily imported.
+
+## Goals
+
+- Simulate ~10k Lennard-Jones particles in an efficient manner so that meaningful physics can be
+extracted in a reasonable amount of time (say, an hour or so for a detailed tour of the
+pressure-temperature plane near the solid-fluid phase transition).
+
+- Observe the phase transition in the results and compare it to the actual phase diagram of Argon.
+
+- Log useful data from the simulation, such as time series, that can be used for visualization.
+
+- Learn how to design a medium-scale project using modern features of C++.
+
+- Learn how to bridge the gap between C++ and Python, so that we can combine the speed of C++
+with the user-friendliness of Python.
+
+- Learn how to use some development and testing tools, such as [CMake](https://cmake.org/),
+[scikit-build](https://scikit-build.readthedocs.io/en/latest/index.html), and
+[Catch2](https://github.com/catchorg/Catch2)
+
+## Non-goals
+
+Although the goal is to write a physics simulation which benefits from compiled code and is thus
+not well-suited to plain Python, it is *not* our goal to use Numpy, Scipy, or Numba, even if those
+tools may be appropriate for this type of simulation.  We are specifically interested in learning
+how to design a project in C++ and how to integrate this with Python.
+
+It is also not our goal to delve too deeply into Cython, although it is a tool that is needed in
+order to bridge the C++/Python gap most effectively, so we will be using it to that extent.
