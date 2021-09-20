@@ -63,3 +63,30 @@ how to design a project in C++ and how to integrate this with Python.
 
 It is also not our goal to delve too deeply into Cython, although it is a tool that is needed in
 order to bridge the C++/Python gap most effectively, so we will be using it to that extent.
+
+## Tools used
+
+For representing points in 3-dimensional space, as well as velocity and force vectors, we will use
+[Eigen 3](http://eigen.tuxfamily.org/index.php?title=Main_Page).
+
+## Techinical architecture
+
+The main bottleneck in simulating the physics of the Lennard-Jones potential is in calculating the
+inter-particle forces.  In principle, this operation must be done pairwise between every pair
+of particles, and thus the time required to calculate the forces grows as *O(n^2)*, where *n* is
+the number of particles.  If the particles are distributed uniformly throughout the volume (which
+they generally are), then this corresponds to a scaling of *O(V^2)*, for *V* the volume.  This
+naive approach is quite costly.
+
+However, there is a way out of this situation, at the cost of some slight loss in accuracy.  The
+Lennard-Jones potential contains a *1/r^6* attractive term and a *1/r^12* repulsive term.  Therefore
+the influence of the potential at large distances diminishes as *1/r^6*.  This strong falloff
+makes the force effectively short-ranged, where a given particle only has meaningful influence
+on particles within some characteristic distance, *R*.  We therefore approximate the Lennard-Jones
+potential by cutting it off completely at a distance *R*.
+
+The effect of this is that, in the force calculation, one only needs to calculate the pairwise
+forces between a particle and its nearest neighbors (up to a distance *R*).  Since *R* is fixed,
+as the volume of the simulation grows, the time needed to perform the force calculation need only
+scale as *O(V)* rather than *O(V^2)*, provided we can choose an appropriate way of storing our
+particles such that it is easy to pick out the ones up to a distance *R* away.
