@@ -110,7 +110,7 @@ only around 16% (the ratio of the volume of a sphere of radius *R* to that of a 
 of the particles iterated over are relevant for the calculation.  So, this could definitely be
 improved.  However, the number of particles in a Cell is not too many (we know from prior
 experience that it will be around 10 to 20), so it is probably not worth subdividing space in a
-more sophisticated way unless it can be done cheaply enough to be faster than ~100 extra iterations
+more sophisticated way unless it can be done cheaply enough to be faster than ~400 extra iterations
 per query.
 
 
