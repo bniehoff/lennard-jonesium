@@ -90,3 +90,27 @@ forces between a particle and its nearest neighbors (up to a distance *R*).  Sin
 as the volume of the simulation grows, the time needed to perform the force calculation need only
 scale as *O(V)* rather than *O(V^2)*, provided we can choose an appropriate way of storing our
 particles such that it is easy to pick out the ones up to a distance *R* away.
+
+### Data structures
+
+There are a variety of data structures useful for *spatial indexing* which are intended to make
+it simpler to answer questions like "Find all the objects within a distance *R* from a given point".
+However, in our case, we will take advantage of the fact that *R* is known in advance and is fixed
+throughout the calculation.
+
+We will divide the simulation volume into a number of cubical *Cells* of side length *R*.  Then,
+for any particle in a given Cell, we know that all the particles within a distance *R* must be
+in that Cell or one of its 26 neighbors (adjacent along any faces or diagonals).  This means that
+to calculate the force on a given particle, we must only iterate over the particles in 27 Cells,
+rather than in the whole volume.
+
+Since a particle has a sphere of influence of radius *R* and we must iterate over all the particles
+distributed (presumed uniformly) in a cubical volume of side length *3R*, this means that still,
+only around 16% (the ratio of the volume of a sphere of radius *R* to that of a cube of side *3R*)
+of the particles iterated over are relevant for the calculation.  So, this could definitely be
+improved.  However, the number of particles in a Cell is not too many (we know from prior
+experience that it will be around 10 to 20), so it is probably not worth subdividing space in a
+more sophisticated way unless it can be done cheaply enough to be faster than ~100 extra iterations
+per query.
+
+
