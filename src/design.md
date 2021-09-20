@@ -133,7 +133,7 @@ hypothetical infinite volume, so that we can compute the mean square displacemen
 
 Each of these pieces of information is a 3-component vector, where each component is a `double`, or
 8 bytes.  This gives a 24 bytes for the 3-component vector, which Eigen will pad to 32 for
-alignement.  Four such vectors is then 128 bytes.  So, 1 MB will hold exactly 8192 particles.
+alignment.  Four such vectors is then 128 bytes.  So, 1 MB will hold exactly 8192 particles.
 This should fit comfortably within the L3 cache of any modern CPU.
 
 To squeeze out as much speed as possible, we should try to make sure that the particles likely
