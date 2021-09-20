@@ -142,5 +142,3 @@ that the particles within a single Cell should be stored in a contiguous array. 
 particles can move across Cell boundaries, which means that in order to keep them in such
 contiguous arrays, they must occasionally be copied from one Cell to another, and the arrays will
 occasionally have to be reallocated.
-
-This copying takes time, of course, so we would also like to minimize it.
