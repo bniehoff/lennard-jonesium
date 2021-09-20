@@ -98,6 +98,8 @@ it simpler to answer questions like "Find all the objects within a distance *R* 
 However, in our case, we will take advantage of the fact that *R* is known in advance and is fixed
 throughout the calculation.
 
+#### Cells
+
 We will divide the simulation volume into a number of cubical *Cells* of side length *R*.  Then,
 for any particle in a given Cell, we know that all the particles within a distance *R* must be
 in that Cell or one of its 26 neighbors (adjacent along any faces or diagonals).  This means that
@@ -113,4 +115,32 @@ experience that it will be around 10 to 20), so it is probably not worth subdivi
 more sophisticated way unless it can be done cheaply enough to be faster than ~400 extra iterations
 per query.
 
+#### Particles within Cells
 
+Having divided the simulation volume into Cells, the next step is to make iteration over the
+particles as efficient as possible.  This means we should try to maximize the *locality* of the
+particles in memory.  A *Particle* must keep track of the following information:
+
+- Position
+- Velocity
+- Force/Acceleration
+- Total Displacement (i.e., position without periodic boundary conditions applied)
+
+The force is equal to the acceleration, since we normalize the particle mass to 1.  The total
+displacement is needed in addition to the position, because the position will have periodic
+boundary conditions applied, and we would like to track the total distance travelled in a
+hypothetical infinite volume, so that we can compute the mean square displacement.
+
+Each of these pieces of information is a 3-component vector, where each component is a `double`, or
+8 bytes.  This gives a 24 bytes for the 3-component vector, which Eigen will pad to 32 for
+alignement.  Four such vectors is then 128 bytes.  So, 1 MB will hold exactly 8192 particles.
+This should fit comfortably within the L3 cache of any modern CPU.
+
+To squeeze out as much speed as possible, we should try to make sure that the particles likely
+to be iterated over are contiguous in memory rather than randomly distributed.  This means
+that the particles within a single Cell should be stored in a contiguous array.  However, the
+particles can move across Cell boundaries, which means that in order to keep them in such
+contiguous arrays, they must occasionally be copied from one Cell to another, and the arrays will
+occasionally have to be reallocated.
+
+This copying takes time, of course, so we would also like to minimize it.
