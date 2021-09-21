@@ -141,4 +141,20 @@ to be iterated over are contiguous in memory rather than randomly distributed.  
 that the particles within a single Cell should be stored in a contiguous array.  However, the
 particles can move across Cell boundaries, which means that in order to keep them in such
 contiguous arrays, they must occasionally be copied from one Cell to another, and the arrays will
-occasionally have to be reallocated.
+occasionally have to be reallocated.  Also, when the Particles are moved into a neighboring Cell,
+they will leave empty spaces in the current Cell's Particle array, so we must be clever with how
+Particle moves are handled, since this empty space also results in wasted time.
+
+Another option is to instead keep the Particles belonging to each Cell in a linked list.  This is
+the strategy used in <https://github.com/bniehoff/lennard-jones-particles-c>.  Over time, as
+Particles travel between Cells, one loses memory locality in individual Cells; in exchange, one
+gains constant-time transfer of Particles between Cells, and there is no need to reallocate.  Also,
+although the Particles belonging to a given Cell may become non-local in memory due to transfers
+between Cells, none of the Particles is ever actually moved from its original memory address, and
+thus the full collection of Particles remains contiguous (and we have already determined that it
+can fit within L3 cache).  So, if one uses the linked-list structure, one may end up with cache
+misses in the lower cache levels, but one should still not have to jump all the way back to main
+memory.
+
+Between these two options, we will try the first one, although this will require some manual
+memory management.
