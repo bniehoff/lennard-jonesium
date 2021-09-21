@@ -145,7 +145,7 @@ occasionally have to be reallocated.  Also, when the Particles are moved into a 
 they will leave empty spaces in the current Cell's Particle array, so we must be clever with how
 Particle moves are handled, since this empty space also results in wasted time.
 
-Another option is to instead keep the Particles belonging to each Cell in a linked list.  This is
+Another option is instead to keep the Particles belonging to each Cell in a linked list.  This is
 the strategy used in <https://github.com/bniehoff/lennard-jones-particles-c>.  Over time, as
 Particles travel between Cells, one loses memory locality in individual Cells; in exchange, one
 gains constant-time transfer of Particles between Cells, and there is no need to reallocate.  Also,
@@ -156,5 +156,33 @@ can fit within L3 cache).  So, if one uses the linked-list structure, one may en
 misses in the lower cache levels, but one should still not have to jump all the way back to main
 memory.
 
-Between these two options, we will try the first one, although this will require some manual
-memory management.
+Between these two options, we will try the first one, where the Particles are physically stored
+in an array local to each Cell, although this will require some manual memory management.  I am
+not actually sure which way will give a faster simulation, and perhaps it makes no difference.
+But I want to try a different method than was used in the previous C implementation.
+
+#### Transferring Particles between Cells
+
+Regardless of how the Particles are associated with Cells, there needs to be a mechanism to
+transfer Particles from one Cell to another.  All of the Particle Transfers must happen in between
+time steps of the integrator (they cannot happen in the middle of a time step, because we use the
+Cells in order to find the Particles needed for the force calculation).
+
+A Particle needs to transfer to a neighboring Cell any time its new position lies outside the
+Cell's boundary.  So, it would make sense to create a list of which Particles need to be
+transferred in the course of computing the new positions.  The essential pieces of information we
+need in order to prepare to transfer a Particle to another Cell are:
+
+- The index to where the Particle is in the current Cell's Particle array (so that we know where
+    we should leave a gap)
+
+- A copy of the Particle
+
+- A reference to the Cell to which the Particle should be moved
+
+The copy of the Particle is needed because its original in-place copy (in the Cell's Particle
+array) might be overwritten (since it has been marked as to-be-vacated) by an incoming Particle
+from another Cell.  Alternatively, we could only ever `push_back()` the Particles when moving them
+to a new Cell, but this will tend to leave more empty spaces, and may require more cleanup
+operations to maintain the contiguous nature of the arrays (i.e., occasionally moving Particles
+down into the empty spaces and resizing the array downwards).
