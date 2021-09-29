@@ -25,6 +25,7 @@ else()
     add_executable(tests
         tests/lennardjones/greeter/test_greeter.cpp
         src/lennardjones/greeter/greeter.cpp
+        tests/lennardjones/components/test_particle.cpp
     )
 
     target_link_libraries(tests
