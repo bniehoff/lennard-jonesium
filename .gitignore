@@ -1,3 +1,21 @@
+# Python virtual environment
+.venv/
+
+# vscode settings
+.vscode/
+
+# CMake build directory
+build/
+
+# Scikit-build directory
+_skbuild/
+
+# Python .egg-* files/directories
+*.egg-*
+
+# Compiled Cython files
+*.pyc
+
 # Prerequisites
 *.d
 
