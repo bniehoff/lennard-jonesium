@@ -7,6 +7,19 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/src
 )
 
+set(SOURCES
+    src/lennardjones/greeter/greeter.hpp
+    src/lennardjones/greeter/greeter.cpp
+    src/lennardjones/components/particle.hpp
+    src/lennardjones/components/cell.hpp
+    src/lennardjones/components/cell.cpp
+)
+
+set(TEST_SOURCES
+    tests/lennardjones/greeter/test_greeter.cpp
+    tests/lennardjones/components/test_particle.cpp
+)
+
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
 if(SKBUILD)
@@ -23,9 +36,8 @@ else()
     find_package(Catch2 REQUIRED)
 
     add_executable(tests
-        tests/lennardjones/greeter/test_greeter.cpp
-        src/lennardjones/greeter/greeter.cpp
-        tests/lennardjones/components/test_particle.cpp
+        ${SOURCES}
+        ${TEST_SOURCES}
     )
 
     target_link_libraries(tests
