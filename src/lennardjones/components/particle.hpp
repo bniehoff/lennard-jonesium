@@ -55,7 +55,7 @@ namespace components
             {}
 
             // Getter for the ID number
-            int getID() {return id_;}
+            int getID() const {return id_;}
 
             // Manipulate the global ID count if needed
             static void setGlobalID(int id) {global_id_ = id;}
