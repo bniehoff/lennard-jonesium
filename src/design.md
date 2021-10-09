@@ -15,10 +15,9 @@ phase transition of the system.  If it does not cause too much loss of efficienc
 like to log the history of the system evolution, so that it can be played back as an animation.
 
 To interact with the simulation library and view the results, we would like to use a Jupyter
-Notebook, so we structure the library as a Python package.  However, the simulation itself is
-speed-critical in a way that is not well-suited to Python, so we implement the actual physics
-in C++.  We use Cython as a glue to bind these together, so that the internal C++ library can
-present itself as a Python package.
+Notebook, so we structure the library as a Python package.  However, we implement the actual
+physics in C++.  We use Cython as a glue to bind these together, so that the internal C++ library
+can present itself as a Python package.
 
 We also choose this overall structure to satisfy a secondary goal: to learn and practice using
 modern features of C++, and to learn how to get C++ and Python to work together.
@@ -38,8 +37,8 @@ C++ code, wrapped in a Python package which can be easily imported.
 ## Goals
 
 - Simulate ~10k Lennard-Jones particles in an efficient manner so that meaningful physics can be
-extracted in a reasonable amount of time (say, an hour or so for a detailed tour of the
-pressure-temperature plane near the solid-fluid phase transition).
+extracted in a reasonable amount of time (in particular, running the simulation at many values
+of pressure and temperature so that the phase diagram can be mapped out at some decent resolution).
 
 - Observe the phase transition in the results and compare it to the actual phase diagram of Argon.
 
@@ -67,7 +66,8 @@ order to bridge the C++/Python gap most effectively, so we will be using it to t
 ## Tools used
 
 For representing points in 3-dimensional space, as well as velocity and force vectors, we will use
-[Eigen 3](http://eigen.tuxfamily.org/index.php?title=Main_Page).
+[Eigen 3](http://eigen.tuxfamily.org/index.php?title=Main_Page).  We will not have a need for most
+of its linear algebra features, however.
 
 ## Techinical architecture
 
@@ -93,33 +93,33 @@ particles such that it is easy to pick out the ones up to a distance *R* away.
 
 ### Data structures
 
-There are a variety of data structures useful for *spatial indexing* which are intended to make
-it simpler to answer questions like "Find all the objects within a distance *R* from a given point".
-However, in our case, we will take advantage of the fact that *R* is known in advance and is fixed
-throughout the calculation.
+The [Cell List](https://en.wikipedia.org/wiki/Cell_lists) is an appropriate data structure for this
+type of short-range force calculation, which has seen extensive use in the literature since the
+earliest molecular dynamics simulations.  This was also the technique used in the prior C version of
+this project.
 
-#### Cells
-
-We will divide the simulation volume into a number of cubical *Cells* of side length *R*.  Then,
-for any particle in a given Cell, we know that all the particles within a distance *R* must be
-in that Cell or one of its 26 neighbors (adjacent along any faces or diagonals).  This means that
-to calculate the force on a given particle, we must only iterate over the particles in 27 Cells,
-rather than in the whole volume.
+We will divide the simulation volume into a number of cubical *Cells* of side length *R*, the cutoff
+distance of our short-range force.  Then, for any particle in a given Cell, we know that all the
+particles within a distance *R* must be in that Cell or one of its 26 neighbors (adjacent along any
+faces or diagonals).  This means that to calculate the force on a given particle, we must only
+iterate over the particles in 27 Cells, rather than in the whole volume.
 
 Since a particle has a sphere of influence of radius *R* and we must iterate over all the particles
 distributed (presumed uniformly) in a cubical volume of side length *3R*, this means that still,
 only around 16% (the ratio of the volume of a sphere of radius *R* to that of a cube of side *3R*)
-of the particles iterated over are relevant for the calculation.  So, this could definitely be
-improved.  However, the number of particles in a Cell is not too many (we know from prior
-experience that it will be around 10 to 20), so it is probably not worth subdividing space in a
-more sophisticated way unless it can be done cheaply enough to be faster than ~400 extra iterations
-per query.
+of the particles iterated over are relevant for the calculation.  So, this could in principle be
+improved, although there is an additional overhead associated with increasing the "voxel resolution"
+by using smaller Cells, and according to the Wiki article on Cell Lists, there is very little to
+gain from this increased complication, so we will keep things simple and use Cells of size *R*.
 
-#### Particles within Cells
+The Wiki article also describes a data structure based on linked lists, which are appropriate for
+large numbers of particles.  In our prior experience, the density of particles together with the
+cutoff distance *R* imply that a typical Cell in our simulation should only have 10 to 20 particles
+in it.  So it seems that an array, rather than a linked list, might be able to take better
+advantage of memory locality.  However, let's do some analysis:
 
-Having divided the simulation volume into Cells, the next step is to make iteration over the
-particles as efficient as possible.  This means we should try to maximize the *locality* of the
-particles in memory.  A *Particle* must keep track of the following information:
+A Cell will contain a number of *Particles*, typically on the order of 10-20 of them.  A Particle
+must keep track of the following information:
 
 - Position
 - Velocity
@@ -133,56 +133,20 @@ hypothetical infinite volume, so that we can compute the mean square displacemen
 
 Each of these pieces of information is a 3-component vector, where each component is a `double`, or
 8 bytes.  This gives a 24 bytes for the 3-component vector, which Eigen will pad to 32 for
-alignment.  Four such vectors is then 128 bytes.  So, 1 MB will hold exactly 8192 particles.
-This should fit comfortably within the L3 cache of any modern CPU.
+alignment.  Four such vectors is then 128 bytes.  My CPU is an Intel i7 10700k, with the following
+cache sizes:
 
-To squeeze out as much speed as possible, we should try to make sure that the particles likely
-to be iterated over are contiguous in memory rather than randomly distributed.  This means
-that the particles within a single Cell should be stored in a contiguous array.  However, the
-particles can move across Cell boundaries, which means that in order to keep them in such
-contiguous arrays, they must occasionally be copied from one Cell to another, and the arrays will
-occasionally have to be reallocated.  Also, when the Particles are moved into a neighboring Cell,
-they will leave empty spaces in the current Cell's Particle array, so we must be clever with how
-Particle moves are handled, since this empty space also results in wasted time.
+- L1: 32KB data + 32KB instructions, per core (8 cores)
+- L2: 256KB per core
+- L3: 16MB (shared)
 
-Another option is instead to keep the Particles belonging to each Cell in a linked list.  This is
-the strategy used in <https://github.com/bniehoff/lennard-jones-particles-c>.  Over time, as
-Particles travel between Cells, one loses memory locality in individual Cells; in exchange, one
-gains constant-time transfer of Particles between Cells, and there is no need to reallocate.  Also,
-although the Particles belonging to a given Cell may become non-local in memory due to transfers
-between Cells, none of the Particles is ever actually moved from its original memory address, and
-thus the full collection of Particles remains contiguous (and we have already determined that it
-can fit within L3 cache).  So, if one uses the linked-list structure, one may end up with cache
-misses in the lower cache levels, but one should still not have to jump all the way back to main
-memory.
+At the moment I have no plans to parallelize the simulation.  A single core L1 cache (32KB) can hold
+262144 particles, which is more than enough for the whole simulation.  If the whole simulation fits
+in L1 cache, then it seems there is little to be gained by using arrays over linked lists.  A single
+cache line is 64 bytes, which is only half of a Particle, so I conclude there is no performance
+benefit to be squeezed out by storing the Particles in an array.
 
-Between these two options, we will try the first one, where the Particles are physically stored
-in an array local to each Cell, although this will require some manual memory management.  I am
-not actually sure which way will give a faster simulation, and perhaps it makes no difference.
-But I want to try a different method than was used in the previous C implementation.
-
-#### Transferring Particles between Cells
-
-Regardless of how the Particles are associated with Cells, there needs to be a mechanism to
-transfer Particles from one Cell to another.  All of the Particle Transfers must happen in between
-time steps of the integrator (they cannot happen in the middle of a time step, because we use the
-Cells in order to find the Particles needed for the force calculation).
-
-A Particle needs to transfer to a neighboring Cell any time its new position lies outside the
-Cell's boundary.  So, it would make sense to create a list of which Particles need to be
-transferred in the course of computing the new positions.  The essential pieces of information we
-need in order to prepare to transfer a Particle to another Cell are:
-
-- The index to where the Particle is in the current Cell's Particle array (so that we know where
-    we should leave a gap)
-
-- A copy of the Particle
-
-- A reference to the Cell to which the Particle should be moved
-
-The copy of the Particle is needed because its original in-place copy (in the Cell's Particle
-array) might be overwritten (since it has been marked as to-be-vacated) by an incoming Particle
-from another Cell.  Alternatively, we could only ever `push_back()` the Particles when moving them
-to a new Cell, but this will tend to leave more empty spaces, and may require more cleanup
-operations to maintain the contiguous nature of the arrays (i.e., occasionally moving Particles
-down into the empty spaces and resizing the array downwards).
+So, we will use a linked list structure for each Cell (which is the same structure used in the C
+version of this project).  This will also allow us to take advantage of *move semantics* when
+transferring Particles between Cells.  This introduces some additional overhead to the Particle
+structure; namely, it must hold two pointers (8 bytes each), but this is not significant.
