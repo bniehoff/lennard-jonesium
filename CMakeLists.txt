@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.18)
 
-project(lennardjones VERSION 0.0.1)
+project(lennardjones
+    VERSION 0.0.1
+    DESCRIPTION "A Python C++ extension package for simulating Lennard-Jones particles"
+)
 
 include_directories(
     ${PROJECT_SOURCE_DIR}
