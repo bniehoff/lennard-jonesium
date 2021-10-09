@@ -41,12 +41,12 @@ namespace components
             // Here we assume we have less than 32768 particles
             int id_;
             static int global_id_;
-            static int next_global_id() {return global_id_++;}
+            static int next_global_id_() {return global_id_++;}
         
         public:
             // Constructor simply accepts the values given
             Particle(Vector3d p, Vector3d d, Vector3d v, Vector3d a)
-                : position(p), displacement(d), velocity(v), acceleration(a), id_(next_global_id())
+                : position(p), displacement(d), velocity(v), acceleration(a), id_(next_global_id_())
             {}
 
             // Default constructor sets all to zero (delegate to standard constructor)
