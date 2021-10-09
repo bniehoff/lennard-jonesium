@@ -41,12 +41,12 @@ namespace components
             // Here we assume we have less than 32768 particles
             int id_;
             static int global_id_;
-            static int nextGlobalID() {return global_id_++;}
+            static int next_global_id_() {return global_id_++;}
         
         public:
             // Constructor simply accepts the values given
             Particle(Vector3d p, Vector3d d, Vector3d v, Vector3d a)
-                : position(p), displacement(d), velocity(v), acceleration(a), id_(nextGlobalID())
+                : position(p), displacement(d), velocity(v), acceleration(a), id_(next_global_id_())
             {}
 
             // Default constructor sets all to zero (delegate to standard constructor)
@@ -55,11 +55,11 @@ namespace components
             {}
 
             // Getter for the ID number
-            int getID() {return id_;}
+            int id() const {return id_;}
 
             // Manipulate the global ID count if needed
-            static void setGlobalID(int id) {global_id_ = id;}
-            static void resetGlobalID() {setGlobalID(0);}
+            static void set_global_id(int id) {global_id_ = id;}
+            static void reset_global_id() {set_global_id(0);}
 
             /**
              * Although particles have a unique ID and will be "moved" between Cells, they actually
@@ -86,8 +86,6 @@ namespace components
 
                 return *this;
             }
-            
-            // We will not define a move constructor or move assignment operator
     };
 
     // Initialize the Particle ID counter

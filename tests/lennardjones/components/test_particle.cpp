@@ -49,7 +49,7 @@ SCENARIO( "Create and assign Particles" ) {
         }
 
         THEN( "The Particles have the same ID" ) {
-            REQUIRE( p.getID() == q.getID() );
+            REQUIRE( p.id() == q.id() );
         }
 
         THEN( "The Particles' values match" ) {
@@ -61,17 +61,17 @@ SCENARIO( "Create and assign Particles" ) {
     }
 
     WHEN( "I create several Particles" ) {
-        Particle::resetGlobalID();
+        Particle::reset_global_id();
         Particle p1, p2, p3, p4, p5;
         Particle q{position, displacement, velocity, acceleration};
 
         THEN( "They are assigned IDs in sequence starting from zero" ) {
-            REQUIRE( 0 == p1.getID() );
-            REQUIRE( 1 == p2.getID() );
-            REQUIRE( 2 == p3.getID() );
-            REQUIRE( 3 == p4.getID() );
-            REQUIRE( 4 == p5.getID() );
-            REQUIRE( 5 == q.getID() );
+            REQUIRE( 0 == p1.id() );
+            REQUIRE( 1 == p2.id() );
+            REQUIRE( 2 == p3.id() );
+            REQUIRE( 3 == p4.id() );
+            REQUIRE( 4 == p5.id() );
+            REQUIRE( 5 == q.id() );
         }
     }
 }
