@@ -2,6 +2,11 @@
  * Test for class Particle
  */
 
+// #include <ranges>
+#include <list>
+#include <array>
+#include <ranges>
+
 #include <catch2/catch.hpp>
 #include <eigen3/Eigen/Dense>
 
@@ -72,6 +77,41 @@ SCENARIO( "Create and assign Particles" ) {
             REQUIRE( 3 == p4.id() );
             REQUIRE( 4 == p5.id() );
             REQUIRE( 5 == q.id() );
+        }
+    }
+}
+
+/**
+ * This "test" is really just for myself to understand how to std::list<Particle*>
+ */
+SCENARIO( "Lists and move semantics" ) {
+    // First create a global vector of 10 particles by id
+    const int particle_count{10};
+
+    // Need to make sure the Particles are numbered 0 through 9 every time the Scenario resets
+    Particle::reset_global_id();
+    std::array<Particle, particle_count> master_array;
+
+    WHEN( "I check the ID of each particle" ) {
+        THEN( "It matches its index in the master list" ) {
+            for(auto i : std::views::iota(0, particle_count)) {
+                REQUIRE( i == master_array[i].id() );
+            }
+        }
+    }
+
+    WHEN( "I add some particles to a list" ) {
+        std::list<Particle*> cell_list;
+        std::vector<int> indices{3, 1, 9, 6, 7};
+
+        for(auto i : indices) {
+            cell_list.push_back(&master_array[i]);
+        }
+
+        THEN( "Their IDs refer to their positions in the master list" ) {
+            for(auto p : cell_list) {
+                REQUIRE( p == &master_array[p->id()] );
+            }
         }
     }
 }
