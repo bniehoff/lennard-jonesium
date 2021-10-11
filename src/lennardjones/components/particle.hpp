@@ -23,19 +23,19 @@
 #ifndef LJ_PARTICLE_HPP
 #define LJ_PARTICLE_HPP
 
-#include <eigen3/Eigen/Dense>
+#include <Eigen/Dense>
 
-using Eigen::Vector3d;
+#include <lennardjones/tools/AlignedVector3d.hpp>
 
 namespace components
 {
     class Particle
     {
         public:
-            Vector3d position;
-            Vector3d displacement;
-            Vector3d velocity;
-            Vector3d acceleration;
+            AlignedVector3d position;
+            AlignedVector3d displacement;
+            AlignedVector3d velocity;
+            AlignedVector3d acceleration;
         
         private:
             // Here we assume we have less than 32768 particles
@@ -45,13 +45,14 @@ namespace components
         
         public:
             // Constructor simply accepts the values given
-            Particle(Vector3d p, Vector3d d, Vector3d v, Vector3d a)
+            Particle(AlignedVector3d p, AlignedVector3d d, AlignedVector3d v, AlignedVector3d a)
                 : position(p), displacement(d), velocity(v), acceleration(a), id_(next_global_id_())
             {}
 
             // Default constructor sets all to zero (delegate to standard constructor)
             Particle()
-                : Particle{Vector3d::Zero(), Vector3d::Zero(), Vector3d::Zero(), Vector3d::Zero()}
+                : Particle{AlignedVector3d::Zero(), AlignedVector3d::Zero(),
+                           AlignedVector3d::Zero(), AlignedVector3d::Zero()}
             {}
 
             // Getter for the ID number

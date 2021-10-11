@@ -3,6 +3,8 @@
  */
 
 #include <string>
+#include <vector>
+#include <ranges>
 
 std::string greet(std::string name) {
     return "Hello, " + name + ", and welcome to C++!";

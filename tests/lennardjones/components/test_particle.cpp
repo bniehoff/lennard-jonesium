@@ -5,16 +5,16 @@
 #include <catch2/catch.hpp>
 #include <eigen3/Eigen/Dense>
 
-#include <lennardjones/components/particle.hpp>
+#include <src/lennardjones/tools/AlignedVector3d.hpp>
+#include <src/lennardjones/components/particle.hpp>
 
-using Eigen::Vector3d;
 using components::Particle;
 
 SCENARIO( "Create and assign Particles" ) {
-    Vector3d position{1.618, 2.718, 3.142};
-    Vector3d displacement{11.618, 12.718, 13.142};
-    Vector3d velocity{-3, -4, 2};
-    Vector3d acceleration{0, 0, -9.8};
+    AlignedVector3d position{1.618, 2.718, 3.142};
+    AlignedVector3d displacement{11.618, 12.718, 13.142};
+    AlignedVector3d velocity{-3, -4, 2};
+    AlignedVector3d acceleration{0, 0, -9.8};
 
     WHEN( "I create a default Particle" ) {
         Particle p;
