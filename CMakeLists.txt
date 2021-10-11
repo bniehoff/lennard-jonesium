@@ -15,7 +15,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(SOURCES
     src/lennardjones/greeter/greeter.hpp
     src/lennardjones/greeter/greeter.cpp
-    src/lennardjones/tools/AlignedVector3d.hpp
+    src/lennardjones/tools/aligned_vectors.hpp
     src/lennardjones/components/particle.hpp
     src/lennardjones/components/cell.hpp
     src/lennardjones/components/cell.cpp
