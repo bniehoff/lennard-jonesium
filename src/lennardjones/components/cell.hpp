@@ -23,11 +23,39 @@
 #ifndef LJ_CELL_HPP
 #define LJ_CELL_HPP
 
+#include <list>
+
 #include <lennardjones/components/particle.hpp>
 
 namespace components {
     class Cell {
+        private:
+            /**
+             * The Particles will be kept in a master std::vector elsewhere, we just point to them
+             * here.  This allows their individual identities to remain intact, and lets us track
+             * their individual trajectories.
+             */
+            std::list<Particle*> particles_;
+        
+        public:
+            void append(Particle*);
 
+            /**
+             * TODO: How do we handle transferring Particles between Cells?
+             * 
+             * We need to "mark" items for removal while calculating the new positions. This
+             * requires a std::list iterator.  The std::list is private, so this shouldn't be
+             * visible outside the Cell.
+             * 
+             * When the item is removed, we need to extract the Particle* pointer itself (or we
+             * can just refer to the Particle by its ID?).  It can then be appended to another Cell
+             * like normal.
+             */
+
+            /**
+             * A Cell will just be created empty, which means there is no need to override the 
+             * default constructor, assignment operator, etc.
+             */
     };
 }
 
