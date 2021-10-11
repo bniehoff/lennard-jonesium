@@ -10,7 +10,7 @@
 #include <catch2/catch.hpp>
 #include <eigen3/Eigen/Dense>
 
-#include <src/lennardjones/tools/AlignedVector3d.hpp>
+#include <src/lennardjones/tools/aligned_vectors.hpp>
 #include <src/lennardjones/components/particle.hpp>
 
 using components::Particle;

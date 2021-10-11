@@ -25,7 +25,7 @@
 
 #include <Eigen/Dense>
 
-#include <lennardjones/tools/AlignedVector3d.hpp>
+#include <lennardjones/tools/aligned_vectors.hpp>
 
 namespace components
 {
