@@ -34,8 +34,6 @@ if(SKBUILD)
 
     add_subdirectory(src/lennardjones)
 else()
-    set(CMAKE_SHARED_LIBRARY_PREFIX "")
-    
     include(CTest)
     enable_testing()
 
