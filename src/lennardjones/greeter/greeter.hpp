@@ -9,4 +9,6 @@
 
 std::string greet(std::string);
 
+int factorial(int n);
+
 #endif
