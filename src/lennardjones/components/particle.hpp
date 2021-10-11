@@ -31,6 +31,12 @@ namespace components
 {
     class Particle
     {
+        /**
+         * TODO: Should Particle enforce any invariants on these data, or let them be completely
+         *       handled elsewhere?  We'd like to centralize the force/acceleration calculation in
+         *       another class, but maybe Particle should do something to control how its data are
+         *       updated.
+         */
         public:
             AlignedVector3d position;
             AlignedVector3d displacement;
@@ -38,7 +44,6 @@ namespace components
             AlignedVector3d acceleration;
         
         private:
-            // Here we assume we have less than 32768 particles
             int id_;
             static int global_id_;
             static int next_global_id_() {return global_id_++;}
