@@ -18,6 +18,7 @@ using components::Particle;
 SCENARIO( "Create and assign Particles" ) {
     AlignedVector3d position{1.618, 2.718, 3.142};
     AlignedVector3d velocity{-3, -4, 2};
+    AlignedVector3d acceleration{0, 0, -9.8};
 
     WHEN( "I create a default Particle" ) {
         Particle p;
@@ -30,14 +31,31 @@ SCENARIO( "Create and assign Particles" ) {
         }
     }
 
-    WHEN( "I create a Particle with some values" ) {
+    WHEN( "I create a Particle with position and velocity" ) {
         Particle q{position, velocity};
 
-        THEN( "Its entries match the values given" ) {
+        THEN( "The position and velocity match the values given" ) {
             REQUIRE( position == q.position() );
-            REQUIRE( q.displacement().isZero() );
             REQUIRE( velocity == q.velocity() );
+        }
+
+        THEN( "The acceleration and displacement are zero" ) {
             REQUIRE( q.acceleration().isZero() );
+            REQUIRE( q.displacement().isZero() );
+        }
+    }
+
+    WHEN( "I create a Particle with position, velocity, and acceleration" ) {
+        Particle q{position, velocity, acceleration};
+
+        THEN( "The position, velocity, and acceleration match the values given" ) {
+            REQUIRE( position     == q.position() );
+            REQUIRE( velocity     == q.velocity() );
+            REQUIRE( acceleration == q.acceleration() );
+        }
+
+        THEN( "The displacement is zero" ) {
+            REQUIRE( q.displacement().isZero() );
         }
     }
 

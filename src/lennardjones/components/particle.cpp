@@ -30,16 +30,21 @@ namespace components {
     int Particle::global_id_ = 0;
 
     // Constructors
-    Particle::Particle(AlignedVector3d position, AlignedVector3d velocity)
-        : position_{position}, velocity_{velocity},
-          displacement_{AlignedVector3d::Zero()}, acceleration_{AlignedVector3d::Zero()},
-          id_{next_global_id_()}
+    Particle::Particle(AlignedVector3d position,
+                       AlignedVector3d velocity,
+                       AlignedVector3d acceleration)
+        : position_{position}, velocity_{velocity}, acceleration_{acceleration},
+          displacement_{AlignedVector3d::Zero()}, id_{next_global_id_()}
+    {}
+
+    Particle::Particle()
+        : Particle::Particle(AlignedVector3d::Zero(), AlignedVector3d::Zero(),
+                             AlignedVector3d::Zero())
     {}
 
     Particle::Particle(const Particle & other)
         : position_{other.position_}, velocity_{other.velocity_},
-          displacement_{other.displacement_}, acceleration_{other.acceleration_},
-          id_{other.id_}
+          acceleration_{other.acceleration_}, displacement_{other.displacement_}, id_{other.id_}
     {}
 
     Particle & Particle::operator=(const Particle & other)
