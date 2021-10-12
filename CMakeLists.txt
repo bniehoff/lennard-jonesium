@@ -10,10 +10,15 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/src
 )
 
+set(CMAKE_CXX_STANDARD 20)
+
 set(SOURCES
     src/lennardjones/greeter/greeter.hpp
     src/lennardjones/greeter/greeter.cpp
+    src/lennardjones/tools/aligned_vectors.hpp
+    src/lennardjones/tools/volume.hpp
     src/lennardjones/components/particle.hpp
+    src/lennardjones/components/particle.cpp
     src/lennardjones/components/cell.hpp
     src/lennardjones/components/cell.cpp
 )
@@ -23,7 +28,7 @@ set(TEST_SOURCES
     tests/lennardjones/components/test_particle.cpp
 )
 
-find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+find_package(Eigen3 3.4 REQUIRED NO_MODULE)
 
 if(SKBUILD)
     find_package(PythonExtensions REQUIRED)
@@ -31,8 +36,6 @@ if(SKBUILD)
 
     add_subdirectory(src/lennardjones)
 else()
-    set(CMAKE_SHARED_LIBRARY_PREFIX "")
-    
     include(CTest)
     enable_testing()
 

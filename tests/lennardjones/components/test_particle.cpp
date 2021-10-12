@@ -2,45 +2,48 @@
  * Test for class Particle
  */
 
+// #include <ranges>
+#include <list>
+#include <array>
+#include <ranges>
+
 #include <catch2/catch.hpp>
 #include <eigen3/Eigen/Dense>
 
-#include <lennardjones/components/particle.hpp>
+#include <src/lennardjones/tools/aligned_vectors.hpp>
+#include <src/lennardjones/components/particle.hpp>
 
-using Eigen::Vector3d;
 using components::Particle;
 
 SCENARIO( "Create and assign Particles" ) {
-    Vector3d position{1.618, 2.718, 3.142};
-    Vector3d displacement{11.618, 12.718, 13.142};
-    Vector3d velocity{-3, -4, 2};
-    Vector3d acceleration{0, 0, -9.8};
+    AlignedVector3d position{1.618, 2.718, 3.142};
+    AlignedVector3d velocity{-3, -4, 2};
 
     WHEN( "I create a default Particle" ) {
         Particle p;
 
         THEN( "Its entries are all zero" ) {
-            REQUIRE( p.position.isZero() );
-            REQUIRE( p.displacement.isZero() );
-            REQUIRE( p.velocity.isZero() );
-            REQUIRE( p.acceleration.isZero() );
+            REQUIRE( p.position().isZero() );
+            REQUIRE( p.displacement().isZero() );
+            REQUIRE( p.velocity().isZero() );
+            REQUIRE( p.acceleration().isZero() );
         }
     }
 
     WHEN( "I create a Particle with some values" ) {
-        Particle q{position, displacement, velocity, acceleration};
+        Particle q{position, velocity};
 
         THEN( "Its entries match the values given" ) {
-            REQUIRE( position == q.position );
-            REQUIRE( displacement == q.displacement );
-            REQUIRE( velocity == q.velocity );
-            REQUIRE( acceleration == q.acceleration );
+            REQUIRE( position == q.position() );
+            REQUIRE( q.displacement().isZero() );
+            REQUIRE( velocity == q.velocity() );
+            REQUIRE( q.acceleration().isZero() );
         }
     }
 
     WHEN( "I assign one Particle to another" ) {
         Particle p;
-        Particle q{position, displacement, velocity, acceleration};
+        Particle q{position, velocity};
 
         p = q;
 
@@ -53,17 +56,17 @@ SCENARIO( "Create and assign Particles" ) {
         }
 
         THEN( "The Particles' values match" ) {
-            REQUIRE( q.position == p.position );
-            REQUIRE( q.displacement == p.displacement );
-            REQUIRE( q.velocity == p.velocity );
-            REQUIRE( q.acceleration == p.acceleration );
+            REQUIRE( q.position()     == p.position()     );
+            REQUIRE( q.displacement() == p.displacement() );
+            REQUIRE( q.velocity()     == p.velocity()     );
+            REQUIRE( q.acceleration() == p.acceleration() );
         }
     }
 
     WHEN( "I create several Particles" ) {
         Particle::reset_global_id();
         Particle p1, p2, p3, p4, p5;
-        Particle q{position, displacement, velocity, acceleration};
+        Particle q{position, velocity};
 
         THEN( "They are assigned IDs in sequence starting from zero" ) {
             REQUIRE( 0 == p1.id() );
@@ -72,6 +75,41 @@ SCENARIO( "Create and assign Particles" ) {
             REQUIRE( 3 == p4.id() );
             REQUIRE( 4 == p5.id() );
             REQUIRE( 5 == q.id() );
+        }
+    }
+}
+
+/**
+ * This "test" is really just for myself to understand how to std::list<Particle*>
+ */
+SCENARIO( "Lists and move semantics" ) {
+    // First create a global vector of 10 particles by id
+    const int particle_count{10};
+
+    // Need to make sure the Particles are numbered 0 through 9 every time the Scenario resets
+    Particle::reset_global_id();
+    std::array<Particle, particle_count> master_array;
+
+    WHEN( "I check the ID of each particle" ) {
+        THEN( "It matches its index in the master list" ) {
+            for(auto i : std::views::iota(0, particle_count)) {
+                REQUIRE( i == master_array[i].id() );
+            }
+        }
+    }
+
+    WHEN( "I add some particles to a list" ) {
+        std::list<Particle*> cell_list;
+        std::vector<int> indices{3, 1, 9, 6, 7};
+
+        for(auto i : indices) {
+            cell_list.push_back(&master_array[i]);
+        }
+
+        THEN( "Their IDs refer to their positions in the master list" ) {
+            for(auto p : cell_list) {
+                REQUIRE( p == &master_array[p->id()] );
+            }
         }
     }
 }

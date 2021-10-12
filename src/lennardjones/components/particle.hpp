@@ -23,73 +23,51 @@
 #ifndef LJ_PARTICLE_HPP
 #define LJ_PARTICLE_HPP
 
-#include <eigen3/Eigen/Dense>
-
-using Eigen::Vector3d;
+#include <lennardjones/tools/aligned_vectors.hpp>
 
 namespace components
 {
     class Particle
     {
-        public:
-            Vector3d position;
-            Vector3d displacement;
-            Vector3d velocity;
-            Vector3d acceleration;
-        
         private:
-            // Here we assume we have less than 32768 particles
-            int id_;
+            AlignedVector3d position_;      // position with boundary conditions applied
+            AlignedVector3d velocity_;      // velocity
+            AlignedVector3d acceleration_;  // force or acceleration (mass normalized to 1)
+            AlignedVector3d displacement_;  // total displacement ignoring boundary conditions
+        
+            int id_;                        // index of this particle in master list
+
             static int global_id_;
-            static int next_global_id_() {return global_id_++;}
+            static int next_global_id_() { return global_id_++; }
         
         public:
-            // Constructor simply accepts the values given
-            Particle(Vector3d p, Vector3d d, Vector3d v, Vector3d a)
-                : position(p), displacement(d), velocity(v), acceleration(a), id_(next_global_id_())
+            // Constructors
+            Particle(AlignedVector3d position, AlignedVector3d velocity);
+
+            Particle() : Particle(AlignedVector3d::Zero(), AlignedVector3d::Zero())
             {}
 
-            // Default constructor sets all to zero (delegate to standard constructor)
-            Particle()
-                : Particle{Vector3d::Zero(), Vector3d::Zero(), Vector3d::Zero(), Vector3d::Zero()}
-            {}
+            Particle(const Particle &);
 
-            // Getter for the ID number
-            int id() const {return id_;}
+            Particle & operator=(const Particle &);
 
-            // Manipulate the global ID count if needed
-            static void set_global_id(int id) {global_id_ = id;}
-            static void reset_global_id() {set_global_id(0);}
+            // Getters
+            const AlignedVector3d & position()     const { return position_;     }
+            const AlignedVector3d & velocity()     const { return velocity_;     }
+            const AlignedVector3d & acceleration() const { return acceleration_; }
+            const AlignedVector3d & displacement() const { return displacement_; }
+
+            int id() const { return id_; }
 
             /**
-             * Although particles have a unique ID and will be "moved" between Cells, they actually
-             * need to be copied to a new memory location, so that they will continue to be local
-             * in memory to the other particles in their new Cell.  So we define a copy constructor
-             * and copy assignment
+             * TODO: Need some way to increment the position and automatically stay within
+             * boundary, if given.  Also think how this might interact with force calculation?
              */
-            
-            // Copy constructor
-            Particle(const Particle & other)
-                : position(other.position), displacement(other.displacement),
-                  velocity(other.velocity), acceleration(other.acceleration),
-                  id_(other.id_)
-            {}
 
-            // Copy assignment
-            Particle & operator=(const Particle & other)
-            {
-                position = other.position;
-                displacement = other.displacement;
-                velocity = other.velocity;
-                acceleration = other.acceleration;
-                id_ = other.id_;
-
-                return *this;
-            }
+            // Manipulate the global ID count if needed
+            static void set_global_id(int id) { global_id_ = id; }
+            static void reset_global_id() { set_global_id(0); }
     };
-
-    // Initialize the Particle ID counter
-    int Particle::global_id_ = 0;
 }
 
 #endif
