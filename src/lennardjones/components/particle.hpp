@@ -42,10 +42,11 @@ namespace components
         
         public:
             // Constructors
-            Particle(AlignedVector3d position, AlignedVector3d velocity);
+            Particle(AlignedVector3d position,
+                     AlignedVector3d velocity,
+                     AlignedVector3d acceleration = AlignedVector3d::Zero());
 
-            Particle() : Particle(AlignedVector3d::Zero(), AlignedVector3d::Zero())
-            {}
+            Particle();
 
             Particle(const Particle &);
 
