@@ -98,7 +98,7 @@ SCENARIO( "Create and assign Particles" ) {
 }
 
 /**
- * This "test" is really just for myself to understand how to std::list<Particle*>
+ * This "test" is really just for myself to understand how to use std::list<Particle*>
  */
 SCENARIO( "Lists and move semantics" ) {
     // First create a global vector of 10 particles by id
