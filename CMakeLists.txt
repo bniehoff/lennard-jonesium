@@ -16,7 +16,9 @@ set(SOURCES
     src/lennardjones/greeter/greeter.hpp
     src/lennardjones/greeter/greeter.cpp
     src/lennardjones/tools/aligned_vectors.hpp
+    src/lennardjones/tools/volume.hpp
     src/lennardjones/components/particle.hpp
+    src/lennardjones/components/particle.cpp
     src/lennardjones/components/cell.hpp
     src/lennardjones/components/cell.cpp
 )
