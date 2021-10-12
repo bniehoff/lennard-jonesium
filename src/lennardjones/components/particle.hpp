@@ -48,10 +48,6 @@ namespace components
 
             Particle();
 
-            Particle(const Particle &);
-
-            Particle & operator=(const Particle &);
-
             // Getters
             const AlignedVector3d & position()     const { return position_;     }
             const AlignedVector3d & velocity()     const { return velocity_;     }

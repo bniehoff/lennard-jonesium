@@ -41,20 +41,4 @@ namespace components {
         : Particle::Particle(AlignedVector3d::Zero(), AlignedVector3d::Zero(),
                              AlignedVector3d::Zero())
     {}
-
-    Particle::Particle(const Particle & other)
-        : position_{other.position_}, velocity_{other.velocity_},
-          acceleration_{other.acceleration_}, displacement_{other.displacement_}, id_{other.id_}
-    {}
-
-    Particle & Particle::operator=(const Particle & other)
-    {
-        position_ = other.position_;
-        velocity_ = other.velocity_;
-        displacement_ = other.displacement_;
-        acceleration_ = other.acceleration_;
-        id_ = other.id_;
-        
-        return *this;
-    }
 }
