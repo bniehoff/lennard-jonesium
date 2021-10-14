@@ -48,10 +48,6 @@ namespace components
 
             Particle();
 
-            Particle(const Particle &);
-
-            Particle & operator=(const Particle &);
-
             // Getters
             const AlignedVector3d & position()     const { return position_;     }
             const AlignedVector3d & velocity()     const { return velocity_;     }
@@ -60,10 +56,17 @@ namespace components
 
             int id() const { return id_; }
 
-            /**
-             * TODO: Need some way to increment the position and automatically stay within
-             * boundary, if given.  Also think how this might interact with force calculation?
-             */
+            // Change the internal state by some delta
+            Particle & increment_position(AlignedVector3d delta);
+            Particle & increment_velocity(AlignedVector3d delta);
+            Particle & increment_acceleration(AlignedVector3d delta);
+
+            // Reset internal state
+            Particle & reset_displacement();
+            Particle & reset_acceleration();
+
+            // Scale velocity (for temperature adjustment)
+            Particle & scale_velocity(double scale);
 
             // Manipulate the global ID count if needed
             static void set_global_id(int id) { global_id_ = id; }

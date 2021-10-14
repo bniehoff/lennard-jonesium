@@ -97,8 +97,86 @@ SCENARIO( "Create and assign Particles" ) {
     }
 }
 
+SCENARIO( "Particle motion" ) {
+    // Create a Particle with some initial conditions
+    AlignedVector3d position{0, 0, 0};
+    AlignedVector3d velocity{0, 0, 0};
+    AlignedVector3d acceleration{0, 0, 0};
+    AlignedVector3d displacement{0, 0, 0};
+
+    AlignedVector3d delta{1.618, -2.718, 3.142};
+
+    Particle::reset_global_id();
+    Particle p{position, velocity, acceleration};
+
+    WHEN( "I increment the position" ) {
+        p.increment_position(delta);
+
+        THEN( "Both the position and displacement are incremented" ) {
+                REQUIRE( delta == p.position() );
+                REQUIRE( delta == p.displacement() );
+                REQUIRE( p.velocity().isZero() );
+                REQUIRE( p.acceleration().isZero() );
+        }
+    }
+
+    WHEN( "I increment the velocity" ) {
+        p.increment_velocity(delta);
+
+        THEN( "The velocity is incremented" ) {
+            REQUIRE( delta == p.velocity() );
+            REQUIRE( p.position().isZero() );
+            REQUIRE( p.displacement().isZero() );
+            REQUIRE( p.acceleration().isZero() );
+        }
+    }
+
+    WHEN( "I increment the acceleration" ) {
+        p.increment_acceleration(delta);
+
+        THEN( "The acceleration is incremented" ) {
+            REQUIRE( delta == p.acceleration() );
+            REQUIRE( p.position().isZero() );
+            REQUIRE( p.displacement().isZero() );
+            REQUIRE( p.velocity().isZero() );
+        }
+    }
+
+    WHEN( "I move the particle and then reset the displacement" ) {
+        p.increment_position(delta);
+        p.reset_displacement();
+
+        THEN( "The displacement is reset, but the position is unaffected" ) {
+            REQUIRE( delta == p.position() );
+            REQUIRE( p.displacement().isZero() );
+        }
+    }
+
+    WHEN( "I increment and then reset the acceleration" ) {
+        p.increment_acceleration(delta);
+        p.reset_acceleration();
+
+        THEN( "The acceleration is reset" ) {
+            REQUIRE( p.acceleration().isZero() );
+        }
+    }
+
+    WHEN( "I scale the velocity" ) {
+        double scale{5.0};
+
+        p.increment_velocity(delta);
+        p.scale_velocity(scale);
+
+        THEN( "The velocity is rescaled" ) {
+            REQUIRE( scale * delta == p.velocity() );
+        }
+    }
+}
+
 /**
- * This "test" is really just for myself to understand how to std::list<Particle*>
+ * This "test" is really just for myself to understand how to use std::list<Particle*>
+ * 
+ * TODO: Remove
  */
 SCENARIO( "Lists and move semantics" ) {
     // First create a global vector of 10 particles by id
