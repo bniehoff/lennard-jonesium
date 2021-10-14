@@ -41,4 +41,49 @@ namespace components {
         : Particle::Particle(AlignedVector3d::Zero(), AlignedVector3d::Zero(),
                              AlignedVector3d::Zero())
     {}
+
+    // Incrementers
+    Particle & Particle::increment_position(AlignedVector3d delta)
+    {
+        // Both the position and total displacement should be updated
+        position_ += delta;
+        displacement_ += delta;
+
+        return *this;
+    }
+
+    Particle & Particle::increment_velocity(AlignedVector3d delta)
+    {
+        velocity_ += delta;
+
+        return *this;
+    }
+
+    Particle & Particle::increment_acceleration(AlignedVector3d delta)
+    {
+        acceleration_ += delta;
+
+        return *this;
+    }
+
+    Particle & Particle::reset_acceleration()
+    {
+        acceleration_ = AlignedVector3d::Zero();
+
+        return *this;
+    }
+
+    Particle & Particle::reset_displacement()
+    {
+        displacement_ = AlignedVector3d::Zero();
+
+        return *this;
+    }
+
+    Particle & Particle::scale_velocity(double scale)
+    {
+        velocity_ *= scale;
+
+        return *this;
+    }
 }
