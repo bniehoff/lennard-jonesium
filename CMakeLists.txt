@@ -19,6 +19,7 @@ set(SOURCES
     src/lennardjones/tools/volume.hpp
     src/lennardjones/engine/system_state.hpp
     src/lennardjones/engine/system_state.cpp
+    src/lennardjones/engine/integrator.hpp
 )
 
 set(TEST_SOURCES
