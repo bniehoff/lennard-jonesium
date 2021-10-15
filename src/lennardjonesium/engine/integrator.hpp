@@ -23,7 +23,7 @@
 #ifndef LJ_INTEGRATOR_HPP
 #define LJ_INTEGRATOR_HPP
 
-#include <lennardjones/engine/system_state.hpp>
+#include <lennardjonesium/engine/system_state.hpp>
 
 namespace engine {
     class Integrator {
