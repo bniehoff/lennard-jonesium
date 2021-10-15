@@ -24,6 +24,7 @@ set(SOURCES
 )
 
 set(TEST_SOURCES
+    tests/eigen/test_eigen.cpp
     tests/lennardjones/greeter/test_greeter.cpp
     tests/lennardjones/components/test_particle.cpp
 )
