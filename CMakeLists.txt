@@ -17,17 +17,12 @@ set(SOURCES
     src/lennardjones/greeter/greeter.cpp
     src/lennardjones/tools/aligned_vectors.hpp
     src/lennardjones/tools/volume.hpp
-    src/lennardjones/components/particle.hpp
-    src/lennardjones/components/particle.cpp
-    src/lennardjones/components/cell.hpp
-    src/lennardjones/components/cell.cpp
     src/lennardjones/engine/system_state.hpp
 )
 
 set(TEST_SOURCES
     tests/eigen/test_eigen.cpp
     tests/lennardjones/greeter/test_greeter.cpp
-    tests/lennardjones/components/test_particle.cpp
     tests/lennardjones/engine/test_system_state.cpp
 )
 
