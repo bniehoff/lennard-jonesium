@@ -20,7 +20,7 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include <lennardjones/engine/system_state.hpp>
+#include <lennardjonesium/engine/system_state.hpp>
 
 namespace engine {
     SystemState& SystemState::set_particle_count(int particle_count)
