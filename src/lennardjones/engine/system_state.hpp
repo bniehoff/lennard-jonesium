@@ -42,24 +42,13 @@ namespace engine {
         Matrix4Xd accelerations;
         Matrix4Xd displacements;
 
-        SystemState() = default;
+        /**
+         * The argument specifies the size of the system, not any of the data in it, so we use
+         * explicit to make sure this constructor can't be used for implicit conversions from int.
+         */
+        explicit SystemState(int particle_count = 0) { set_particle_count(particle_count); }
 
-        SystemState(int particle_count) { set_particle_count(particle_count); }
-
-        SystemState & set_particle_count(int particle_count)
-        {
-            /**
-             * Create initial SystemState with all entries set to zero.  The particle count is not
-             * known until runtime, so we can't use a template class.
-             */
-
-            positions.setZero(4, particle_count);
-            velocities.setZero(4, particle_count);
-            accelerations.setZero(4, particle_count);
-            displacements.setZero(4, particle_count);
-
-            return *this;
-        }
+        SystemState& set_particle_count(int particle_count);
     };
 }
 

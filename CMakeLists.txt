@@ -18,6 +18,7 @@ set(SOURCES
     src/lennardjones/tools/aligned_vectors.hpp
     src/lennardjones/tools/volume.hpp
     src/lennardjones/engine/system_state.hpp
+    src/lennardjones/engine/system_state.cpp
 )
 
 set(TEST_SOURCES
