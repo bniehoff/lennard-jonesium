@@ -1,5 +1,5 @@
 /**
- * state_machine.cpp
+ * thermostat.cpp
  * 
  * Copyright (c) 2021 Benjamin E. Niehoff
  * 
