@@ -1,5 +1,5 @@
 /**
- * cell.cpp
+ * system_state.hpp
  * 
  * Copyright (c) 2021 Benjamin E. Niehoff
  * 
@@ -19,3 +19,22 @@
  * License along with Lennard-Jones-Particles.  If not, see
  * <https://www.gnu.org/licenses/>.
  */
+
+#include <lennardjones/engine/system_state.hpp>
+
+namespace engine {
+    SystemState& SystemState::set_particle_count(int particle_count)
+    {
+        /**
+         * Create initial SystemState with all entries set to zero.  The particle count is not
+         * known until runtime, so we can't use a template class.
+         */
+
+        positions    .setZero(4, particle_count);
+        velocities   .setZero(4, particle_count);
+        accelerations.setZero(4, particle_count);
+        displacements.setZero(4, particle_count);
+
+        return *this;
+    }
+}

@@ -37,10 +37,9 @@ namespace tools {
         
         public:
             /**
-             * TODO: Should we take two points in space, and construct the volume that they span,
-             * or should we take the origin and the dimensions directly?
+             * We construct a Volume in space from an origin and dimensions.
              */
-            Volume(AlignedVector3d, AlignedVector3d);
+            Volume(AlignedVector3d origin, AlignedVector3d dimensions);
 
             Volume() : Volume(AlignedVector3d::Zero(), AlignedVector3d::Zero())
             {}

@@ -17,18 +17,21 @@ set(SOURCES
     src/lennardjones/greeter/greeter.cpp
     src/lennardjones/tools/aligned_vectors.hpp
     src/lennardjones/tools/volume.hpp
-    src/lennardjones/components/particle.hpp
-    src/lennardjones/components/particle.cpp
-    src/lennardjones/components/cell.hpp
-    src/lennardjones/components/cell.cpp
+    src/lennardjones/engine/system_state.hpp
+    src/lennardjones/engine/system_state.cpp
 )
 
 set(TEST_SOURCES
+    tests/eigen/test_eigen.cpp
     tests/lennardjones/greeter/test_greeter.cpp
-    tests/lennardjones/components/test_particle.cpp
+    tests/lennardjones/engine/test_system_state.cpp
 )
 
 find_package(Eigen3 3.4 REQUIRED NO_MODULE)
+
+# This option enables vectorization for Eigen
+# TODO: Make this more portable for different compilers
+add_compile_options(-march=native)
 
 if(SKBUILD)
     find_package(PythonExtensions REQUIRED)
