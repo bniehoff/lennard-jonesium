@@ -28,6 +28,10 @@ set(TEST_SOURCES
 
 find_package(Eigen3 3.4 REQUIRED NO_MODULE)
 
+# This option enables vectorization for Eigen
+# TODO: Make this more portable for different compilers
+add_compile_options(-march=native)
+
 if(SKBUILD)
     find_package(PythonExtensions REQUIRED)
     find_package(Cython REQUIRED)
