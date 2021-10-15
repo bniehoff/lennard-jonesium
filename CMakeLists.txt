@@ -13,18 +13,19 @@ include_directories(
 set(CMAKE_CXX_STANDARD 20)
 
 set(SOURCES
-    src/lennardjones/greeter/greeter.hpp
-    src/lennardjones/greeter/greeter.cpp
-    src/lennardjones/tools/aligned_vectors.hpp
-    src/lennardjones/tools/volume.hpp
-    src/lennardjones/engine/system_state.hpp
-    src/lennardjones/engine/system_state.cpp
+    src/lennardjonesium/greeter/greeter.hpp
+    src/lennardjonesium/greeter/greeter.cpp
+    src/lennardjonesium/tools/aligned_vectors.hpp
+    src/lennardjonesium/tools/volume.hpp
+    src/lennardjonesium/engine/system_state.hpp
+    src/lennardjonesium/engine/system_state.cpp
+    src/lennardjonesium/engine/integrator.hpp
 )
 
 set(TEST_SOURCES
     tests/eigen/test_eigen.cpp
-    tests/lennardjones/greeter/test_greeter.cpp
-    tests/lennardjones/engine/test_system_state.cpp
+    tests/lennardjonesium/greeter/test_greeter.cpp
+    tests/lennardjonesium/engine/test_system_state.cpp
 )
 
 find_package(Eigen3 3.4 REQUIRED NO_MODULE)
@@ -37,7 +38,7 @@ if(SKBUILD)
     find_package(PythonExtensions REQUIRED)
     find_package(Cython REQUIRED)
 
-    add_subdirectory(src/lennardjones)
+    add_subdirectory(src/lennardjonesium)
 else()
     include(CTest)
     enable_testing()

@@ -10,12 +10,12 @@ pytest_runner = (['pytest-runner>=2.0,<3dev']
 setup_requires = pytest_runner
 
 setup(
-    name="lennardjones",
+    name="lennardjonesium",
     version="0.0.1",
-    description="A simulator for Lennard-Jones particles",
+    description="A simulator for the Lennard-Jones substance",
     author='Ben Niehoff',
     license="GPL v3.0",
-    packages=['lennardjones'],
+    packages=['lennardjonesium'],
     package_dir = {'': 'src'},
     install_requires=['cython'],
     tests_require=['pytest'],

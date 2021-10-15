@@ -7,7 +7,7 @@
 #include <catch2/catch.hpp>
 #include <Eigen/Dense>
 
-#include <src/lennardjones/engine/system_state.hpp>
+#include <src/lennardjonesium/engine/system_state.hpp>
 
 using Eigen::Matrix4Xd;
 using Eigen::Vector4d;

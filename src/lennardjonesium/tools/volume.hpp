@@ -23,7 +23,7 @@
 #ifndef LJ_VOLUME_HPP
 #define LJ_VOLUME_HPP
 
-#include <lennardjones/tools/aligned_vectors.hpp>
+#include <lennardjonesium/tools/aligned_vectors.hpp>
 
 namespace tools {
     class Volume {
