@@ -48,6 +48,9 @@ namespace engine {
          */
         explicit SystemState(int particle_count = 0) { set_particle_count(particle_count); }
 
+        /**
+         * This both sets the particle count AND initializes all data to zero.
+         */
         SystemState& set_particle_count(int particle_count);
     };
 }
