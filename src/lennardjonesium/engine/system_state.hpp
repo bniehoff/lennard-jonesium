@@ -37,10 +37,10 @@ namespace engine {
          * with += to work nicely).
          */
 
-        Matrix4Xd positions;
-        Matrix4Xd velocities;
-        Matrix4Xd accelerations;
-        Matrix4Xd displacements;
+        Matrix4Xd positions;        // Position within the bounding box
+        Matrix4Xd velocities;       // Velocity
+        Matrix4Xd accelerations;    // Force or acceleration, since mass is normalized to 1
+        Matrix4Xd displacements;    // Total displacement ignoring boundary conditions
 
         /**
          * The argument specifies the size of the system, not any of the data in it, so we use

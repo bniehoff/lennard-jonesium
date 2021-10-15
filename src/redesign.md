@@ -38,7 +38,6 @@ might be divided between distinct units.
 6. A way to log relevant data to a file (thermo measurements and maybe particle trajectories)
 7. Maybe a way to parallelize for very large simulations.
 
-We want to separate concerns as much as possible:
-
-- Integrator: Will handle Velocity-Verlet updates to positions and velocities
-- Force Law
+Another problem: Some of the thermodynamic measurements (potential energy and virial) require the
+pairwise interactions, and therefore should be done during the force calculation step.  How can we
+separate concerns while allowing this to happen?
