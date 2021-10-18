@@ -43,4 +43,10 @@ namespace engine {
 
         return *this;
     }
+
+    SystemState& operator|
+        (SystemState& state, std::function<SystemState& (SystemState&)> operation)
+    {
+        return operation(state);
+    }
 }

@@ -23,6 +23,8 @@
 #ifndef LJ_SYSTEM_STATE_HPP
 #define LJ_SYSTEM_STATE_HPP
 
+#include <functional>
+
 #include <Eigen/Dense>
 
 using Eigen::Matrix4Xd;
@@ -63,6 +65,13 @@ namespace engine {
          * This both sets the particle count AND initializes all array data to zero.
          */
         SystemState& set_particle_count(int particle_count);
+
+        /**
+         * This will allow us to "pipe" some operations together.  Note that it remains left-
+         * associative; it does not try to compose all of the piped functions into a single
+         * operation.
+         */
+        friend SystemState& operator| (SystemState&, std::function<SystemState& (SystemState&)>);
     };
 }
 
