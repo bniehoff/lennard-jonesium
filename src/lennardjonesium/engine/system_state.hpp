@@ -69,7 +69,7 @@ namespace engine {
         /**
          * This will allow us to "pipe" some operations together.  Note that it remains left-
          * associative; it does not try to compose all of the piped functions into a single
-         * operation.
+         * operation.  This is actually what we want anyway.
          */
         friend SystemState& operator| (SystemState&, std::function<SystemState& (SystemState&)>);
     };
