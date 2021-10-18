@@ -20,6 +20,8 @@ set(SOURCES
     src/lennardjonesium/engine/system_state.hpp
     src/lennardjonesium/engine/system_state.cpp
     src/lennardjonesium/engine/integrator.hpp
+    src/lennardjonesium/engine/velocity_verlet_integrator.hpp
+    src/lennardjonesium/engine/velocity_verlet_integrator.cpp
 )
 
 set(TEST_SOURCES
@@ -30,7 +32,7 @@ set(TEST_SOURCES
 
 find_package(Eigen3 3.4 REQUIRED NO_MODULE)
 
-# This option enables vectorization for Eigen
+# This option enables vectorization for Eigen in GCC and Clang
 # TODO: Make this more portable for different compilers
 add_compile_options(-march=native)
 

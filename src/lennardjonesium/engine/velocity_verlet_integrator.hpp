@@ -1,5 +1,5 @@
 /**
- * system_state.cpp
+ * velocity_verlet_integrator.hpp
  * 
  * Copyright (c) 2021 Benjamin E. Niehoff
  * 
@@ -20,33 +20,20 @@
  * <https://www.gnu.org/licenses/>.
  */
 
+#ifndef LJ_VELOCITY_VERLET_INTEGRATOR_HPP
+#define LJ_VELOCITY_VERLET_INTEGRATOR_HPP
+
+#include <lennardjonesium/engine/integrator.hpp>
 #include <lennardjonesium/engine/system_state.hpp>
 
 namespace engine {
-    SystemState::SystemState(int particle_count)
-        : kinetic_energy{0}, potential_energy{0}, virial{0}
-    {
-        set_particle_count(particle_count);
-    }
-
-    SystemState& SystemState::set_particle_count(int particle_count)
-    {
-        /**
-         * Create initial SystemState with all entries set to zero.  The particle count is not
-         * known until runtime, so we can't use a template class.
-         */
-
-        positions.setZero(4, particle_count);
-        velocities.setZero(4, particle_count);
-        displacements.setZero(4, particle_count);
-        forces.setZero(4, particle_count);
-
-        return *this;
-    }
-
-    SystemState& operator|
-        (SystemState& state, std::function<SystemState& (SystemState&)> operation)
-    {
-        return operation(state);
-    }
+    class VelocityVerletIntegrator : public Integrator {
+        public:
+            /**
+             * Evolves time by one time step.
+             */
+            virtual SystemState& forward_step(SystemState&) override;
+    };
 }
+
+#endif

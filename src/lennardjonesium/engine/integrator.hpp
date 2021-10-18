@@ -48,7 +48,7 @@ namespace engine {
             /**
              * Evolves time by one time step.  Must be given concrete implementation.
              */
-            virtual Integrator& forward_step(SystemState&) = 0;
+            virtual SystemState& forward_step(SystemState&) = 0;
     };
 }
 
