@@ -1,5 +1,5 @@
 /**
- * integrator.cpp
+ * velocity_verlet_integrator.cpp
  * 
  * Copyright (c) 2021 Benjamin E. Niehoff
  * 
@@ -19,3 +19,17 @@
  * License along with Lennard-Jones-Particles.  If not, see
  * <https://www.gnu.org/licenses/>.
  */
+
+#include <lennardjonesium/engine/velocity_verlet_integrator.hpp>
+#include <lennardjonesium/engine/system_state.hpp>
+
+namespace engine {
+    SystemState& VelocityVerletIntegrator::forward_step(SystemState& state)
+    {
+        /**
+         * TODO: Implement Velocity Verlet algorithm
+         */
+
+        return state;
+    }
+}

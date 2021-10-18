@@ -43,7 +43,7 @@ SCENARIO( "Representing the system state" ) {
         int count = 7;
         SystemState s(count);
 
-        for (auto i : std::views::iota(0, count)) {
+        for (const auto i : std::views::iota(0, count)) {
             s.positions.col(i) = Vector4d{i + 0.0, i + 1.0, i + 2.0, i + 3.0};
         }
 
