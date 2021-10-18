@@ -27,8 +27,24 @@ namespace engine {
     SystemState& VelocityVerletIntegrator::forward_step(SystemState& state)
     {
         /**
-         * TODO: Implement Velocity Verlet algorithm
+         * The Velocity Verlet algorithm splits the integration into two half-steps, with the
+         * force calculation in between.
          */
+
+        // First increment the velocities by half a time step:
+        state.velocities += (1./2.) * state.forces * timestep_;
+
+        // With the half-incremented velocities, give the positions a full increment:
+        state.positions += state.velocities * timestep_;
+
+        // Now with the new positions, compute the new forces (TODO)
+        // compute_forces(state)
+
+        // Finally, with the new forces, increment the velocities by a second half-step:
+        state.velocities += (1./2.) * state.forces * timestep_;
+
+        // Also, now that the velocities are fully updated, we should compute the kinetic energy:
+        // compute_kinetic_energy(state)
 
         return state;
     }
