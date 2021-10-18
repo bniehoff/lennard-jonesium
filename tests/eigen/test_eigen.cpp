@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <ranges>
+#include <tuple>
 
 #include <catch2/catch.hpp>
 #include <Eigen/Dense>
@@ -106,4 +107,18 @@ SCENARIO( "Cross products" ) {
             REQUIRE( Vector4i::UnitZ() == abc.col(2) );
         }
     }
+}
+
+SCENARIO( "Structured bindings" ) {
+    WHEN( "I assign variables from a tuple" ) {
+        std::tuple<int, double, char> t{3, 9.8, 'q'};
+
+        auto [a, b, c] = t;
+
+        THEN( "I get the expected values" ) {
+            REQUIRE( 3 == a );
+            REQUIRE( 9.8 == b );
+            REQUIRE( 'q' == c );
+        }
+    } 
 }

@@ -37,19 +37,30 @@ namespace engine {
          * with += to work nicely).
          */
 
-        Matrix4Xd positions;
-        Matrix4Xd velocities;
-        Matrix4Xd accelerations;
-        Matrix4Xd displacements;
+        // Kinematic quantities (properties of the motion itself)
+        Matrix4Xd positions;        // Position within the bounding box
+        Matrix4Xd velocities;       // Velocity
+        Matrix4Xd displacements;    // Total displacement ignoring boundary conditions
+        double kinetic_energy;
+
+        // Dynamic quantities (arising from the interactions between particles)
+        Matrix4Xd forces;           // Force or acceleration, since mass is normalized to 1
+        double potential_energy;    // Potential energy from particle interactions
+        double virial;              // Virial from pairwise forces
+
+        /**
+         * TODO: Consider defining kinetic energy tensor and virial tensor, which can be used
+         * to compute shear stresses as well as pressure.
+         */
 
         /**
          * The argument specifies the size of the system, not any of the data in it, so we use
          * explicit to make sure this constructor can't be used for implicit conversions from int.
          */
-        explicit SystemState(int particle_count = 0) { set_particle_count(particle_count); }
+        explicit SystemState(int particle_count = 0);
 
         /**
-         * This both sets the particle count AND initializes all data to zero.
+         * This both sets the particle count AND initializes all array data to zero.
          */
         SystemState& set_particle_count(int particle_count);
     };

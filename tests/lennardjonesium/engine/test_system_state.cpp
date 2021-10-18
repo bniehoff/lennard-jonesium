@@ -21,7 +21,7 @@ SCENARIO( "Representing the system state" ) {
         THEN( "It has the expected number of particles" ) {
             REQUIRE( 7 == s.positions.cols() );
             REQUIRE( 7 == s.velocities.cols() );
-            REQUIRE( 7 == s.accelerations.cols() );
+            REQUIRE( 7 == s.forces.cols() );
             REQUIRE( 7 == s.displacements.cols() );
         }
     }
@@ -34,7 +34,7 @@ SCENARIO( "Representing the system state" ) {
         THEN( "It has the expected number of particles" ) {
             REQUIRE( 7 == s.positions.cols() );
             REQUIRE( 7 == s.velocities.cols() );
-            REQUIRE( 7 == s.accelerations.cols() );
+            REQUIRE( 7 == s.forces.cols() );
             REQUIRE( 7 == s.displacements.cols() );
         }
     }
