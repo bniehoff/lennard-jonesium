@@ -45,8 +45,8 @@ namespace engine {
     }
 
     SystemState& operator|
-        (SystemState& state, std::function<SystemState& (SystemState&)> operation)
+        (SystemState& state, SystemState::Operator state_operator)
     {
-        return operation(state);
+        return state_operator(state);
     }
 }

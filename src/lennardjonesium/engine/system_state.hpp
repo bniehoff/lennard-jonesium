@@ -31,6 +31,9 @@ using Eigen::Matrix4Xd;
 
 namespace engine {
     struct SystemState {
+        // It will be useful to talk about functions acting on the SystemState
+        typedef std::function<SystemState& (SystemState&)> Operator;
+
         /**
          * We use 4xN matrices so that each of the columns will be aligned for vectorization.
          * 
@@ -67,11 +70,11 @@ namespace engine {
         SystemState& set_particle_count(int particle_count);
 
         /**
-         * This will allow us to "pipe" some operations together.  Note that it remains left-
+         * These will allow us to "pipe" some operations together.  Note that it remains left-
          * associative; it does not try to compose all of the piped functions into a single
          * operation.  This is actually what we want anyway.
          */
-        friend SystemState& operator| (SystemState&, std::function<SystemState& (SystemState&)>);
+        friend SystemState& operator| (SystemState&, Operator);
     };
 }
 
