@@ -74,4 +74,12 @@ SCENARIO( "Piping operations" ) {
             REQUIRE( Vector4d{0, 0, -8, 0} == s.velocities.col(0) );
         }
     }
+
+    WHEN( "I act with the identity operator" ) {
+        s | SystemState::identity_operator;
+
+        THEN( "I get back the state I started with" ) {
+            REQUIRE( Vector4d{0, 0, 0, 0} == s.velocities.col(0) );
+        }
+    }
 }

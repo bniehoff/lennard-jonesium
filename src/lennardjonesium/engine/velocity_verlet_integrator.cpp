@@ -24,7 +24,7 @@
 #include <lennardjonesium/engine/system_state.hpp>
 
 namespace engine {
-    SystemState& VelocityVerletIntegrator::forward_step(SystemState& state)
+    SystemState& VelocityVerletIntegrator::evolve_forward(SystemState& state)
     {
         /**
          * The Velocity Verlet algorithm splits the integration into two half-steps, with the
@@ -38,16 +38,13 @@ namespace engine {
         state.positions += state.velocities * timestep_;
 
         // Need to impose boundary conditions here
-        // boundary_conditions(state)
+        impose_boundary_conditions_(state);
 
-        // Now with the new positions, compute the new forces (TODO)
-        // compute_forces(state)
+        // Now with the new positions, compute the new forces
+        compute_interactions_(state);
 
         // Finally, with the new forces, increment the velocities by a second half-step:
         state.velocities += (1./2.) * state.forces * timestep_;
-
-        // Also, now that the velocities are fully updated, we should compute the kinetic energy:
-        // compute_kinetic_energy(state)
 
         return state;
     }
