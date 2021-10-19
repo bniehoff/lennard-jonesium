@@ -25,8 +25,6 @@
 
 #include <eigen3/Eigen/Dense>
 
-#include <lennardjonesium/engine/system_state.hpp>
-
 using Eigen::Vector4d;
 
 namespace engine {
