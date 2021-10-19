@@ -31,9 +31,6 @@ using Eigen::Matrix4Xd;
 
 namespace engine {
     struct SystemState {
-        // It will be useful to talk about functions acting on the SystemState
-        typedef std::function<SystemState& (SystemState&)> Operator;
-
         /**
          * We use 4xN matrices so that each of the columns will be aligned for vectorization.
          * 
@@ -68,6 +65,13 @@ namespace engine {
          * This both sets the particle count AND initializes all array data to zero.
          */
         SystemState& set_particle_count(int particle_count);
+
+
+        // It will be useful to talk about functions acting on the SystemState
+        typedef std::function<SystemState& (SystemState&)> Operator;
+
+        // SystemState Operator that does nothing
+        static SystemState& identity_operator(SystemState&);
 
         /**
          * These will allow us to "pipe" some operations together.  Note that it remains left-
