@@ -49,9 +49,7 @@ namespace engine {
                 SystemState::Operator impose_boundary_conditions = SystemState::identity_operator
             );
 
-            /**
-             * Evolves time by one time step.  Must be given concrete implementation.
-             */
+            // Evolves time by one time step.  Must be given concrete implementation.
             virtual SystemState& evolve_forward(SystemState&) = 0;
     };
 }
