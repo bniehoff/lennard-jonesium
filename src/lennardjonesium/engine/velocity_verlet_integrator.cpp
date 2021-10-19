@@ -37,6 +37,9 @@ namespace engine {
         // With the half-incremented velocities, give the positions a full increment:
         state.positions += state.velocities * timestep_;
 
+        // Need to impose boundary conditions here
+        // boundary_conditions(state)
+
         // Now with the new positions, compute the new forces (TODO)
         // compute_forces(state)
 
