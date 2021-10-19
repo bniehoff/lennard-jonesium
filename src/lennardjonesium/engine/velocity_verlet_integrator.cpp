@@ -37,6 +37,16 @@ namespace engine {
         // With the half-incremented velocities, give the positions a full increment:
         state.positions += state.velocities * timestep_;
 
+        /**
+         * TODO: It appears that we are gathering dependencies here that will make this class hard
+         * to test, is there anything better we can do?  It would be very nice if we could have
+         * the Integrator, Dynamics (force computation) and BoundaryConditions all be dependencies
+         * of another class which actually orchestrates the time stepping functionality.  The
+         * problem is that VelocityVerlet requires doing "half steps" with the force calculation
+         * in the middle, which makes it awkward to properly separate these concerns.  We need
+         * some kind of uniform interface.
+         */
+
         // Need to impose boundary conditions here
         // boundary_conditions(state)
 
