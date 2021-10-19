@@ -21,6 +21,7 @@ set(SOURCES
     src/lennardjonesium/engine/system_state.cpp
     src/lennardjonesium/engine/interaction.hpp
     src/lennardjonesium/engine/integrator.hpp
+    src/lennardjonesium/engine/integrator.cpp
     src/lennardjonesium/engine/velocity_verlet_integrator.hpp
     src/lennardjonesium/engine/velocity_verlet_integrator.cpp
 )

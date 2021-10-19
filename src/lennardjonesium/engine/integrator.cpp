@@ -1,5 +1,5 @@
 /**
- * velocity_verlet_integrator.hpp
+ * integrator.cpp
  * 
  * Copyright (c) 2021 Benjamin E. Niehoff
  * 
@@ -20,18 +20,21 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LJ_VELOCITY_VERLET_INTEGRATOR_HPP
-#define LJ_VELOCITY_VERLET_INTEGRATOR_HPP
+#include <Eigen/Dense>
 
 #include <lennardjonesium/engine/integrator.hpp>
 #include <lennardjonesium/engine/system_state.hpp>
 
-namespace engine {
-    class VelocityVerletIntegrator : public Integrator {
-        public:
-            // Evolves time by one step
-            virtual SystemState& evolve_forward(SystemState&) override;
-    };
-}
+using Eigen::Vector4d;
 
-#endif
+namespace engine {
+    Integrator::Integrator(
+        double timestep,
+        SystemState::Operator compute_interactions,
+        SystemState::Operator impose_boundary_conditions
+    )
+        : timestep_{timestep},
+          compute_interactions_{compute_interactions},
+          impose_boundary_conditions_{impose_boundary_conditions}
+    {}
+}

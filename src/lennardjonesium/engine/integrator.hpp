@@ -28,22 +28,31 @@
 namespace engine {
     class Integrator {
         /**
-         * An Integrator acts on the SystemState via the method forward_step(), which increments
-         * the SystemStep by one time step.  There are many different integrator strategies one
+         * An Integrator acts on the SystemState via the method evolve_forward(), which increments
+         * the SystemState by one time step.  There are many different integrator strategies one
          * could use, which will be implemented in concrete derived classes.
          */
         protected:
             // The time step by which we will increment (assumed fixed)
             const double timestep_;
+
+            // A state operator that computes the forces, potential energy, and virial
+            SystemState::Operator compute_interactions_;
+
+            // A state operator that imposes the boundary conditions
+            SystemState::Operator impose_boundary_conditions_;
         
         public:
-            explicit Integrator(double timestep) : timestep_{timestep}
-            {}
+            Integrator(
+                double timestep,
+                SystemState::Operator compute_interactions = SystemState::identity_operator,
+                SystemState::Operator impose_boundary_conditions = SystemState::identity_operator
+            );
 
             /**
              * Evolves time by one time step.  Must be given concrete implementation.
              */
-            virtual SystemState& forward_step(SystemState&) = 0;
+            virtual SystemState& evolve_forward(SystemState&) = 0;
     };
 }
 
