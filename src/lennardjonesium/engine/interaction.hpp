@@ -28,6 +28,16 @@
 using Eigen::Vector4d;
 
 namespace engine {
+    /**
+     * These need to be calculated at the same time.  Use structured bindings to access
+     * the separate parts more conveniently.
+     */
+    struct ForceContribution {
+        Vector4d force;
+        double potential_energy;
+        double virial;
+    };
+    
     class Interaction {
         /**
          * An Interaction defines a pairwise force that exists between particles.  It must provide
@@ -54,20 +64,10 @@ namespace engine {
             {}
 
             /**
-             * These need to be calculated at the same time.  Use structured bindings to access
-             * the separate parts more conveniently.
-             */
-            struct Contribution {
-                Vector4d force;
-                double potential_energy;
-                double virial;
-            };
-
-            /**
              * Computes the contributions to force, potential energy, and virial arising from two
              * particles along a given separation vector.
              */
-            virtual Contribution force_law(Vector4d separation) = 0;
+            virtual ForceContribution force_law(Vector4d separation) = 0;
     };
 }
 
