@@ -28,21 +28,16 @@
 namespace engine {
     class Integrator {
         /**
-         * Integrator is an abstract class that represents how we act on the SystemState to advance
-         * it through time.  There are many different integrator strategies one could use, which
-         * will be implemented in concrete derived classes.
+         * An Integrator acts on the SystemState via the method forward_step(), which increments
+         * the SystemStep by one time step.  There are many different integrator strategies one
+         * could use, which will be implemented in concrete derived classes.
          */
         protected:
-            /**
-             * We store the time step, as we only consider integrators that step by the same
-             * time interval each iteration.  It is possible to change the time resolution from
-             * one step to the next, but this is an additional complication that is not useful for
-             * this project.
-             */
+            // The time step by which we will increment (assumed fixed)
             const double timestep_;
         
         public:
-            Integrator(double timestep) : timestep_{timestep}
+            explicit Integrator(double timestep) : timestep_{timestep}
             {}
 
             /**
