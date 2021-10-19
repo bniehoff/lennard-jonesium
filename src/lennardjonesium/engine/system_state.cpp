@@ -44,9 +44,22 @@ namespace engine {
         return *this;
     }
 
-    SystemState& operator|
-        (SystemState& state, SystemState::Operator state_operator)
+    SystemState& operator| (SystemState& state, SystemState::Operator state_operator)
     {
+        /**
+         * We want the operations to chain from left to right, so we can just immediately act
+         * with the operator.
+         */
+
         return state_operator(state);
+    }
+
+    SystemState& SystemState::identity_operator(SystemState& state)
+    {
+        /**
+         * A trivial operator that just returns the state itself.
+         */
+
+        return state;
     }
 }
