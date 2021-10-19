@@ -39,6 +39,9 @@ namespace engine {
          * with += to work nicely).
          */
 
+        // It will be useful to talk about functions acting on the SystemState
+        typedef std::function<SystemState& (SystemState&)> Operator;
+
         // Kinematic quantities (properties of the motion itself)
         Matrix4Xd positions;        // Position within the bounding box
         Matrix4Xd velocities;       // Velocity
@@ -66,15 +69,11 @@ namespace engine {
          */
         SystemState& set_particle_count(int particle_count);
 
-
-        // It will be useful to talk about functions acting on the SystemState
-        typedef std::function<SystemState& (SystemState&)> Operator;
-
         // SystemState Operator that does nothing
         static SystemState& identity_operator(SystemState&);
 
         /**
-         * These will allow us to "pipe" some operations together.  Note that it remains left-
+         * This will allow us to "pipe" some operations together.  Note that it remains left-
          * associative; it does not try to compose all of the piped functions into a single
          * operation.  This is actually what we want anyway.
          */
