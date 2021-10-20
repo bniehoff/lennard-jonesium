@@ -23,7 +23,9 @@
 #ifndef LJ_INTEGRATOR_HPP
 #define LJ_INTEGRATOR_HPP
 
-#include <lennardjonesium/engine/system_state.hpp>
+#include <lennardjonesium/physics/system_state.hpp>
+
+using physics::SystemState;
 
 namespace engine {
     class Integrator {

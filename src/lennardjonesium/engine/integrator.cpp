@@ -23,9 +23,11 @@
 #include <Eigen/Dense>
 
 #include <lennardjonesium/engine/integrator.hpp>
-#include <lennardjonesium/engine/system_state.hpp>
+#include <lennardjonesium/physics/system_state.hpp>
 
 using Eigen::Vector4d;
+
+using physics::SystemState;
 
 namespace engine {
     Integrator::Integrator(

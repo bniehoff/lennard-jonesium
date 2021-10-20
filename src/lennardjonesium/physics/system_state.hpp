@@ -29,7 +29,7 @@
 
 using Eigen::Matrix4Xd;
 
-namespace engine {
+namespace physics {
     struct SystemState {
         /**
          * We use 4xN matrices so that each of the columns will be aligned for vectorization.

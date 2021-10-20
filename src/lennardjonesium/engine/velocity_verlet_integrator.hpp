@@ -24,7 +24,9 @@
 #define LJ_VELOCITY_VERLET_INTEGRATOR_HPP
 
 #include <lennardjonesium/engine/integrator.hpp>
-#include <lennardjonesium/engine/system_state.hpp>
+#include <lennardjonesium/physics/system_state.hpp>
+
+using physics::SystemState;
 
 namespace engine {
     class VelocityVerletIntegrator : public Integrator {
