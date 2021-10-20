@@ -61,7 +61,7 @@ SCENARIO( "Motion under a gravitational force" ) {
         state | integrator | integrator | integrator | integrator;
 
         // Expected result from four iterations of Velocity Verlet with timestep 1.0
-        double expected_z_coordinate = -((1./2.) + (3./2.) + (5./2.) + (7./2.));
+        const double expected_z_coordinate = -((1./2.) + (3./2.) + (5./2.) + (7./2.));
 
         THEN( "The positions move in the expected way" ) {
             REQUIRE( Vector4d{4.0, 0, expected_z_coordinate, 0} == state.positions.col(0) );
