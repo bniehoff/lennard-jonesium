@@ -23,7 +23,9 @@
 #include <Eigen/Dense>
 
 #include <lennardjonesium/engine/velocity_verlet_integrator.hpp>
-#include <lennardjonesium/engine/system_state.hpp>
+#include <lennardjonesium/physics/system_state.hpp>
+
+using physics::SystemState;
 
 namespace engine {
     SystemState& VelocityVerletIntegrator::operator() (SystemState& state)

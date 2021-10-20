@@ -6,13 +6,13 @@
 #include <Eigen/Dense>
 
 #include <src/lennardjonesium/engine/velocity_verlet_integrator.hpp>
-#include <src/lennardjonesium/engine/system_state.hpp>
+#include <src/lennardjonesium/physics/system_state.hpp>
 
 using Eigen::Matrix4Xd;
 using Eigen::Vector4d;
 
 using engine::VelocityVerletIntegrator;
-using engine::SystemState;
+using physics::SystemState;
 
 SCENARIO( "Inertial motion without forces" ) {
     SystemState state(2);
