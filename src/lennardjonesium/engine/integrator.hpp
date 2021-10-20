@@ -27,8 +27,10 @@
 
 using physics::SystemState;
 
-namespace engine {
-    class Integrator {
+namespace engine
+{
+    class Integrator
+    {
         /**
          * An Integrator is an operator that acts on the SystemState, evolving it forward by one
          * unit of time.  There are many different integrator strategies one could use, which will
@@ -36,7 +38,8 @@ namespace engine {
          */
 
         public:
-            explicit Integrator(
+            explicit Integrator
+            (
                 double timestep,
                 SystemState::Operator interactions = SystemState::identity_operator,
                 SystemState::Operator boundary_conditions = SystemState::identity_operator
@@ -58,6 +61,6 @@ namespace engine {
             // A state operator that imposes the boundary conditions
             SystemState::Operator boundary_conditions_;
     };
-}
+} // namespace engine
 
 #endif
