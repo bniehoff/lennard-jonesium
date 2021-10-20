@@ -7,12 +7,12 @@
 #include <catch2/catch.hpp>
 #include <Eigen/Dense>
 
-#include <src/lennardjonesium/engine/system_state.hpp>
+#include <src/lennardjonesium/physics/system_state.hpp>
 
 using Eigen::Matrix4Xd;
 using Eigen::Vector4d;
 
-using engine::SystemState;
+using physics::SystemState;
 
 SCENARIO( "Representing the system state" ) {
     WHEN( "I create a SystemState for a given number of particles" ) {

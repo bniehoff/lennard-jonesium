@@ -24,10 +24,14 @@
 #define LJ_VELOCITY_VERLET_INTEGRATOR_HPP
 
 #include <lennardjonesium/engine/integrator.hpp>
-#include <lennardjonesium/engine/system_state.hpp>
+#include <lennardjonesium/physics/system_state.hpp>
 
-namespace engine {
-    class VelocityVerletIntegrator : public Integrator {
+using physics::SystemState;
+
+namespace engine
+{
+    class VelocityVerletIntegrator : public Integrator
+    {
         public:
             // Should be able to inherit constructor without problems
             using Integrator::Integrator;
@@ -35,6 +39,6 @@ namespace engine {
             // Evolves time by one step
             virtual SystemState& operator() (SystemState&) override;
     };
-}
+} // namespace engine
 
 #endif

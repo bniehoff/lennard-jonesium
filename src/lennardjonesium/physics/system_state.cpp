@@ -20,9 +20,10 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include <lennardjonesium/engine/system_state.hpp>
+#include <lennardjonesium/physics/system_state.hpp>
 
-namespace engine {
+namespace physics
+{
     SystemState::SystemState(int particle_count)
         : kinetic_energy{0}, potential_energy{0}, virial{0}
     {
@@ -62,4 +63,4 @@ namespace engine {
 
         return state;
     }
-}
+} // namespace physics

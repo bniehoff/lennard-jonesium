@@ -17,9 +17,11 @@ set(SOURCES
     src/lennardjonesium/greeter/greeter.cpp
     src/lennardjonesium/tools/aligned_vectors.hpp
     src/lennardjonesium/tools/volume.hpp
-    src/lennardjonesium/engine/system_state.hpp
-    src/lennardjonesium/engine/system_state.cpp
-    src/lennardjonesium/engine/interaction.hpp
+    src/lennardjonesium/physics/system_state.hpp
+    src/lennardjonesium/physics/system_state.cpp
+    src/lennardjonesium/physics/interaction.hpp
+    src/lennardjonesium/engine/boundary_condition.hpp
+    src/lennardjonesium/engine/boundary_condition.cpp
     src/lennardjonesium/engine/integrator.hpp
     src/lennardjonesium/engine/integrator.cpp
     src/lennardjonesium/engine/velocity_verlet_integrator.hpp
@@ -29,15 +31,18 @@ set(SOURCES
 set(TEST_SOURCES
     tests/eigen/test_eigen.cpp
     tests/lennardjonesium/greeter/test_greeter.cpp
-    tests/lennardjonesium/engine/test_system_state.cpp
+    tests/lennardjonesium/physics/test_system_state.cpp
     tests/lennardjonesium/engine/test_velocity_verlet_integrator.cpp
 )
 
 find_package(Eigen3 3.4 REQUIRED NO_MODULE)
 
-# This option enables vectorization for Eigen in GCC and Clang
-# TODO: Make this more portable for different compilers
-add_compile_options(-march=native)
+# TODO: Make these more portable for different compilers
+add_compile_options(
+    -march=native       # Enables vectorization for Eigen in GCC and Clang
+    -ffast-math         # Disables adherence to error reporting and rounding rules in GCC
+                        # (Needed for efficient std::floor() function)
+)
 
 if(SKBUILD)
     find_package(PythonExtensions REQUIRED)

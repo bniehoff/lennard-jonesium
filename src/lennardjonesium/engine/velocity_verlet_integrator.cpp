@@ -23,9 +23,12 @@
 #include <Eigen/Dense>
 
 #include <lennardjonesium/engine/velocity_verlet_integrator.hpp>
-#include <lennardjonesium/engine/system_state.hpp>
+#include <lennardjonesium/physics/system_state.hpp>
 
-namespace engine {
+using physics::SystemState;
+
+namespace engine
+{
     SystemState& VelocityVerletIntegrator::operator() (SystemState& state)
     {
         /**
@@ -42,7 +45,7 @@ namespace engine {
         state.displacements += position_increment;
 
         // Need to impose boundary conditions here
-        boundary_conditions_(state);
+        boundary_condition_(state);
 
         // Now with the new positions, compute the new forces
         interactions_(state);
@@ -52,4 +55,4 @@ namespace engine {
 
         return state;
     }
-}
+} // namespace engine

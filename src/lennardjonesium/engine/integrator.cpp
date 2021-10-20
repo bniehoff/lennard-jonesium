@@ -23,18 +23,22 @@
 #include <Eigen/Dense>
 
 #include <lennardjonesium/engine/integrator.hpp>
-#include <lennardjonesium/engine/system_state.hpp>
+#include <lennardjonesium/physics/system_state.hpp>
 
 using Eigen::Vector4d;
 
-namespace engine {
-    Integrator::Integrator(
+using physics::SystemState;
+
+namespace engine
+{
+    Integrator::Integrator
+    (
         double timestep,
         SystemState::Operator interactions,
-        SystemState::Operator boundary_conditions
+        SystemState::Operator boundary_condition
     )
         : timestep_{timestep},
           interactions_{interactions},
-          boundary_conditions_{boundary_conditions}
+          boundary_condition_{boundary_condition}
     {}
-}
+} // namespace engine

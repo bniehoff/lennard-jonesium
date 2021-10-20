@@ -23,10 +23,14 @@
 #ifndef LJ_INTEGRATOR_HPP
 #define LJ_INTEGRATOR_HPP
 
-#include <lennardjonesium/engine/system_state.hpp>
+#include <lennardjonesium/physics/system_state.hpp>
 
-namespace engine {
-    class Integrator {
+using physics::SystemState;
+
+namespace engine
+{
+    class Integrator
+    {
         /**
          * An Integrator is an operator that acts on the SystemState, evolving it forward by one
          * unit of time.  There are many different integrator strategies one could use, which will
@@ -34,17 +38,18 @@ namespace engine {
          */
 
         public:
-            explicit Integrator(
-                double timestep,
-                SystemState::Operator interactions = SystemState::identity_operator,
-                SystemState::Operator boundary_conditions = SystemState::identity_operator
-            );
-
             /**
              * Evolves a SystemState forward by one unit of time.  Should be given a concrete
              * implementation in derived classes.
              */
             virtual SystemState& operator() (SystemState&) = 0;
+
+            explicit Integrator
+            (
+                double timestep,
+                SystemState::Operator interactions = SystemState::identity_operator,
+                SystemState::Operator boundary_condition = SystemState::identity_operator
+            );
 
         protected:
             // The time step by which we will increment (assumed fixed)
@@ -53,9 +58,9 @@ namespace engine {
             // A state operator that computes the forces, potential energy, and virial
             SystemState::Operator interactions_;
 
-            // A state operator that imposes the boundary conditions
-            SystemState::Operator boundary_conditions_;
+            // A state operator that imposes the boundary condition
+            SystemState::Operator boundary_condition_;
     };
-}
+} // namespace engine
 
 #endif

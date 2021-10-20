@@ -3,8 +3,6 @@
  */
 
 #include <vector>
-#include <ranges>
-#include <tuple>
 
 #include <catch2/catch.hpp>
 #include <Eigen/Dense>
@@ -13,6 +11,10 @@
 using Eigen::Vector4i;
 using Eigen::Vector3i;
 using Eigen::Matrix4Xi;
+
+using Eigen::Matrix4Xd;
+using Eigen::Vector4d;
+using Eigen::Array4d;
 
 SCENARIO( "Views of a Matrix" ) {
     Matrix4Xi positions{
@@ -109,16 +111,36 @@ SCENARIO( "Cross products" ) {
     }
 }
 
-SCENARIO( "Structured bindings" ) {
-    WHEN( "I assign variables from a tuple" ) {
-        std::tuple<int, double, char> t{3, 9.8, 'q'};
+SCENARIO( "Component-wise operations" ) {
+    Matrix4Xd positions{
+        {1.7,   0,    0},
+        {0,   3.2,    0},
+        {0,     0, -1.3},
+        {0,     0,    0}
+    };
 
-        auto [a, b, c] = t;
+    // We set the last component to 1 so that it has no effect
+    Array4d box{1.5, 1.5, 1.5, 1.0};
 
-        THEN( "I get the expected values" ) {
-            REQUIRE( 3 == a );
-            REQUIRE( 9.8 == b );
-            REQUIRE( 'q' == c );
+    WHEN( "I adjust the positions to fit in a 1 x 1 x 1 box" ) {
+        positions -= positions.array().floor().matrix();
+
+        THEN( "I get the expected result" ) {
+            REQUIRE( Approx(0.7) == positions(0, 0) );
+            REQUIRE( Approx(0.2) == positions(1, 1) );
+            REQUIRE( Approx(0.7) == positions(2, 2) );
         }
-    } 
+    }
+
+    WHEN( "I adjust the positions to fit in a 1.5 x 1.5 x 1.5 box" ) {
+        positions -= (
+            (positions.array().colwise() / box).floor().array().colwise() * box
+        ).matrix();
+
+        THEN( "I get the expected result" ) {
+            REQUIRE( Approx(0.2) == positions(0, 0) );
+            REQUIRE( Approx(0.2) == positions(1, 1) );
+            REQUIRE( Approx(0.2) == positions(2, 2) );
+        }
+    }
 }
