@@ -20,11 +20,13 @@
  * <https://www.gnu.org/licenses/>.
  */
 
+#include <Eigen/Dense>
+
 #include <lennardjonesium/engine/velocity_verlet_integrator.hpp>
 #include <lennardjonesium/engine/system_state.hpp>
 
 namespace engine {
-    SystemState& VelocityVerletIntegrator::evolve_forward(SystemState& state)
+    SystemState& VelocityVerletIntegrator::operator() (SystemState& state)
     {
         /**
          * The Velocity Verlet algorithm splits the integration into two half-steps, with the
@@ -34,14 +36,16 @@ namespace engine {
         // First increment the velocities by half a time step:
         state.velocities += (1./2.) * state.forces * timestep_;
 
-        // With the half-incremented velocities, give the positions a full increment:
-        state.positions += state.velocities * timestep_;
+        // With the half-incremented velocities, give positions and displacements a full increment:
+        auto position_increment = state.velocities * timestep_;
+        state.positions += position_increment;
+        state.displacements += position_increment;
 
         // Need to impose boundary conditions here
-        impose_boundary_conditions_(state);
+        boundary_conditions_(state);
 
         // Now with the new positions, compute the new forces
-        compute_interactions_(state);
+        interactions_(state);
 
         // Finally, with the new forces, increment the velocities by a second half-step:
         state.velocities += (1./2.) * state.forces * timestep_;

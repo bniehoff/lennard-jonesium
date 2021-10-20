@@ -29,8 +29,11 @@
 namespace engine {
     class VelocityVerletIntegrator : public Integrator {
         public:
+            // Should be able to inherit constructor without problems
+            using Integrator::Integrator;
+
             // Evolves time by one step
-            virtual SystemState& evolve_forward(SystemState&) override;
+            virtual SystemState& operator() (SystemState&) override;
     };
 }
 

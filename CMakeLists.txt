@@ -30,6 +30,7 @@ set(TEST_SOURCES
     tests/eigen/test_eigen.cpp
     tests/lennardjonesium/greeter/test_greeter.cpp
     tests/lennardjonesium/engine/test_system_state.cpp
+    tests/lennardjonesium/engine/test_velocity_verlet_integrator.cpp
 )
 
 find_package(Eigen3 3.4 REQUIRED NO_MODULE)
