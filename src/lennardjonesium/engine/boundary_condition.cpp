@@ -41,10 +41,14 @@ namespace engine
     SystemState& BoundaryCondition::operator() (SystemState& state)
     {
         /**
-         * Decrement every column in the positions matrix by the largest whole number of
-         * bounding box sizes, so that the resulting position lies inside the bounding box.
+         * This would be slightly more elegant if Eigen provided a componentwise fractional part.
+         * Instead we have to subtract the integer part (floor), appropriately rescaled by the
+         * size of the box.
+         * 
+         * Note that this code is generic for rectilinear bounding boxes, although the constructor
+         * above only creates cubical boxes.
          */
-        
+
         state.positions -= (
             (state.positions.array().colwise() / bounding_box_).floor().array() * bounding_box_
         ).matrix();
