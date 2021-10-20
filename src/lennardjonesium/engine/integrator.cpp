@@ -30,11 +30,11 @@ using Eigen::Vector4d;
 namespace engine {
     Integrator::Integrator(
         double timestep,
-        SystemState::Operator compute_interactions,
-        SystemState::Operator impose_boundary_conditions
+        SystemState::Operator interactions,
+        SystemState::Operator boundary_conditions
     )
         : timestep_{timestep},
-          compute_interactions_{compute_interactions},
-          impose_boundary_conditions_{impose_boundary_conditions}
+          interactions_{interactions},
+          boundary_conditions_{boundary_conditions}
     {}
 }
