@@ -28,8 +28,10 @@
 
 using physics::SystemState;
 
-namespace engine {
-    class VelocityVerletIntegrator : public Integrator {
+namespace engine
+{
+    class VelocityVerletIntegrator : public Integrator
+    {
         public:
             // Should be able to inherit constructor without problems
             using Integrator::Integrator;
@@ -37,6 +39,6 @@ namespace engine {
             // Evolves time by one step
             virtual SystemState& operator() (SystemState&) override;
     };
-}
+} // namespace engine
 
 #endif

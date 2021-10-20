@@ -29,8 +29,10 @@ using Eigen::Vector4d;
 
 using physics::SystemState;
 
-namespace engine {
-    Integrator::Integrator(
+namespace engine
+{
+    Integrator::Integrator
+    (
         double timestep,
         SystemState::Operator interactions,
         SystemState::Operator boundary_conditions
@@ -39,4 +41,4 @@ namespace engine {
           interactions_{interactions},
           boundary_conditions_{boundary_conditions}
     {}
-}
+} // namespace engine

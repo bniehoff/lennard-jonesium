@@ -27,7 +27,8 @@
 
 using physics::SystemState;
 
-namespace engine {
+namespace engine
+{
     SystemState& VelocityVerletIntegrator::operator() (SystemState& state)
     {
         /**
@@ -54,4 +55,4 @@ namespace engine {
 
         return state;
     }
-}
+} // namespace engine

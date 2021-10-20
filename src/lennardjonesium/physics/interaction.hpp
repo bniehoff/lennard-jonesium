@@ -27,18 +27,21 @@
 
 using Eigen::Vector4d;
 
-namespace physics {
+namespace physics
+{
     /**
      * These need to be calculated at the same time.  Use structured bindings to access
      * the separate parts more conveniently.
      */
-    struct ForceContribution {
+    struct ForceContribution
+    {
         Vector4d force;
         double potential_energy;
         double virial;
     };
     
-    class Interaction {
+    class Interaction
+    {
         /**
          * An Interaction defines a pairwise force that exists between particles.  It must provide
          * a method force_law() which takes a single vector (the difference between two particle
@@ -69,6 +72,6 @@ namespace physics {
              */
             virtual ForceContribution force_law(Vector4d separation) = 0;
     };
-}
+} // namespace physics
 
 #endif

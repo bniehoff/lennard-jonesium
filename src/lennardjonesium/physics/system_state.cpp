@@ -22,7 +22,8 @@
 
 #include <lennardjonesium/physics/system_state.hpp>
 
-namespace physics {
+namespace physics
+{
     SystemState::SystemState(int particle_count)
         : kinetic_energy{0}, potential_energy{0}, virial{0}
     {
@@ -62,4 +63,4 @@ namespace physics {
 
         return state;
     }
-}
+} // namespace physics
