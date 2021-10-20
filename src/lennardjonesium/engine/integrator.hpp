@@ -28,29 +28,33 @@
 namespace engine {
     class Integrator {
         /**
-         * An Integrator acts on the SystemState via the method evolve_forward(), which increments
-         * the SystemState by one time step.  There are many different integrator strategies one
-         * could use, which will be implemented in concrete derived classes.
+         * An Integrator is an operator that acts on the SystemState, evolving it forward by one
+         * unit of time.  There are many different integrator strategies one could use, which will
+         * be implemented in concrete derived classes.  Derived classes should override operator().
          */
+
+        public:
+            explicit Integrator(
+                double timestep,
+                SystemState::Operator interactions = SystemState::identity_operator,
+                SystemState::Operator boundary_conditions = SystemState::identity_operator
+            );
+
+            /**
+             * Evolves a SystemState forward by one unit of time.  Should be given a concrete
+             * implementation in derived classes.
+             */
+            virtual SystemState& operator() (SystemState&) = 0;
+
         protected:
             // The time step by which we will increment (assumed fixed)
             const double timestep_;
 
             // A state operator that computes the forces, potential energy, and virial
-            SystemState::Operator compute_interactions_;
+            SystemState::Operator interactions_;
 
             // A state operator that imposes the boundary conditions
-            SystemState::Operator impose_boundary_conditions_;
-        
-        public:
-            Integrator(
-                double timestep,
-                SystemState::Operator compute_interactions = SystemState::identity_operator,
-                SystemState::Operator impose_boundary_conditions = SystemState::identity_operator
-            );
-
-            // Evolves time by one time step.  Must be given concrete implementation.
-            virtual SystemState& evolve_forward(SystemState&) = 0;
+            SystemState::Operator boundary_conditions_;
     };
 }
 
