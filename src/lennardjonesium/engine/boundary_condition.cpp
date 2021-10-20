@@ -20,4 +20,36 @@
  * <https://www.gnu.org/licenses/>.
  */
 
+#include <Eigen/Dense>
+
+#include <lennardjonesium/engine/boundary_condition.hpp>
+#include <lennardjonesium/physics/system_state.hpp>
+
+using Eigen::Array4d;
+using physics::SystemState;
+
+namespace engine
+{
+    BoundaryCondition::BoundaryCondition(double dimension)
+        /**
+         * The .w() component must be nonzero in order to prevent division by zero in expressions.
+         * However, the exact value is not important.
+         */
+        : bounding_box_{dimension, dimension, dimension, 1.0}
+    {}
+
+    SystemState& BoundaryCondition::operator() (SystemState& state)
+    {
+        /**
+         * Decrement every column in the positions matrix by the largest whole number of
+         * bounding box sizes, so that the resulting position lies inside the bounding box.
+         */
+        
+        state.positions -= (
+            (state.positions.array().colwise() / bounding_box_).floor().array() * bounding_box_
+        ).matrix();
+
+        return state;
+    }
+} // namespace engine
 
