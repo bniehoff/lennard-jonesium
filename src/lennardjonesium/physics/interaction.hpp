@@ -23,11 +23,11 @@
 #ifndef LJ_INTERACTION_HPP
 #define LJ_INTERACTION_HPP
 
-#include <eigen3/Eigen/Dense>
+#include <Eigen/Dense>
 
 using Eigen::Vector4d;
 
-namespace engine {
+namespace physics {
     /**
      * These need to be calculated at the same time.  Use structured bindings to access
      * the separate parts more conveniently.

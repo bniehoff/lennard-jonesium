@@ -19,7 +19,7 @@ set(SOURCES
     src/lennardjonesium/tools/volume.hpp
     src/lennardjonesium/physics/system_state.hpp
     src/lennardjonesium/physics/system_state.cpp
-    src/lennardjonesium/engine/interaction.hpp
+    src/lennardjonesium/physics/interaction.hpp
     src/lennardjonesium/engine/integrator.hpp
     src/lennardjonesium/engine/integrator.cpp
     src/lennardjonesium/engine/velocity_verlet_integrator.hpp
