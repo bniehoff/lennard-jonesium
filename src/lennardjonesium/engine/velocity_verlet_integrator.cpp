@@ -45,7 +45,7 @@ namespace engine
         state.displacements += position_increment;
 
         // Need to impose boundary conditions here
-        boundary_conditions_(state);
+        boundary_condition_(state);
 
         // Now with the new positions, compute the new forces
         interactions_(state);

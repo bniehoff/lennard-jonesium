@@ -38,18 +38,18 @@ namespace engine
          */
 
         public:
-            explicit Integrator
-            (
-                double timestep,
-                SystemState::Operator interactions = SystemState::identity_operator,
-                SystemState::Operator boundary_conditions = SystemState::identity_operator
-            );
-
             /**
              * Evolves a SystemState forward by one unit of time.  Should be given a concrete
              * implementation in derived classes.
              */
             virtual SystemState& operator() (SystemState&) = 0;
+
+            explicit Integrator
+            (
+                double timestep,
+                SystemState::Operator interactions = SystemState::identity_operator,
+                SystemState::Operator boundary_condition = SystemState::identity_operator
+            );
 
         protected:
             // The time step by which we will increment (assumed fixed)
@@ -58,8 +58,8 @@ namespace engine
             // A state operator that computes the forces, potential energy, and virial
             SystemState::Operator interactions_;
 
-            // A state operator that imposes the boundary conditions
-            SystemState::Operator boundary_conditions_;
+            // A state operator that imposes the boundary condition
+            SystemState::Operator boundary_condition_;
     };
 } // namespace engine
 

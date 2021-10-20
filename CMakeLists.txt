@@ -20,6 +20,8 @@ set(SOURCES
     src/lennardjonesium/physics/system_state.hpp
     src/lennardjonesium/physics/system_state.cpp
     src/lennardjonesium/physics/interaction.hpp
+    src/lennardjonesium/engine/boundary_condition.hpp
+    src/lennardjonesium/engine/boundary_condition.cpp
     src/lennardjonesium/engine/integrator.hpp
     src/lennardjonesium/engine/integrator.cpp
     src/lennardjonesium/engine/velocity_verlet_integrator.hpp
@@ -35,9 +37,12 @@ set(TEST_SOURCES
 
 find_package(Eigen3 3.4 REQUIRED NO_MODULE)
 
-# This option enables vectorization for Eigen in GCC and Clang
-# TODO: Make this more portable for different compilers
-add_compile_options(-march=native)
+# TODO: Make these more portable for different compilers
+add_compile_options(
+    -march=native       # Enables vectorization for Eigen in GCC and Clang
+    -ffast-math         # Disables adherence to error reporting and rounding rules in GCC
+                        # (Needed for efficient std::floor() function)
+)
 
 if(SKBUILD)
     find_package(PythonExtensions REQUIRED)
