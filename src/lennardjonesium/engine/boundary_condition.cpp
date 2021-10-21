@@ -50,7 +50,8 @@ namespace engine
          */
 
         state.positions -= (
-            (state.positions.array().colwise() / bounding_box_).floor().array() * bounding_box_
+            (state.positions.array().colwise() / bounding_box_).floor().array().colwise()
+            * bounding_box_
         ).matrix();
 
         return state;
