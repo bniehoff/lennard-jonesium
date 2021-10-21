@@ -32,6 +32,7 @@ set(TEST_SOURCES
     tests/eigen/test_eigen.cpp
     tests/lennardjonesium/greeter/test_greeter.cpp
     tests/lennardjonesium/physics/test_system_state.cpp
+    tests/lennardjonesium/engine/test_boundary_condition.cpp
     tests/lennardjonesium/engine/test_velocity_verlet_integrator.cpp
 )
 

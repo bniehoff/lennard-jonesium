@@ -39,7 +39,7 @@ namespace engine
          * a rectilinear region of space.  We use periodic boundary conditions.
          * 
          * (In principle, we could have defined some abstract BoundaryCondition and then
-         * specialized it for PeriodicBoundaryConditions, but we don't intend to use any other
+         * specialized it for PeriodicBoundaryCondition, but we don't intend to use any other
          * type of BoundaryCondition, so we just implement periodic ones here).
          */
         
