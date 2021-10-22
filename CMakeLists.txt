@@ -25,9 +25,7 @@ set(SOURCES
     src/lennardjonesium/engine/boundary_condition.hpp
     src/lennardjonesium/engine/boundary_condition.cpp
     src/lennardjonesium/engine/integrator.hpp
-    src/lennardjonesium/engine/integrator.cpp
     src/lennardjonesium/engine/velocity_verlet_integrator.hpp
-    src/lennardjonesium/engine/velocity_verlet_integrator.cpp
 )
 
 set(TEST_SOURCES
