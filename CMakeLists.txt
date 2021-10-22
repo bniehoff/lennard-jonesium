@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.19)
 
 project(lennardjonesium
     VERSION 0.0.1
@@ -19,7 +19,9 @@ set(SOURCES
     src/lennardjonesium/tools/volume.hpp
     src/lennardjonesium/physics/system_state.hpp
     src/lennardjonesium/physics/system_state.cpp
-    src/lennardjonesium/physics/interaction.hpp
+    src/lennardjonesium/physics/operator.hpp
+    src/lennardjonesium/physics/operator.cpp
+    src/lennardjonesium/engine/interaction.hpp
     src/lennardjonesium/engine/boundary_condition.hpp
     src/lennardjonesium/engine/boundary_condition.cpp
     src/lennardjonesium/engine/integrator.hpp
@@ -32,6 +34,8 @@ set(TEST_SOURCES
     tests/eigen/test_eigen.cpp
     tests/lennardjonesium/greeter/test_greeter.cpp
     tests/lennardjonesium/physics/test_system_state.cpp
+    tests/lennardjonesium/physics/test_operator.cpp
+    tests/lennardjonesium/engine/test_boundary_condition.cpp
     tests/lennardjonesium/engine/test_velocity_verlet_integrator.cpp
 )
 
@@ -39,6 +43,7 @@ find_package(Eigen3 3.4 REQUIRED NO_MODULE)
 
 # TODO: Make these more portable for different compilers
 add_compile_options(
+    -O3                 # Enable optimization level 3
     -march=native       # Enables vectorization for Eigen in GCC and Clang
     -ffast-math         # Disables adherence to error reporting and rounding rules in GCC
                         # (Needed for efficient std::floor() function)

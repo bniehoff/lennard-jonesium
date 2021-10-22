@@ -27,30 +27,17 @@
 
 using Eigen::Vector4d;
 
-namespace physics
-{
-    /**
-     * These need to be calculated at the same time.  Use structured bindings to access
-     * the separate parts more conveniently.
-     */
-    struct ForceContribution
-    {
-        Vector4d force;
-        double potential_energy;
-        double virial;
-    };
-    
+namespace engine
+{   
     class Interaction
     {
         /**
-         * An Interaction defines a pairwise force that exists between particles.  It must provide
-         * a method force_law() which takes a single vector (the difference between two particle
-         * positions) and returns a structure containing the contributions to the force, potential
-         * energy, and virial that arise from this interaction between the two particles separated
-         * along the given vector.
+         * An Interaction acts on the SystemState to impose forces on the particles.  Forces may
+         * be background forces (like gravity), long-range forces (like electrostatic forces), or
+         * short-range forces (like the Lennard-Jones force).
          * 
-         * If the interaction is short-ranged, then it should also provide a cutoff distance, which
-         * can be used to optimize the implementation of pairwise calculations.
+         * The action of an Interaction object is executed by operator().  It should compute the
+         * forces that result from the physical interaction it represents.
          */
         public:
             /**
@@ -65,12 +52,6 @@ namespace physics
             explicit Interaction(double square_cutoff_distance = -1.0)
                 : square_cutoff_distance(square_cutoff_distance)
             {}
-
-            /**
-             * Computes the contributions to force, potential energy, and virial arising from two
-             * particles along a given separation vector.
-             */
-            virtual ForceContribution force_law(Vector4d separation) = 0;
     };
 } // namespace physics
 

@@ -30,14 +30,53 @@ using physics::SystemState;
 
 namespace engine
 {
-    class VelocityVerletIntegrator : public Integrator
+    template <Operator interaction_type, Operator boundary_condition_type>
+    class VelocityVerletIntegrator : public Integrator<interaction_type, boundary_condition_type>
     {
         public:
             // Should be able to inherit constructor without problems
-            using Integrator::Integrator;
+            // using Integrator<interaction_type, boundary_condition_type>::Integrator;
+
+            // We cannot inherit the base constructor as above, instead we must delegate to it:
+            explicit VelocityVerletIntegrator
+            (
+                double timestep,
+                interaction_type interaction,
+                boundary_condition_type boundary_condition
+            )
+                : Integrator<interaction_type, boundary_condition_type>::Integrator(
+                    timestep, interaction, boundary_condition
+                )
+            {}
 
             // Evolves time by one step
-            virtual SystemState& operator() (SystemState&) override;
+            virtual SystemState& operator()  (SystemState& state) override
+        {
+            /**
+             * The Velocity Verlet algorithm splits the integration into two half-steps, with the
+             * force calculation in between.
+             */
+
+            // First increment the velocities by half a time step:
+            state.velocities += (1./2.) * state.forces * this->timestep_;
+
+            // With the half-incremented velocities, give positions and displacements a full
+            // increment:
+            auto position_increment = state.velocities * this->timestep_;
+            state.positions += position_increment;
+            state.displacements += position_increment;
+
+            // Need to impose boundary conditions here
+            state | this->boundary_condition_;
+
+            // Now with the new positions, compute the new forces
+            state | this->interaction_;
+
+            // Finally, with the new forces, increment the velocities by a second half-step:
+            state.velocities += (1./2.) * state.forces * this->timestep_;
+
+            return state;
+        }
     };
 } // namespace engine
 

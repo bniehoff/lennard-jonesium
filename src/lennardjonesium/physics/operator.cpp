@@ -1,5 +1,5 @@
 /**
- * system_state.cpp
+ * operator.cpp
  * 
  * Copyright (c) 2021 Benjamin E. Niehoff
  * 
@@ -20,28 +20,21 @@
  * <https://www.gnu.org/licenses/>.
  */
 
+#include <utility>
+
+#include <lennardjonesium/physics/operator.hpp>
 #include <lennardjonesium/physics/system_state.hpp>
+
+using physics::Operator;
+using physics::SystemState;
 
 namespace physics
 {
-    SystemState::SystemState(int particle_count)
-        : kinetic_energy{0}, potential_energy{0}, virial{0}
+    /**
+     * Operator that simply returns the system state without change
+     */
+    SystemState& identity_operator(SystemState& state)
     {
-        set_particle_count(particle_count);
-    }
-
-    SystemState& SystemState::set_particle_count(int particle_count)
-    {
-        /**
-         * Create initial SystemState with all entries set to zero.  The particle count is not
-         * known until runtime, so we can't use a template class.
-         */
-
-        positions.setZero(4, particle_count);
-        velocities.setZero(4, particle_count);
-        displacements.setZero(4, particle_count);
-        forces.setZero(4, particle_count);
-
-        return *this;
+        return state;
     }
 } // namespace physics

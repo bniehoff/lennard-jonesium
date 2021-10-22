@@ -20,39 +20,39 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include <Eigen/Dense>
+// #include <Eigen/Dense>
 
-#include <lennardjonesium/engine/velocity_verlet_integrator.hpp>
-#include <lennardjonesium/physics/system_state.hpp>
+// #include <lennardjonesium/engine/velocity_verlet_integrator.hpp>
+// #include <lennardjonesium/physics/system_state.hpp>
 
-using physics::SystemState;
+// using physics::SystemState;
 
-namespace engine
-{
-    SystemState& VelocityVerletIntegrator::operator() (SystemState& state)
-    {
-        /**
-         * The Velocity Verlet algorithm splits the integration into two half-steps, with the
-         * force calculation in between.
-         */
+// namespace engine
+// {
+//     SystemState& VelocityVerletIntegrator::operator() (SystemState& state)
+//     {
+//         /**
+//          * The Velocity Verlet algorithm splits the integration into two half-steps, with the
+//          * force calculation in between.
+//          */
 
-        // First increment the velocities by half a time step:
-        state.velocities += (1./2.) * state.forces * timestep_;
+//         // First increment the velocities by half a time step:
+//         state.velocities += (1./2.) * state.forces * timestep_;
 
-        // With the half-incremented velocities, give positions and displacements a full increment:
-        auto position_increment = state.velocities * timestep_;
-        state.positions += position_increment;
-        state.displacements += position_increment;
+//         // With the half-incremented velocities, give positions and displacements a full increment:
+//         auto position_increment = state.velocities * timestep_;
+//         state.positions += position_increment;
+//         state.displacements += position_increment;
 
-        // Need to impose boundary conditions here
-        boundary_condition_(state);
+//         // Need to impose boundary conditions here
+//         boundary_condition_(state);
 
-        // Now with the new positions, compute the new forces
-        interactions_(state);
+//         // Now with the new positions, compute the new forces
+//         interaction_(state);
 
-        // Finally, with the new forces, increment the velocities by a second half-step:
-        state.velocities += (1./2.) * state.forces * timestep_;
+//         // Finally, with the new forces, increment the velocities by a second half-step:
+//         state.velocities += (1./2.) * state.forces * timestep_;
 
-        return state;
-    }
-} // namespace engine
+//         return state;
+//     }
+// } // namespace engine
