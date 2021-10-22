@@ -24,11 +24,14 @@
 #define LJ_INTEGRATOR_HPP
 
 #include <lennardjonesium/physics/system_state.hpp>
+#include <lennardjonesium/physics/operator.hpp>
 
 using physics::SystemState;
+using physics::Operator;
 
 namespace engine
 {
+    template <Operator interaction_type, Operator boundary_condition_type>
     class Integrator
     {
         /**
@@ -47,19 +50,23 @@ namespace engine
             explicit Integrator
             (
                 double timestep,
-                SystemState::Operator interactions = SystemState::identity_operator,
-                SystemState::Operator boundary_condition = SystemState::identity_operator
-            );
+                interaction_type interaction,
+                boundary_condition_type boundary_condition
+            )
+                : timestep_(timestep),
+                  interaction_(interaction),
+                  boundary_condition_(boundary_condition)
+            {}
 
         protected:
             // The time step by which we will increment (assumed fixed)
             const double timestep_;
 
             // A state operator that computes the forces, potential energy, and virial
-            SystemState::Operator interactions_;
+            interaction_type interaction_;
 
             // A state operator that imposes the boundary condition
-            SystemState::Operator boundary_condition_;
+            boundary_condition_type boundary_condition_;
     };
 } // namespace engine
 

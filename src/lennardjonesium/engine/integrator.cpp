@@ -20,25 +20,26 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include <Eigen/Dense>
+// #include <Eigen/Dense>
 
-#include <lennardjonesium/engine/integrator.hpp>
-#include <lennardjonesium/physics/system_state.hpp>
+// #include <lennardjonesium/engine/integrator.hpp>
+// #include <lennardjonesium/physics/system_state.hpp>
+// #include <lennardjonesium/physics/operator.hpp>
 
-using Eigen::Vector4d;
+// using Eigen::Vector4d;
 
-using physics::SystemState;
+// using physics::SystemState;
 
-namespace engine
-{
-    Integrator::Integrator
-    (
-        double timestep,
-        SystemState::Operator interactions,
-        SystemState::Operator boundary_condition
-    )
-        : timestep_{timestep},
-          interactions_{interactions},
-          boundary_condition_{boundary_condition}
-    {}
-} // namespace engine
+// namespace engine
+// {
+//     Integrator::Integrator
+//     (
+//         double timestep,
+//         SystemState::Operator interactions,
+//         SystemState::Operator boundary_condition
+//     )
+//         : timestep_{timestep},
+//           interaction_{interactions},
+//           boundary_condition_{boundary_condition}
+//     {}
+// } // namespace engine

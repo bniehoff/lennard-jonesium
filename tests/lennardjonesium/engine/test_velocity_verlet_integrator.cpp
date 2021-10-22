@@ -7,12 +7,14 @@
 
 #include <src/lennardjonesium/engine/velocity_verlet_integrator.hpp>
 #include <src/lennardjonesium/physics/system_state.hpp>
+#include <src/lennardjonesium/physics/operator.hpp>
 
 using Eigen::Matrix4Xd;
 using Eigen::Vector4d;
 
 using engine::VelocityVerletIntegrator;
 using physics::SystemState;
+using physics::identity_operator;
 
 SCENARIO( "Inertial motion without forces" ) {
     SystemState state(2);
@@ -22,7 +24,7 @@ SCENARIO( "Inertial motion without forces" ) {
     state.velocities.col(1) = Vector4d{0, 1.0, 0, 0};
 
     // Configure integrator with time step 1
-    VelocityVerletIntegrator integrator(1.0);
+    auto integrator = VelocityVerletIntegrator(1.0, identity_operator, identity_operator);
 
     WHEN( "I evolve the state by 4 time steps" ) {
         state | integrator | integrator | integrator | integrator;
@@ -55,13 +57,13 @@ SCENARIO( "Motion under a gravitational force" ) {
     state.forces.col(0) = state.forces.col(1) = Vector4d{0, 0, -1.0, 0};
 
     // Configure integrator with time step 1
-    VelocityVerletIntegrator integrator(1.0);
+    auto integrator = VelocityVerletIntegrator(1.0, identity_operator, identity_operator);
 
     WHEN( "I evolve the state by 4 time steps" ) {
         state | integrator | integrator | integrator | integrator;
 
         // Expected result from four iterations of Velocity Verlet with timestep 1.0
-        const double expected_z_coordinate = -((1./2.) + (3./2.) + (5./2.) + (7./2.));
+        constexpr double expected_z_coordinate = -((1./2.) + (3./2.) + (5./2.) + (7./2.));
 
         THEN( "The positions move in the expected way" ) {
             REQUIRE( Vector4d{4.0, 0, expected_z_coordinate, 0} == state.positions.col(0) );
