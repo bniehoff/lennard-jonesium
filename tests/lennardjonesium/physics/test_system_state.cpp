@@ -52,34 +52,3 @@ SCENARIO( "Representing the system state" ) {
         }
     }
 }
-
-SCENARIO( "Piping operations" ) {
-    SystemState s(1);
-    Vector4d gravity{0, 0, -10, 0};
-
-    auto increase_velocity = [](SystemState& s) -> SystemState& {
-        s.velocities.col(0) += Vector4d::UnitZ();
-        return s;
-    };
-
-    auto apply_gravity = [gravity](SystemState& s) -> SystemState& {
-        s.velocities.col(0) += gravity;
-        return s;
-    };
-
-    WHEN( "I apply a chain of functions to the state" ) {
-        s | increase_velocity | increase_velocity | apply_gravity;
-
-        THEN( "I get the expected result" ) {
-            REQUIRE( Vector4d{0, 0, -8, 0} == s.velocities.col(0) );
-        }
-    }
-
-    WHEN( "I act with the identity operator" ) {
-        s | SystemState::identity_operator;
-
-        THEN( "I get back the state I started with" ) {
-            REQUIRE( Vector4d{0, 0, 0, 0} == s.velocities.col(0) );
-        }
-    }
-}
