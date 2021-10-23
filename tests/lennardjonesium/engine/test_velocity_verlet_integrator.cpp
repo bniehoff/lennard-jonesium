@@ -24,7 +24,7 @@ SCENARIO( "Inertial motion without forces" ) {
     state.velocities.col(1) = Vector4d{0, 1.0, 0, 0};
 
     // Configure integrator with time step 1
-    auto integrator = VelocityVerletIntegrator(1.0, identity_operator, identity_operator);
+    auto integrator = VelocityVerletIntegrator(1.0);
 
     WHEN( "I evolve the state by 4 time steps" ) {
         state | integrator | integrator | integrator | integrator;
@@ -57,7 +57,7 @@ SCENARIO( "Motion under a gravitational force" ) {
     state.forces.col(0) = state.forces.col(1) = Vector4d{0, 0, -1.0, 0};
 
     // Configure integrator with time step 1
-    auto integrator = VelocityVerletIntegrator(1.0, identity_operator, identity_operator);
+    auto integrator = VelocityVerletIntegrator(1.0);
 
     WHEN( "I evolve the state by 4 time steps" ) {
         state | integrator | integrator | integrator | integrator;

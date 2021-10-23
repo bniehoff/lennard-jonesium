@@ -20,21 +20,21 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include <utility>
+// #include <utility>
 
-#include <lennardjonesium/physics/operator.hpp>
-#include <lennardjonesium/physics/system_state.hpp>
+// #include <lennardjonesium/physics/operator.hpp>
+// #include <lennardjonesium/physics/system_state.hpp>
 
-using physics::Operator;
-using physics::SystemState;
+// using physics::Operator;
+// using physics::SystemState;
 
-namespace physics
-{
-    /**
-     * Operator that simply returns the system state without change
-     */
-    SystemState& identity_operator(SystemState& state)
-    {
-        return state;
-    }
-} // namespace physics
+// namespace physics
+// {
+//     /**
+//      * Operator that simply returns the system state without change
+//      */
+//     SystemState& identity_operator(SystemState& state)
+//     {
+//         return state;
+//     }
+// } // namespace physics

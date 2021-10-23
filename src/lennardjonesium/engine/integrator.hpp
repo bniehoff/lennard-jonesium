@@ -40,24 +40,6 @@ namespace engine
          * be implemented in concrete derived classes.  Derived classes should override operator().
          */
 
-        public:
-            /**
-             * Evolves a SystemState forward by one unit of time.  Should be given a concrete
-             * implementation in derived classes.
-             */
-            virtual SystemState& operator() (SystemState&) = 0;
-
-            explicit Integrator
-            (
-                double timestep,
-                interaction_type interaction,
-                boundary_condition_type boundary_condition
-            )
-                : timestep_(timestep),
-                  interaction_(interaction),
-                  boundary_condition_(boundary_condition)
-            {}
-
         protected:
             // The time step by which we will increment (assumed fixed)
             const double timestep_;
@@ -67,7 +49,35 @@ namespace engine
 
             // A state operator that imposes the boundary condition
             boundary_condition_type boundary_condition_;
+
+        public:
+            /**
+             * Evolves a SystemState forward by one unit of time.  Should be given a concrete
+             * implementation in derived classes.
+             */
+            virtual SystemState& operator() (SystemState&) = 0;
+
+            explicit Integrator(double timestep)
+                : timestep_(timestep),
+                  interaction_(physics::identity_operator),
+                  boundary_condition_(physics::identity_operator)
+            {}
+
+            Integrator
+            (
+                double timestep,
+                interaction_type interaction,
+                boundary_condition_type boundary_condition
+            )
+                : timestep_(timestep),
+                  interaction_(interaction),
+                  boundary_condition_(boundary_condition)
+            {}
     };
+
+    // Template argument deduction guide
+    Integrator(double)
+        -> Integrator<decltype(physics::identity_operator), decltype(physics::identity_operator)>;
 } // namespace engine
 
 #endif
