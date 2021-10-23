@@ -20,7 +20,6 @@ set(SOURCES
     src/lennardjonesium/physics/system_state.hpp
     src/lennardjonesium/physics/system_state.cpp
     src/lennardjonesium/physics/operator.hpp
-    src/lennardjonesium/physics/operator.cpp
     src/lennardjonesium/engine/interaction.hpp
     src/lennardjonesium/engine/boundary_condition.hpp
     src/lennardjonesium/engine/boundary_condition.cpp
