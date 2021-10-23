@@ -43,7 +43,7 @@ namespace physics
     /**
      * Operator that simply returns the state without change
      */
-    SystemState& identity_operator(SystemState&);
+    inline auto identity_operator = [](SystemState& s) -> SystemState& {return s;};
 
     /**
      * The following are template functions, so their definitions must be in the header rather than

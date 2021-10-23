@@ -38,7 +38,11 @@ namespace engine
             // using Integrator<interaction_type, boundary_condition_type>::Integrator;
 
             // We cannot inherit the base constructor as above, instead we must delegate to it:
-            explicit VelocityVerletIntegrator
+            explicit VelocityVerletIntegrator(double timestep)
+                : Integrator<interaction_type, boundary_condition_type>::Integrator(timestep)
+            {}
+
+            VelocityVerletIntegrator
             (
                 double timestep,
                 interaction_type interaction,
@@ -50,7 +54,7 @@ namespace engine
             {}
 
             // Evolves time by one step
-            virtual SystemState& operator()  (SystemState& state) override
+            virtual SystemState& operator() (SystemState& state) override
         {
             /**
              * The Velocity Verlet algorithm splits the integration into two half-steps, with the
@@ -78,6 +82,11 @@ namespace engine
             return state;
         }
     };
+
+    // Template argument deduction guide
+    VelocityVerletIntegrator(double)
+        -> VelocityVerletIntegrator<decltype(physics::identity_operator),
+                                    decltype(physics::identity_operator)>;
 } // namespace engine
 
 #endif
