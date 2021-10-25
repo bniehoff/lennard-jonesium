@@ -23,9 +23,7 @@
 #ifndef LJ_INTERACTION_HPP
 #define LJ_INTERACTION_HPP
 
-#include <Eigen/Dense>
-
-using Eigen::Vector4d;
+#include <lennardjonesium/physics/system_state.hpp>
 
 namespace engine
 {   
@@ -40,18 +38,9 @@ namespace engine
          * forces that result from the physical interaction it represents.
          */
         public:
-            /**
-             * The square of the cutoff distance (note that we work in square distances only, to
-             * avoid having to take a square root).
-             * 
-             * If the value is <= 0, then we interpret this as a long-range force.
-             */
-            const double square_cutoff_distance;
-        
-            // By default we assume a long-range force; any negative number will do
-            explicit Interaction(double square_cutoff_distance = -1.0)
-                : square_cutoff_distance(square_cutoff_distance)
-            {}
+            // Compute the forces resulting from this interaction
+            virtual physics::SystemState& operator() (physics::SystemState&) const = 0;
+            
     };
 } // namespace physics
 

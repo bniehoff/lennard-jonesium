@@ -22,9 +22,12 @@ set(SOURCES
     src/lennardjonesium/physics/operator.hpp
     src/lennardjonesium/engine/interaction.hpp
     src/lennardjonesium/engine/boundary_condition.hpp
-    src/lennardjonesium/engine/boundary_condition.cpp
+    src/lennardjonesium/engine/periodic_boundary_condition.hpp
+    src/lennardjonesium/engine/periodic_boundary_condition.cpp
     src/lennardjonesium/engine/integrator.hpp
+    src/lennardjonesium/engine/integrator.cpp
     src/lennardjonesium/engine/velocity_verlet_integrator.hpp
+    src/lennardjonesium/engine/velocity_verlet_integrator.cpp
 )
 
 set(TEST_SOURCES
@@ -32,7 +35,7 @@ set(TEST_SOURCES
     tests/lennardjonesium/greeter/test_greeter.cpp
     tests/lennardjonesium/physics/test_system_state.cpp
     tests/lennardjonesium/physics/test_operator.cpp
-    tests/lennardjonesium/engine/test_boundary_condition.cpp
+    tests/lennardjonesium/engine/test_periodic_boundary_condition.cpp
     tests/lennardjonesium/engine/test_velocity_verlet_integrator.cpp
 )
 
