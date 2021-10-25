@@ -1,17 +1,17 @@
 /**
- * Test for BoundaryCondition
+ * Test for PeriodicBoundaryCondition
  */
 
 #include <catch2/catch.hpp>
 #include <Eigen/Dense>
 
-#include <src/lennardjonesium/engine/boundary_condition.hpp>
+#include <src/lennardjonesium/engine/periodic_boundary_condition.hpp>
 #include <src/lennardjonesium/physics/system_state.hpp>
 #include <src/lennardjonesium/physics/operator.hpp>
 
 using Eigen::Matrix4Xd;
 using Eigen::Vector4d;
-using engine::BoundaryCondition;
+using engine::PeriodicBoundaryCondition;
 using physics::SystemState;
 
 SCENARIO( "Imposing boundary conditions" ) {
@@ -27,7 +27,7 @@ SCENARIO( "Imposing boundary conditions" ) {
     };
 
     // Use a bounding box of side length 1.5
-    BoundaryCondition boundary_condition(1.5);
+    PeriodicBoundaryCondition boundary_condition(1.5);
 
     WHEN( "I impose the boundary conditions on the system" ) {
         state | boundary_condition;

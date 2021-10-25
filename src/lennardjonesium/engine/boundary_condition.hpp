@@ -23,12 +23,7 @@
 #ifndef LJ_BOUNDARY_CONDITION_HPP
 #define LJ_BOUNDARY_CONDITION_HPP
 
-#include <Eigen/Dense>
-
 #include <lennardjonesium/physics/system_state.hpp>
-
-using Eigen::Array4d;
-using physics::SystemState;
 
 namespace engine
 {
@@ -36,30 +31,12 @@ namespace engine
     {
         /**
          * The BoundaryCondition acts on the SystemState to impose that the particles remain in
-         * a rectilinear region of space.  We use periodic boundary conditions.
-         * 
-         * (In principle, we could have defined some abstract BoundaryCondition and then
-         * specialized it for PeriodicBoundaryCondition, but we don't intend to use any other
-         * type of BoundaryCondition, so we just implement periodic ones here).
+         * a region of space.
          */
         
         public:
-            /**
-             * Imposes the boundary conditions on the given SystemState
-             */
-            SystemState& operator() (SystemState&);
-
-            /**
-             * We will only use cubical bounding boxes, so we just take a single dimension
-             */
-            explicit BoundaryCondition(double dimension);
-        
-        protected:
-            /**
-             * We store the bounding box internally as an array type so that it can more easily
-             * be used in Eigen broadcasting expressions.
-             */
-            const Array4d bounding_box_;
+            // Imposes the boundary conditions on the system state
+            virtual physics::SystemState& operator() (physics::SystemState&) const = 0;
             
     };
 } // namespace engine

@@ -24,14 +24,11 @@
 #define LJ_INTEGRATOR_HPP
 
 #include <lennardjonesium/physics/system_state.hpp>
-#include <lennardjonesium/physics/operator.hpp>
-
-using physics::SystemState;
-using physics::Operator;
+#include <lennardjonesium/engine/interaction.hpp>
+#include <lennardjonesium/engine/boundary_condition.hpp>
 
 namespace engine
 {
-    template <Operator interaction_type, Operator boundary_condition_type>
     class Integrator
     {
         /**
@@ -40,44 +37,44 @@ namespace engine
          * be implemented in concrete derived classes.  Derived classes should override operator().
          */
 
-        protected:
-            // The time step by which we will increment (assumed fixed)
-            const double timestep_;
-
-            // A state operator that computes the forces, potential energy, and virial
-            interaction_type interaction_;
-
-            // A state operator that imposes the boundary condition
-            boundary_condition_type boundary_condition_;
-
         public:
             /**
              * Evolves a SystemState forward by one unit of time.  Should be given a concrete
              * implementation in derived classes.
              */
-            virtual SystemState& operator() (SystemState&) = 0;
+            virtual physics::SystemState& operator() (physics::SystemState&) const = 0;
 
-            explicit Integrator(double timestep)
-                : timestep_(timestep),
-                  interaction_(physics::identity_operator),
-                  boundary_condition_(physics::identity_operator)
-            {}
+            /**
+             * Create a "default" integrator with the given timestep, and no interactions or
+             * boundary conditions.
+             */
+            explicit Integrator(double timestep);
 
-            Integrator
-            (
-                double timestep,
-                interaction_type interaction,
-                boundary_condition_type boundary_condition
-            )
-                : timestep_(timestep),
-                  interaction_(interaction),
-                  boundary_condition_(boundary_condition)
-            {}
+            // Create an integrator with the given time step, interaction, and boundary condition
+            Integrator(double timestep, Interaction&, BoundaryCondition&);
+
+            // Create from addresses, useful if we want to set just one of the entries to nullptr
+            Integrator(double timestep, const Interaction*, const BoundaryCondition*);
+
+        protected:
+            // The time step by which we will increment (assumed fixed)
+            const double timestep_;
+
+            /**
+             * For interactions or boundary conditions, we use nullptr to indicate that these
+             * steps will be skipped.  Calling them requires vtable lookup, which normally
+             * has no impact, since they must loop over a large number of particles anyway.  But
+             * when we want to skip imposing forces or boundary conditions, the vtable lookup
+             * becomes significant, so it is nicer to just check for nullptr rather than calling
+             * a "no-op" function that requires vtable lookup to find.
+             */
+
+            // A state operator that computes the forces, potential energy, and virial
+            const Interaction* interaction_;
+
+            //A state operator that imposes the boundary condition
+            const BoundaryCondition* boundary_condition_;
     };
-
-    // Template argument deduction guide
-    Integrator(double)
-        -> Integrator<decltype(physics::identity_operator), decltype(physics::identity_operator)>;
 } // namespace engine
 
 #endif

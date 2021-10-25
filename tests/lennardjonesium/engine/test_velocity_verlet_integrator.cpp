@@ -14,7 +14,6 @@ using Eigen::Vector4d;
 
 using engine::VelocityVerletIntegrator;
 using physics::SystemState;
-using physics::identity_operator;
 
 SCENARIO( "Inertial motion without forces" ) {
     SystemState state(2);

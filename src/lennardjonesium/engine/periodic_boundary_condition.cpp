@@ -1,5 +1,5 @@
 /**
- * boundary_condition.cpp
+ * periodic_boundary_condition.cpp
  * 
  * Copyright (c) 2021 Benjamin E. Niehoff
  * 
@@ -22,7 +22,7 @@
 
 #include <Eigen/Dense>
 
-#include <lennardjonesium/engine/boundary_condition.hpp>
+#include <lennardjonesium/engine/periodic_boundary_condition.hpp>
 #include <lennardjonesium/physics/system_state.hpp>
 
 using Eigen::Array4d;
@@ -30,23 +30,31 @@ using physics::SystemState;
 
 namespace engine
 {
-    BoundaryCondition::BoundaryCondition(double dimension)
-        /**
-         * The .w() component must be nonzero in order to prevent division by zero in expressions.
-         * However, the exact value is not important.
-         */
-        : bounding_box_{dimension, dimension, dimension, 1.0}
+    /**
+     * The .w() component of bounding_box must be nonzero in order to prevent division by zero
+     * in expressions.  The public constructors delegate to this constructor by explicitly
+     * passing 1.0 for the fourth component.
+     */
+    PeriodicBoundaryCondition::PeriodicBoundaryCondition(Array4d bounding_box)
+        : bounding_box_(bounding_box)
     {}
 
-    SystemState& BoundaryCondition::operator() (SystemState& state)
+    // Set the side lengths equal to x, y, z
+    PeriodicBoundaryCondition::PeriodicBoundaryCondition(double x, double y, double z)
+        : PeriodicBoundaryCondition::PeriodicBoundaryCondition{{x, y, z, 1.0}}
+    {}
+
+    // Set all side lengths equal to the dimension d
+    PeriodicBoundaryCondition::PeriodicBoundaryCondition(double d)
+        : PeriodicBoundaryCondition::PeriodicBoundaryCondition{{d, d, d, 1.0}}
+    {}
+
+    SystemState& PeriodicBoundaryCondition::operator() (SystemState& state) const
     {
         /**
          * This would be slightly more elegant if Eigen provided a componentwise fractional part.
          * Instead we have to subtract the integer part (floor), appropriately rescaled by the
          * size of the box.
-         * 
-         * Note that this code is generic for rectilinear bounding boxes, although the constructor
-         * above only creates cubical boxes.
          */
 
         state.positions -= (

@@ -25,8 +25,6 @@
 
 #include <Eigen/Dense>
 
-using Eigen::Matrix4Xd;
-
 namespace physics
 {
     struct SystemState
@@ -43,13 +41,13 @@ namespace physics
         typedef std::function<SystemState& (SystemState&)> Operator;
 
         // Kinematic quantities (properties of the motion itself)
-        Matrix4Xd positions;        // Position within the bounding box
-        Matrix4Xd velocities;       // Velocity
-        Matrix4Xd displacements;    // Total displacement ignoring boundary conditions
+        Eigen::Matrix4Xd positions;        // Position within the bounding box
+        Eigen::Matrix4Xd velocities;       // Velocity
+        Eigen::Matrix4Xd displacements;    // Total displacement ignoring boundary conditions
         double kinetic_energy;
 
         // Dynamic quantities (arising from the interactions between particles)
-        Matrix4Xd forces;           // Force or acceleration, since mass is normalized to 1
+        Eigen::Matrix4Xd forces;           // Force or acceleration, since mass is normalized to 1
         double potential_energy;    // Potential energy from particle interactions
         double virial;              // Virial from pairwise forces
 

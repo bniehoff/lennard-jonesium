@@ -28,8 +28,6 @@
 
 #include <lennardjonesium/physics/system_state.hpp>
 
-using physics::SystemState;
-
 namespace physics
 {
     /**
@@ -46,16 +44,11 @@ namespace physics
     inline auto identity_operator = [](SystemState& s) -> SystemState& {return s;};
 
     /**
-     * The following are template functions, so their definitions must be in the header rather than
-     * in the .cpp file.
-     */
-
-    /**
      * Operators can act on SystemStates via the pipe syntax
      * 
      *      state | op1 | op2 | ...;
      */
-    SystemState& operator| (SystemState& s, Operator auto op)
+    SystemState& operator| (SystemState& s, const Operator auto& op)
     {
         return op(s);
     }
@@ -65,7 +58,7 @@ namespace physics
      * 
      *      combined_op = op1 | op2 | op3 | ...;
      */
-    Operator auto operator| (Operator auto op1, Operator auto op2)
+    Operator auto operator| (const Operator auto& op1, const Operator auto& op2)
     {
         return [op1=std::move(op1), op2=std::move(op2)](SystemState& s) -> SystemState&
             {
