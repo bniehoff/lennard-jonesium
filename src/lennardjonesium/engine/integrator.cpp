@@ -50,4 +50,9 @@ namespace engine
     Integrator::Integrator(double timestep)
         : Integrator::Integrator(timestep, nullptr, nullptr)
     {}
+
+    void Integrator::set_boundary_condition(BoundaryCondition& boundary_condition)
+    {
+        boundary_condition_ = &boundary_condition;
+    }
 } // namespace engine
