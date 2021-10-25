@@ -56,6 +56,8 @@ namespace engine
             // Create from addresses, useful if we want to set just one of the entries to nullptr
             Integrator(double timestep, const Interaction*, const BoundaryCondition*);
 
+            void set_boundary_condition(BoundaryCondition&);
+
         protected:
             // The time step by which we will increment (assumed fixed)
             const double timestep_;
