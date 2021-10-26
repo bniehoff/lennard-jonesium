@@ -47,8 +47,8 @@ namespace engine
             state | (*boundary_condition_);
 
         // Now with the new positions, compute the new forces
-        if (interaction_ != nullptr)
-            state | (*interaction_);
+        if (force_calculation_ != nullptr)
+            state | (*force_calculation_);
 
         // Finally, with the new forces, increment the velocities by a second half-step:
         state.velocities += (1./2.) * state.forces * timestep_;

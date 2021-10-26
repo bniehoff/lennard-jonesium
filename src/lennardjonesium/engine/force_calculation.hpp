@@ -1,5 +1,5 @@
 /**
- * interaction.hpp
+ * force_calculation.hpp
  * 
  * Copyright (c) 2021 Benjamin E. Niehoff
  * 
@@ -20,22 +20,22 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LJ_INTERACTION_HPP
-#define LJ_INTERACTION_HPP
+#ifndef LJ_FORCE_CALCULATION_HPP
+#define LJ_FORCE_CALCULATION_HPP
 
 #include <lennardjonesium/physics/system_state.hpp>
 
 namespace engine
 {   
-    class Interaction
+    class ForceCalculation
     {
         /**
-         * An Interaction acts on the SystemState to impose forces on the particles.  Forces may
-         * be background forces (like gravity), long-range forces (like electrostatic forces), or
-         * short-range forces (like the Lennard-Jones force).
+         * An ForceCalculation acts on the SystemState to impose forces on the particles.  Forces
+         * may be background forces (like gravity), long-range forces (like electrostatic forces),
+         * or short-range forces (like the Lennard-Jones force).
          * 
-         * The action of an Interaction object is executed by operator().  It should compute the
-         * forces that result from the physical interaction it represents.
+         * The action of an ForceCalculation object is executed by operator().  It should compute
+         * the forces that result from the physical interaction it represents.
          */
         public:
             // Compute the forces resulting from this interaction

@@ -19,7 +19,7 @@ set(SOURCES
     src/lennardjonesium/tools/volume.hpp
     src/lennardjonesium/physics/system_state.hpp
     src/lennardjonesium/physics/system_state.cpp
-    src/lennardjonesium/engine/interaction.hpp
+    src/lennardjonesium/engine/force_calculation.hpp
     src/lennardjonesium/engine/boundary_condition.hpp
     src/lennardjonesium/engine/periodic_boundary_condition.hpp
     src/lennardjonesium/engine/periodic_boundary_condition.cpp
