@@ -20,6 +20,7 @@ set(SOURCES
     src/lennardjonesium/physics/system_state.hpp
     src/lennardjonesium/physics/system_state.cpp
     src/lennardjonesium/engine/force_calculation.hpp
+    src/lennardjonesium/engine/cutoff_force_calculation.hpp
     src/lennardjonesium/engine/boundary_condition.hpp
     src/lennardjonesium/engine/periodic_boundary_condition.hpp
     src/lennardjonesium/engine/periodic_boundary_condition.cpp
