@@ -20,7 +20,7 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include <lennardjonesium/engine/interaction.hpp>
+#include <lennardjonesium/engine/force_calculation.hpp>
 #include <lennardjonesium/engine/boundary_condition.hpp>
 #include <lennardjonesium/engine/integrator.hpp>
 
@@ -29,24 +29,24 @@ namespace engine
     // Generic constructor allows nullptr entries
     Integrator::Integrator(
         double timestep,
-        const Interaction* interaction,
+        const ForceCalculation* force_calculation,
         const BoundaryCondition* boundary_condition
     )
         : timestep_(timestep),
-          interaction_(interaction),
+          force_calculation_(force_calculation),
           boundary_condition_(boundary_condition)
     {}
 
-    // Create an integrator with the given time step, interaction, and boundary condition
+    // Create an integrator with the given time step, force_calculation, and boundary condition
     Integrator::Integrator(
         double timestep,
-        Interaction& interaction,
+        ForceCalculation& force_calculation,
         BoundaryCondition& boundary_condition
     )
-        : Integrator::Integrator(timestep, &interaction, &boundary_condition)
+        : Integrator::Integrator(timestep, &force_calculation, &boundary_condition)
     {}
 
-    // Delegate to the above constructor with null interaction and boundary condition
+    // Delegate to the above constructor with null force_calculation and boundary condition
     Integrator::Integrator(double timestep)
         : Integrator::Integrator(timestep, nullptr, nullptr)
     {}

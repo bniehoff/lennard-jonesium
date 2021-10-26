@@ -24,7 +24,7 @@
 #define LJ_INTEGRATOR_HPP
 
 #include <lennardjonesium/physics/system_state.hpp>
-#include <lennardjonesium/engine/interaction.hpp>
+#include <lennardjonesium/engine/force_calculation.hpp>
 #include <lennardjonesium/engine/boundary_condition.hpp>
 
 namespace engine
@@ -51,10 +51,10 @@ namespace engine
             explicit Integrator(double timestep);
 
             // Create an integrator with the given time step, interaction, and boundary condition
-            Integrator(double timestep, Interaction&, BoundaryCondition&);
+            Integrator(double timestep, ForceCalculation&, BoundaryCondition&);
 
             // Create from addresses, useful if we want to set just one of the entries to nullptr
-            Integrator(double timestep, const Interaction*, const BoundaryCondition*);
+            Integrator(double timestep, const ForceCalculation*, const BoundaryCondition*);
 
             void set_boundary_condition(BoundaryCondition&);
 
@@ -72,7 +72,7 @@ namespace engine
              */
 
             // A state operator that computes the forces, potential energy, and virial
-            const Interaction* interaction_;
+            const ForceCalculation* force_calculation_;
 
             //A state operator that imposes the boundary condition
             const BoundaryCondition* boundary_condition_;
