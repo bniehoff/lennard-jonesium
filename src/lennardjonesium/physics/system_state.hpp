@@ -67,6 +67,42 @@ namespace physics
          */
         SystemState& set_particle_count(int particle_count);
     };
+
+    /**
+     * Let's also define the concept of an Operator that acts on the SystemState.
+     * 
+     * This definition is more generic than necessary, we will only use the SystemState version.
+     */
+    template <typename Op, typename S = SystemState>
+    concept Operator = std::invocable<Op, S&> and std::is_invocable_r_v<S&, Op, S&>;
+
+    /**
+     * Operator that simply returns the state without change
+     */
+    inline auto identity_operator = [](SystemState& s) -> SystemState& {return s;};
+
+    /**
+     * Operators can act on SystemStates via the pipe syntax
+     * 
+     *      state | op1 | op2 | ...;
+     */
+    SystemState& operator| (SystemState& s, const Operator auto& op)
+    {
+        return op(s);
+    }
+
+    /**
+     * Operators together in a pipeline can also be combined into a single operator
+     * 
+     *      combined_op = op1 | op2 | op3 | ...;
+     */
+    Operator auto operator| (const Operator auto& op1, const Operator auto& op2)
+    {
+        return [op1=std::move(op1), op2=std::move(op2)](SystemState& s) -> SystemState&
+            {
+                return op2(op1(s));
+            };
+    }
 } // namespace physics
 
 #endif

@@ -21,7 +21,6 @@
  */
 
 #include <lennardjonesium/physics/system_state.hpp>
-#include <lennardjonesium/physics/operator.hpp>
 #include <lennardjonesium/engine/velocity_verlet_integrator.hpp>
 
 namespace engine
