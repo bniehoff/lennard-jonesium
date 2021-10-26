@@ -42,6 +42,14 @@ namespace engine
             virtual physics::SystemState& operator() (physics::SystemState&) const = 0;
             
     };
+
+    // Single instance of anonymous subclass that calculates no forces
+    inline const class : public ForceCalculation
+    {
+        public:
+            virtual physics::SystemState& operator() (physics::SystemState& s) const override
+            {return s;}
+    } null_force_calculation;
 } // namespace physics
 
 #endif

@@ -93,9 +93,9 @@ SCENARIO( "Inertial motion with boundary conditions" ) {
     auto boundary_condition = PeriodicBoundaryCondition(3.0);
 
     // Configure integrator with time step 1
-    auto integrator = VelocityVerletIntegrator(1.0);
-
-    integrator.set_boundary_condition(boundary_condition);
+    auto integrator = VelocityVerletIntegrator(
+        1.0, engine::null_force_calculation, boundary_condition
+    );
 
     WHEN( "I evolve the state by 4 time steps" ) {
         state | integrator | integrator | integrator | integrator;
@@ -131,7 +131,9 @@ SCENARIO( "Motion under a gravitational force with boundary conditions" ) {
     auto boundary_condition = PeriodicBoundaryCondition(3.0);
 
     // Configure integrator with time step 1
-    auto integrator = VelocityVerletIntegrator(1.0, nullptr, &boundary_condition);
+    auto integrator = VelocityVerletIntegrator(
+        1.0, engine::null_force_calculation, boundary_condition
+    );
 
     WHEN( "I evolve the state by 4 time steps" ) {
         state | integrator | integrator | integrator | integrator;
