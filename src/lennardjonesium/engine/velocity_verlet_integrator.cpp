@@ -21,7 +21,6 @@
  */
 
 #include <lennardjonesium/physics/system_state.hpp>
-#include <lennardjonesium/physics/operator.hpp>
 #include <lennardjonesium/engine/velocity_verlet_integrator.hpp>
 
 namespace engine
@@ -44,12 +43,10 @@ namespace engine
         state.displacements += position_increment;
 
         // Need to impose boundary conditions here
-        if (boundary_condition_ != nullptr)
-            state | (*boundary_condition_);
+        state | boundary_condition_;
 
         // Now with the new positions, compute the new forces
-        if (interaction_ != nullptr)
-            state | (*interaction_);
+        state | force_calculation_;
 
         // Finally, with the new forces, increment the velocities by a second half-step:
         state.velocities += (1./2.) * state.forces * timestep_;

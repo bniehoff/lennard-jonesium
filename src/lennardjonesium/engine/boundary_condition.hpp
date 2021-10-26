@@ -39,6 +39,14 @@ namespace engine
             virtual physics::SystemState& operator() (physics::SystemState&) const = 0;
             
     };
+
+    // Single instance of anonymous subclass that imposes no boundary conditions
+    inline const class : public BoundaryCondition
+    {
+        public:
+            virtual physics::SystemState& operator() (physics::SystemState& s) const override
+            {return s;}
+    } null_boundary_condition;
 } // namespace engine
 
 #endif
