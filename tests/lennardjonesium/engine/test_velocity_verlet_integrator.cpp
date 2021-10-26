@@ -8,7 +8,6 @@
 #include <src/lennardjonesium/engine/velocity_verlet_integrator.hpp>
 #include <src/lennardjonesium/engine/periodic_boundary_condition.hpp>
 #include <src/lennardjonesium/physics/system_state.hpp>
-#include <src/lennardjonesium/physics/operator.hpp>
 
 using Eigen::Matrix4Xd;
 using Eigen::Vector4d;

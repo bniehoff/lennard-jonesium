@@ -19,7 +19,6 @@ set(SOURCES
     src/lennardjonesium/tools/volume.hpp
     src/lennardjonesium/physics/system_state.hpp
     src/lennardjonesium/physics/system_state.cpp
-    src/lennardjonesium/physics/operator.hpp
     src/lennardjonesium/engine/interaction.hpp
     src/lennardjonesium/engine/boundary_condition.hpp
     src/lennardjonesium/engine/periodic_boundary_condition.hpp
@@ -34,7 +33,6 @@ set(TEST_SOURCES
     tests/eigen/test_eigen.cpp
     tests/lennardjonesium/greeter/test_greeter.cpp
     tests/lennardjonesium/physics/test_system_state.cpp
-    tests/lennardjonesium/physics/test_operator.cpp
     tests/lennardjonesium/engine/test_periodic_boundary_condition.cpp
     tests/lennardjonesium/engine/test_velocity_verlet_integrator.cpp
 )
