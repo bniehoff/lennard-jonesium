@@ -43,12 +43,10 @@ namespace engine
         state.displacements += position_increment;
 
         // Need to impose boundary conditions here
-        if (boundary_condition_ != nullptr)
-            state | (*boundary_condition_);
+        state | boundary_condition_;
 
         // Now with the new positions, compute the new forces
-        if (force_calculation_ != nullptr)
-            state | (*force_calculation_);
+        state | force_calculation_;
 
         // Finally, with the new forces, increment the velocities by a second half-step:
         state.velocities += (1./2.) * state.forces * timestep_;

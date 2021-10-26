@@ -26,33 +26,21 @@
 
 namespace engine
 {
-    // Generic constructor allows nullptr entries
+    // Create an integrator with the given time step, force_calculation, and boundary condition
     Integrator::Integrator(
         double timestep,
-        const ForceCalculation* force_calculation,
-        const BoundaryCondition* boundary_condition
+        const ForceCalculation& force_calculation,
+        const BoundaryCondition& boundary_condition
     )
         : timestep_(timestep),
           force_calculation_(force_calculation),
           boundary_condition_(boundary_condition)
     {}
 
-    // Create an integrator with the given time step, force_calculation, and boundary condition
-    Integrator::Integrator(
-        double timestep,
-        ForceCalculation& force_calculation,
-        BoundaryCondition& boundary_condition
-    )
-        : Integrator::Integrator(timestep, &force_calculation, &boundary_condition)
-    {}
-
-    // Delegate to the above constructor with null force_calculation and boundary condition
+    // Delegate to the above constructor with null force calculation and boundary condition
     Integrator::Integrator(double timestep)
-        : Integrator::Integrator(timestep, nullptr, nullptr)
+        : Integrator::Integrator(
+            timestep, engine::null_force_calculation, engine::null_boundary_condition
+        )
     {}
-
-    void Integrator::set_boundary_condition(BoundaryCondition& boundary_condition)
-    {
-        boundary_condition_ = &boundary_condition;
-    }
 } // namespace engine
