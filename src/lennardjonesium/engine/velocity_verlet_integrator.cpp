@@ -33,12 +33,12 @@ namespace engine
          * force calculation in between.
          */
 
-        // First increment the velocities by half a time step:
-        state.velocities += (1./2.) * state.forces * timestep_;
+        // First get the half increment to the velocities using the current value of the forces
+        auto velocity_half_step = state.velocities + (1./2.) * state.forces * timestep_;
 
         // With the half-incremented velocities, give positions and displacements a full
         // increment:
-        auto position_increment = state.velocities * timestep_;
+        auto position_increment = velocity_half_step * timestep_;
         state.positions += position_increment;
         state.displacements += position_increment;
 
@@ -48,8 +48,9 @@ namespace engine
         // Now with the new positions, compute the new forces
         state | force_calculation_;
 
-        // Finally, with the new forces, increment the velocities by a second half-step:
-        state.velocities += (1./2.) * state.forces * timestep_;
+        // Finally, update the velocities using the first half increment and a second half
+        // increment based on the new forces:
+        state.velocities = velocity_half_step + (1./2.) * state.forces * timestep_;
 
         return state;
     }
