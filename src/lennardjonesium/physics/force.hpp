@@ -1,5 +1,5 @@
 /**
- * pair_potential.cpp
+ * force.hpp
  * 
  * Copyright (c) 2021 Benjamin E. Niehoff
  * 

@@ -1,5 +1,5 @@
 /**
- * cutoff_force_calculation.hpp
+ * background_force.hpp
  * 
  * Copyright (c) 2021 Benjamin E. Niehoff
  * 
@@ -19,21 +19,3 @@
  * License along with Lennard-Jonesium.  If not, see
  * <https://www.gnu.org/licenses/>.
  */
-
-#ifndef LJ_CUTOFF_FORCE_CALCULATION_HPP
-#define LJ_CUTOFF_FORCE_CALCULATION_HPP
-
-#include <lennardjonesium/engine/force_calculation.hpp>
-
-namespace engine
-{
-    class CutoffForceCalculation : public ForceCalculation
-    {
-        /**
-         * TODO:  Need to define a PairwiseForce before we can write very much
-         */
-    };
-} // namespace engine
-
-
-#endif
