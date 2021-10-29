@@ -19,6 +19,9 @@ set(SOURCES
     src/lennardjonesium/tools/volume.hpp
     src/lennardjonesium/physics/system_state.hpp
     src/lennardjonesium/physics/system_state.cpp
+    src/lennardjonesium/physics/force.hpp
+    src/lennardjonesium/physics/background_force.hpp
+    src/lennardjonesium/physics/pairwise_force.hpp
     src/lennardjonesium/engine/force_calculation.hpp
     src/lennardjonesium/engine/cutoff_force_calculation.hpp
     src/lennardjonesium/engine/boundary_condition.hpp
