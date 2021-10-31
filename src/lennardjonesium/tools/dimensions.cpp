@@ -1,5 +1,5 @@
 /**
- * background_force.hpp
+ * dimensions.hpp
  * 
  * Copyright (c) 2021 Benjamin E. Niehoff
  * 
@@ -19,3 +19,16 @@
  * License along with Lennard-Jonesium.  If not, see
  * <https://www.gnu.org/licenses/>.
  */
+
+#include <lennardjonesium/tools/dimensions.hpp>
+
+namespace tools
+{
+    Dimensions::Dimensions(double x, double y, double z) : x(x), y(y), z(z)
+    {}
+
+    Dimensions::Dimensions(double dimension)
+        : Dimensions::Dimensions(dimension, dimension, dimension)
+    {}
+} // namespace tools
+
