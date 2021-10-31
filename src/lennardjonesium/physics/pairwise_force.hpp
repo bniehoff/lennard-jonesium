@@ -30,7 +30,7 @@ namespace physics
     struct ForceContribution
     {
         /**
-         * A ForceContribution is the collection of data calculated by a PairwiseForce, described below.
+         * A ForceContribution is the collection of data calculated by a PairwiseForce.
          */
 
         Eigen::Vector4d force;
@@ -60,21 +60,17 @@ namespace physics
          *      F_{ji} = -F_{ij}
          * 
          * so this gives all the contributions to forces and energies from this pair of particles.
+         * 
+         * We assume that all pairwise forces are short-range (since long-range forces with periodic
+         * boundary conditions require specialized techniques).
          */
 
         public:
             virtual ForceContribution operator() (Eigen::Vector4d) const = 0;
-    };
 
-    // Single instance of null force law which may be useful
-    inline class : PairwiseForce
-    {
-        public:
-            virtual ForceContribution operator()(Eigen::Vector4d rij [[maybe_unused]])
-                const override
-            {
-                return ForceContribution{Eigen::Vector4d::Zero(), 0.0, 0.0};
-            }
-    } null_pairwise_force;
+            virtual double cutoff_length() const = 0;
+
+            virtual double square_cutoff_length() const = 0;
+    };
 } // namespace physics
 #endif
