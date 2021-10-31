@@ -1,5 +1,5 @@
 /**
- * pair_potential.cpp
+ * dimensions.hpp
  * 
  * Copyright (c) 2021 Benjamin E. Niehoff
  * 
@@ -19,3 +19,29 @@
  * License along with Lennard-Jonesium.  If not, see
  * <https://www.gnu.org/licenses/>.
  */
+
+#ifndef LJ_DIMENSIONS_HPP
+#define LJ_DIMENSIONS_HPP
+
+namespace tools
+{
+    struct Dimensions
+    {
+        /**
+         * Used to give bounding box dimensions.
+         */
+
+        double x;
+        double y;
+        double z;
+
+        // Construct bounding box of specified dimensions
+        Dimensions(double x, double y, double z);
+
+        // Construct cubical bounding box with given side length
+        Dimensions(double dimension);
+    };
+} // namespace tools
+
+
+#endif

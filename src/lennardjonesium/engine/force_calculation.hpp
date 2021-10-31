@@ -37,10 +37,10 @@ namespace engine
          * The action of an ForceCalculation object is executed by operator().  It should compute
          * the forces that result from the physical interaction it represents.
          */
+
         public:
             // Compute the forces resulting from this interaction
             virtual physics::SystemState& operator() (physics::SystemState&) const = 0;
-            
     };
 
     // Single instance of anonymous subclass that calculates no forces
