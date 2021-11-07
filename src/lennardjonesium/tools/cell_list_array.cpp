@@ -22,7 +22,9 @@
 
 #include <cmath>
 #include <cassert>
+#include <ranges>
 
+#include <lennardjonesium/draft_cpp23/generator.hpp>
 #include <lennardjonesium/tools/dimensions.hpp>
 #include <lennardjonesium/tools/cell_list_array.hpp>
 
@@ -51,9 +53,10 @@ namespace tools
         ));
 
         // Obtain the cell counts along the three axes
-        int x = std::floor(dimensions.x / cutoff_length);
-        int y = std::floor(dimensions.y / cutoff_length);
-        int z = std::floor(dimensions.z / cutoff_length);
+        auto x = static_cast<int>(std::floor(dimensions.x / cutoff_length));
+        auto y = static_cast<int>(std::floor(dimensions.y / cutoff_length));
+        auto z = static_cast<int>(std::floor(dimensions.z / cutoff_length));
+
 
         // Resize the cell lists array according to the cell counts
         cell_lists_.resize(boost::extents[x][y][z]);
@@ -61,13 +64,30 @@ namespace tools
 
     const CellList& CellListArray::operator() (int x, int y, int z) const
     {
-        return cell_lists_(multi_index_{x, y, z});
+        return cell_lists_(multi_index_type{x, y, z});
     }
 
     CellList& CellListArray::operator() (int x, int y, int z)
     {
         // Delegate to const version
         return const_cast<CellList&>(static_cast<const CellListArray&>(*this)(x, y, z));
+    }
+
+    /**
+     * Now we need to define generators
+     */
+
+    std::generator<CellList&> CellListArray::cell_view()
+    {
+        for (cell_list_array_type::index i = 0; i < cell_lists_.shape()[0]; ++i)
+            for (cell_list_array_type::index j = 0; j < cell_lists_.shape()[1]; ++j)
+                for (cell_list_array_type::index k = 0; k < cell_lists_.shape()[2]; ++k)
+                    co_yield cell_lists_(multi_index_type{i, j, k});
+    }
+
+    std::generator<NeighborPair&> CellListArray::neighbor_view()
+    {
+        // TODO
     }
 } // namespace tools
 

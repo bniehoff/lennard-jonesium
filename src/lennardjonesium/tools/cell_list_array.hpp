@@ -24,14 +24,24 @@
 #define LJ_CELL_LIST_ARRAY_HPP
 
 #include <vector>
+#include <ranges>
 
 #include <boost/multi_array.hpp>
+#include <Eigen/Dense>
 
+#include <lennardjonesium/draft_cpp23/generator.hpp>
 #include <lennardjonesium/tools/dimensions.hpp>
 
 namespace tools
 {
     typedef std::vector<int> CellList;
+
+    struct NeighborPair
+    {
+        const CellList& first;
+        const CellList& second;
+        Eigen::Vector4i offset;
+    };
 
     class CellListArray
     {
@@ -44,7 +54,7 @@ namespace tools
 
         public:
             // Construct the cell list array from a simulation box size, and a minimum cell size
-            CellListArray(tools::Dimensions dimensions, double cutoff_length);
+            CellListArray(Dimensions dimensions, double cutoff_length);
 
             // Access a given element (cannot use operator[] with more than one parameter)
             CellList& operator() (int, int, int);
@@ -54,12 +64,20 @@ namespace tools
              * TODO: Functions related to iteration
              */
 
+            std::generator<CellList&> cell_view();
+            // const CellView& cell_view() const;
+
+            std::generator<NeighborPair&> neighbor_view();
+
+            // NeighborView& neighbor_view();
+            // const NeighborView& neighbor_view() const;
+
         protected:
-            typedef boost::multi_array<CellList, 3> cell_list_array_;
-            typedef boost::array<cell_list_array_::index, 3> multi_index_;
+            typedef boost::multi_array<CellList, 3> cell_list_array_type;
+            typedef boost::array<cell_list_array_type::index, 3> multi_index_type;
 
             // We store the cell lists internally in a multidimensional array
-            cell_list_array_ cell_lists_;
+            cell_list_array_type cell_lists_;
     };
 } // namespace tools
 

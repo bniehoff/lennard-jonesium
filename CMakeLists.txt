@@ -16,6 +16,9 @@ set(SOURCES
     src/lennardjonesium/greeter/greeter.hpp
     src/lennardjonesium/greeter/greeter.cpp
 
+    src/lennardjonesium/draft_cpp23/generator.hpp
+    src/lennardjonesium/draft_cpp23/examples.hpp
+
     src/lennardjonesium/tools/aligned_vectors.hpp
     src/lennardjonesium/tools/volume.hpp
     src/lennardjonesium/tools/dimensions.hpp
