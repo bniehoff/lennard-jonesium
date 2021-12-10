@@ -51,6 +51,7 @@ set(TEST_SOURCES
     tests/lennardjonesium/greeter/test_greeter.cpp
 
     tests/lennardjonesium/tools/test_dimensions.cpp
+    tests/lennardjonesium/tools/test_cell_list_array.cpp
 
     tests/lennardjonesium/physics/test_system_state.cpp
 
