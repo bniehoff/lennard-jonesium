@@ -40,6 +40,10 @@ namespace tools
     {
         const CellList& first;
         const CellList& second;
+
+        // A vector of integers which indicates how the second cell should be offset, in multiples
+        // of the total simulation box dimensions, in order to appear next to the first cell
+        // (assuming periodic boundary conditions).
         Eigen::Vector4i offset;
     };
 
@@ -67,7 +71,7 @@ namespace tools
             std::generator<CellList&> cell_view();
             // const CellView& cell_view() const;
 
-            std::generator<NeighborPair&> neighbor_view();
+            // std::generator<NeighborPair&> neighbor_view();
 
             // NeighborView& neighbor_view();
             // const NeighborView& neighbor_view() const;

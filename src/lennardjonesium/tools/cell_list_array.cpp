@@ -47,9 +47,9 @@ namespace tools
 
         assert((
             "Simulation box size is less than the cutoff length",
-            (dimensions.x < cutoff_length ||
-             dimensions.y < cutoff_length ||
-             dimensions.z < cutoff_length)
+            (dimensions.x > cutoff_length &&
+             dimensions.y > cutoff_length &&
+             dimensions.z > cutoff_length)
         ));
 
         // Obtain the cell counts along the three axes
@@ -85,9 +85,9 @@ namespace tools
                     co_yield cell_lists_(multi_index_type{i, j, k});
     }
 
-    std::generator<NeighborPair&> CellListArray::neighbor_view()
-    {
-        // TODO
-    }
+    // std::generator<NeighborPair&> CellListArray::neighbor_view()
+    // {
+    //     // TODO
+    // }
 } // namespace tools
 
