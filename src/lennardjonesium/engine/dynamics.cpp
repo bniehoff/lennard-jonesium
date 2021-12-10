@@ -21,24 +21,27 @@
  */
 
 #include <lennardjonesium/engine/dynamics.hpp>
+#include <lennardjonesium/tools/dimensions.hpp>
+#include <lennardjonesium/physics/pairwise_force.hpp>
 
 namespace engine
 {
+    Dynamics::Dynamics(const tools::Dimensions& dimensions, const physics::PairwiseForce& force)
+        : Dynamics::Dynamics(dimensions, &force)
+    {}
+
+    Dynamics::Dynamics(const tools::Dimensions& dimensions)
+        : Dynamics::Dynamics(dimensions, nullptr)
+    {}
+
     /**
      * When setting the internal Eigen::Array4d from the bounding box dimensions, we set the
      * fourth component to 1.0 rather than 0.0.  Any non-zero number is fine; the process for
      * imposing the boundary conditions involves componentwise multiplication and division by the
      * entries in the Eigen::Array4d.
      */
-    Dynamics::Dynamics(const Dimensions& dimensions, const physics::PairwiseForce& force)
-        : Dynamics::Dynamics(dimensions, &force)
-    {}
-
-    Dynamics::Dynamics(const Dimensions& dimensions)
-        : Dynamics::Dynamics(dimensions, nullptr)
-    {}
-
-    Dynamics::Dynamics(const Dimensions& dimensions, const physics::PairwiseForce *const force)
+    Dynamics::Dynamics(const tools::Dimensions& dimensions,
+                       const physics::PairwiseForce *const force)
         : dimensions_{dimensions.x, dimensions.y, dimensions.z, 1.0},
           force_(force)
     {}

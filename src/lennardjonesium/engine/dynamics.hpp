@@ -27,26 +27,10 @@
 
 #include <lennardjonesium/physics/system_state.hpp>
 #include <lennardjonesium/physics/pairwise_force.hpp>
+#include <lennardjonesium/tools/dimensions.hpp>
 
 namespace engine
 {
-    struct Dimensions
-    {
-        /**
-         * Used to set the bounding box dimensions.
-         */
-
-        double x;
-        double y;
-        double z;
-
-        // Construct bounding box of specified dimensions
-        Dimensions(double x, double y, double z);
-
-        // Construct cubical bounding box with given side length
-        Dimensions(double dimension);
-    };
-
     class Dynamics
     {
         /**
@@ -72,10 +56,10 @@ namespace engine
             virtual physics::SystemState& operator() (physics::SystemState&) const = 0;
 
             // Construct the system's Dynamics from a bounding box and pairwise force
-            Dynamics(const Dimensions&, const physics::PairwiseForce&);
+            Dynamics(const tools::Dimensions&, const physics::PairwiseForce&);
 
             // Construct a trivial Dynamics that only imposes boundary conditions, and has no forces
-            Dynamics(const Dimensions&);
+            Dynamics(const tools::Dimensions&);
 
         protected:
             /**
@@ -93,7 +77,7 @@ namespace engine
             const physics::PairwiseForce *const force_;
 
             // Internal constructor that directly assigns the member variables
-            Dynamics(const Dimensions&, const physics::PairwiseForce *const);
+            Dynamics(const tools::Dimensions&, const physics::PairwiseForce *const);
     };
 } // namespace engine
 
