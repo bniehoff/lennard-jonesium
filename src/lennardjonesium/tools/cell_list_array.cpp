@@ -73,6 +73,11 @@ namespace tools
         return const_cast<CellList&>(static_cast<const CellListArray&>(*this)(x, y, z));
     }
 
+    const boost::multi_array_types::size_type* CellListArray::shape()
+    {
+        return cell_lists_.shape();
+    }
+
     /**
      * Now we need to define generators
      */
