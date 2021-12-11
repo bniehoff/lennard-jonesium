@@ -20,7 +20,9 @@ SCENARIO( "Creating a CellListArray with unit dimensions" ) {
         tools::CellListArray cell_list_array{dimensions, cutoff_length};
 
         THEN( "It has 3x3x3 elements" ) {
-            // TODO: Need to understand how to get size of boost::multi_array
+            REQUIRE( 3 == cell_list_array.shape()[0] );
+            REQUIRE( 3 == cell_list_array.shape()[1] );
+            REQUIRE( 3 == cell_list_array.shape()[2] );
         }
 
         THEN( "I can access the elements as expected" ) {
