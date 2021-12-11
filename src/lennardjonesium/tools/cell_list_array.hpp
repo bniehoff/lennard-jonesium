@@ -64,6 +64,11 @@ namespace tools
             CellList& operator() (int, int, int);
             const CellList& operator() (int, int, int) const;
 
+            // Get the shape of the array (should not be needed for iteration usually; instead
+            // use the generator methods below)
+            // The type here is a raw pointer to a C-style array of size_t
+            const boost::multi_array_types::size_type* shape();
+
             /**
              * TODO: Functions related to iteration
              */
