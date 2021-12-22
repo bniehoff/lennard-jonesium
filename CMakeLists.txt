@@ -46,7 +46,8 @@ set(SOURCES
 )
 
 set(TEST_SOURCES
-    tests/eigen/test_eigen.cpp
+    tests/other/test_eigen.cpp
+    tests/other/test_modulo.cpp
 
     tests/lennardjonesium/greeter/test_greeter.cpp
 

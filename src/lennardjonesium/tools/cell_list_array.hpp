@@ -69,17 +69,10 @@ namespace tools
             // The type here is a raw pointer to a C-style array of size_t
             const boost::multi_array_types::size_type* shape();
 
-            /**
-             * TODO: Functions related to iteration
-             */
-
+            // Generators for iterating over cells and pairs of adjacent cells.
+            // These are always used in a non-const context, so we do not write const versions.
             std::generator<CellList&> cell_view();
-            // const CellView& cell_view() const;
-
-            // std::generator<NeighborPair&> neighbor_view();
-
-            // NeighborView& neighbor_view();
-            // const NeighborView& neighbor_view() const;
+            std::generator<NeighborPair&&> neighbor_view();
 
         protected:
             typedef boost::multi_array<CellList, 3> cell_list_array_type;
