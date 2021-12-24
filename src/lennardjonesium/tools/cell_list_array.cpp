@@ -116,7 +116,7 @@ namespace tools
          * above list, whose leading nonzero term is +1.
          */
 
-        constexpr CellListArray::multi_index_type neighbors[13] = {
+        constexpr CellListArray::multi_index_type displacements[13] = {
             {1,  1,  1},    {1,  1,  0},    {1,  1,  -1},
             {1,  0,  1},    {1,  0,  0},    {1,  0,  -1},
             {1, -1,  1},    {1, -1,  0},    {1, -1,  -1},
@@ -127,115 +127,39 @@ namespace tools
         for (cell_list_array_type::index i = 0; i < cell_lists_.shape()[0]; ++i)
             for (cell_list_array_type::index j = 0; j < cell_lists_.shape()[1]; ++j)
                 for (cell_list_array_type::index k = 0; k < cell_lists_.shape()[2]; ++k)
-                {
-                    int i_next = (i + 1) % cell_lists_.shape()[0];
-                    int j_next = (j + 1) % cell_lists_.shape()[1];
-                    int k_next = (k + 1) % cell_lists_.shape()[2];
-                    int j_prev = (j - 1) % cell_lists_.shape()[1];
-                    int k_prev = (k - 1) % cell_lists_.shape()[2];
+                    for (auto displacement : displacements)
+                        co_yield get_neighbor_pair_(multi_index_type{i, j, k}, displacement);
+    }
 
-                    // These offsets are used to shift the neighboring element by the corresponding
-                    // multiple of the box size, in the case that the next/prev wraps around.
-                    int offset_i_next = (i_next > i) ? 0 : 1;
-                    int offset_j_next = (j_next > j) ? 0 : 1;
-                    int offset_k_next = (k_next > k) ? 0 : 1;
-                    int offset_j_prev = (j_prev < j) ? 0 : -1;
-                    int offset_k_prev = (k_prev < k) ? 0 : -1;
+    NeighborPair CellListArray::get_neighbor_pair_
+        (const multi_index_type index, const multi_index_type displacement)
+    {
+        multi_index_type neighbor_index {0, 0, 0};
+        Eigen::Vector4i offset {0, 0, 0, 0};
 
-                    // Now give the 13 neighbors, packaged into a NeighborPair struct.
-                    // Did not see much sense in actually writing a loop here.
+        /**
+         * Note: We assume that displacement is one of {-1, 0, 1}.  We cannot use the modulo
+         * operator % naively because it does not have the correct behavior for negative
+         * displacements.
+         */
 
-                    // 1. (i+1, j+1, k+1)
-                    co_yield NeighborPair{
-                        cell_lists_(multi_index_type{i, j, k}),
-                        cell_lists_(multi_index_type{i_next, j_next, k_next}),
-                        Eigen::Vector4i{offset_i_next, offset_j_next, offset_k_next, 0}
-                    };
+        for (int d = 0; d < 3; d++)
+        {
+            // First compute the displaced index without imposing modulo arithmetic
+            neighbor_index[d] += displacement[d];
 
-                    // 2. (i+1, j+1, k)
-                    co_yield NeighborPair{
-                        cell_lists_(multi_index_type{i, j, k}),
-                        cell_lists_(multi_index_type{i_next, j_next, k}),
-                        Eigen::Vector4i{offset_i_next, offset_j_next, 0, 0}
-                    };
+            // Since the displacement can only be {-1, 0, 1}, we can compute the offset without
+            // the modulo operator and without branching.  If we are outside of the correct index
+            // range, then shift in the direction of displacement.
+            offset[d] = displacement[d] * (
+                (neighbor_index[d] < 0) || (neighbor_index[d] >= cell_lists_.shape()[d])
+            );
 
-                    // 3. (i+1, j+1, k-1)
-                    co_yield NeighborPair{
-                        cell_lists_(multi_index_type{i, j, k}),
-                        cell_lists_(multi_index_type{i_next, j_next, k_prev}),
-                        Eigen::Vector4i{offset_i_next, offset_j_next, offset_k_prev, 0}
-                    };
+            // Once we have the offset, use it to find the correct neighbor index in the index range
+            neighbor_index[d] -= offset[d] * cell_lists_.shape()[d];
+        }
 
-                    // 4. (i+1, j, k+1)
-                    co_yield NeighborPair{
-                        cell_lists_(multi_index_type{i, j, k}),
-                        cell_lists_(multi_index_type{i_next, j, k_next}),
-                        Eigen::Vector4i{offset_i_next, 0, offset_k_next, 0}
-                    };
-
-                    // 5. (i+1, j, k)
-                    co_yield NeighborPair{
-                        cell_lists_(multi_index_type{i, j, k}),
-                        cell_lists_(multi_index_type{i_next, j, k}),
-                        Eigen::Vector4i{offset_i_next, 0, 0, 0}
-                    };
-
-                    // 6. (i+1, j, k-1)
-                    co_yield NeighborPair{
-                        cell_lists_(multi_index_type{i, j, k}),
-                        cell_lists_(multi_index_type{i_next, j, k_prev}),
-                        Eigen::Vector4i{offset_i_next, 0, offset_k_prev, 0}
-                    };
-
-                    // 7. (i+1, j-1, k+1)
-                    co_yield NeighborPair{
-                        cell_lists_(multi_index_type{i, j, k}),
-                        cell_lists_(multi_index_type{i_next, j_prev, k_next}),
-                        Eigen::Vector4i{offset_i_next, offset_k_prev, offset_k_next, 0}
-                    };
-
-                    // 8. (i+1, j-1, k)
-                    co_yield NeighborPair{
-                        cell_lists_(multi_index_type{i, j, k}),
-                        cell_lists_(multi_index_type{i_next, j_prev, k}),
-                        Eigen::Vector4i{offset_i_next, offset_k_prev, 0, 0}
-                    };
-
-                    // 9. (i+1, j-1, k-1)
-                    co_yield NeighborPair{
-                        cell_lists_(multi_index_type{i, j, k}),
-                        cell_lists_(multi_index_type{i_next, j_prev, k_prev}),
-                        Eigen::Vector4i{offset_i_next, offset_k_prev, offset_k_prev, 0}
-                    };
-
-                    // 10. (i, j+1, k+1)
-                    co_yield NeighborPair{
-                        cell_lists_(multi_index_type{i, j, k}),
-                        cell_lists_(multi_index_type{i, j_next, k_next}),
-                        Eigen::Vector4i{0, offset_j_next, offset_k_next, 0}
-                    };
-
-                    // 11. (i, j+1, k)
-                    co_yield NeighborPair{
-                        cell_lists_(multi_index_type{i, j, k}),
-                        cell_lists_(multi_index_type{i, j_next, k}),
-                        Eigen::Vector4i{0, offset_j_next, 0, 0}
-                    };
-
-                    // 12. (i, j+1, k-1)
-                    co_yield NeighborPair{
-                        cell_lists_(multi_index_type{i, j, k}),
-                        cell_lists_(multi_index_type{i, j_next, k_prev}),
-                        Eigen::Vector4i{0, offset_j_next, offset_k_prev, 0}
-                    };
-
-                    // 13. (i, j, k+1)
-                    co_yield NeighborPair{
-                        cell_lists_(multi_index_type{i, j, k}),
-                        cell_lists_(multi_index_type{i, j, k_next}),
-                        Eigen::Vector4i{0, 0, offset_k_next, 0}
-                    };
-                }
+        return NeighborPair{cell_lists_(index), cell_lists_(neighbor_index), offset};
     }
 } // namespace tools
 
