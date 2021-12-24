@@ -39,7 +39,7 @@ namespace tools
         Dimensions(double x, double y, double z);
 
         // Construct cubical bounding box with given side length
-        Dimensions(double dimension);
+        explicit Dimensions(double dimension);
     };
 } // namespace tools
 
