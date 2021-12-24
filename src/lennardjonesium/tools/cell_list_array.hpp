@@ -24,6 +24,7 @@
 #define LJ_CELL_LIST_ARRAY_HPP
 
 #include <vector>
+#include <tuple>
 #include <ranges>
 
 #include <boost/multi_array.hpp>
@@ -80,6 +81,10 @@ namespace tools
 
             // We store the cell lists internally in a multidimensional array
             cell_list_array_type cell_lists_;
+
+            // Computes a NeighborPair from the first index and a displacement.
+            NeighborPair get_neighbor_pair_
+                (const multi_index_type index, const multi_index_type displacement);
     };
 } // namespace tools
 
