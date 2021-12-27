@@ -72,8 +72,8 @@ SCENARIO( "Using the cell_view() generator on a 3x3x3 array" ) {
 
 void setup_cell_list_array(tools::CellListArray& cell_list_array)
 {
-    // To set up, let's populate the cell list array with arrays of indices, so that we can
-    // easily see which cells have been selected
+    // To set up, let's populate the cell list array with its own index (as an array), so that we
+    // can easily see which cells have been selected
     for (int i = 0; i < cell_list_array.shape()[0]; i++)
         for (int j = 0; j < cell_list_array.shape()[1]; j++)
             for (int k = 0; k < cell_list_array.shape()[2]; k++)

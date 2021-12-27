@@ -37,8 +37,6 @@ set(SOURCES
     src/lennardjonesium/engine/periodic_boundary_condition.cpp
     src/lennardjonesium/engine/dynamics.hpp
     src/lennardjonesium/engine/dynamics.cpp
-    # src/lennardjonesium/engine/cell_list_dynamics.hpp
-    # src/lennardjonesium/engine/cell_list_dynamics.cpp
     src/lennardjonesium/engine/integrator.hpp
     src/lennardjonesium/engine/integrator.cpp
     src/lennardjonesium/engine/velocity_verlet_integrator.hpp
