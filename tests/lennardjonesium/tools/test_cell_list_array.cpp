@@ -69,3 +69,52 @@ SCENARIO( "Using the cell_view() generator on a 3x3x3 array" ) {
         }
     }
 }
+
+SCENARIO( "Getting a neighbor pair from index and displacement" ) {
+    // To access a protected method for testing, we define a derived class which makes it public
+    class TestCellListArray : public tools::CellListArray
+    {
+        public:
+            using tools::CellListArray::get_neighbor_pair_;
+            using tools::CellListArray::multi_index_type;
+            using tools::CellListArray::CellListArray;
+    };
+
+    // Now create a 3x3x3 cell list array so that we can test different corner cases
+    tools::Dimensions dimensions{1.0};
+    double cutoff_length{0.3};
+    TestCellListArray cell_list_array{dimensions, cutoff_length};
+
+    // To set up, let's populate the cell list array with arrays of indices, so that we can
+    // easily see which cells have been selected
+    for (int i = 0; i < cell_list_array.shape()[0]; i++)
+        for (int j = 0; j < cell_list_array.shape()[1]; j++)
+            for (int k = 0; k < cell_list_array.shape()[2]; k++)
+                cell_list_array(i, j, k) = tools::CellList{i, j, k};
+    
+    WHEN( "I try a displacement that does not wrap around" ) {
+        auto neighbor_pair = cell_list_array.get_neighbor_pair_(
+            TestCellListArray::multi_index_type {1, 1, 1},
+            TestCellListArray::multi_index_type {0, 0, 1}
+        );
+
+        THEN( "I get the correct pair of cells, with zero offset" ) {
+            REQUIRE( tools::CellList {1, 1, 1}    == neighbor_pair.first  );
+            REQUIRE( tools::CellList {1, 1, 2}    == neighbor_pair.second );
+            REQUIRE( Eigen::Vector4i {0, 0, 0, 0} == neighbor_pair.offset );
+        }
+    }
+
+    WHEN( "I try a displacement that wraps around" ) {
+        auto neighbor_pair = cell_list_array.get_neighbor_pair_(
+            TestCellListArray::multi_index_type {0, 1, 2},
+            TestCellListArray::multi_index_type {-1, 1, 1}
+        );
+
+        THEN( "I get the correct pair of cells, with correct offset" ) {
+            REQUIRE( tools::CellList {0, 1, 2}     == neighbor_pair.first  );
+            REQUIRE( tools::CellList {2, 2, 0}     == neighbor_pair.second );
+            REQUIRE( Eigen::Vector4i {-1, 0, 1, 0} == neighbor_pair.offset );
+        }
+    }
+}

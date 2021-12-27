@@ -134,7 +134,7 @@ namespace tools
     NeighborPair CellListArray::get_neighbor_pair_
         (const multi_index_type index, const multi_index_type displacement)
     {
-        multi_index_type neighbor_index {0, 0, 0};
+        multi_index_type neighbor_index = index;
         Eigen::Vector4i offset {0, 0, 0, 0};
 
         /**
