@@ -27,11 +27,10 @@
 
 #include <Eigen/Dense>
 
-#include <boost/multi_array.hpp>
-
 #include <lennardjonesium/physics/system_state.hpp>
 #include <lennardjonesium/physics/pairwise_force.hpp>
 #include <lennardjonesium/tools/dimensions.hpp>
+#include <lennardjonesium/tools/cell_list_array.hpp>
 #include <lennardjonesium/engine/dynamics.hpp>
 
 namespace engine
@@ -41,9 +40,6 @@ namespace engine
         /**
          * A CellListDynamics implements the dynamics of short-range forces by using cell lists.
          */
-
-        // Although we're calling it a "list", we use a contiguous vector
-        typedef std::vector<int> cell_list;
 
         public:
             // Imposes the boundary conditions and calculates the forces of the system
@@ -56,8 +52,7 @@ namespace engine
             CellListDynamics(const tools::Dimensions&);
         
         protected:
-            // The 3-dimensional array of cell lists
-            boost::multi_array<cell_list, 3> cell_lists_;
+            tools::CellListArray cell_list_array_;
 
             // Internal constructor that directly assigns to variables
             CellListDynamics(const tools::Dimensions&, const physics::PairwiseForce *const);
