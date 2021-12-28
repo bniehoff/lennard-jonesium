@@ -23,12 +23,12 @@
 #include <cassert>
 
 #include <Eigen/Dense>
-#include <boost/multi_array.hpp>
 
 #include <lennardjonesium/engine/cell_list_dynamics.hpp>
 #include <lennardjonesium/physics/system_state.hpp>
 #include <lennardjonesium/physics/pairwise_force.hpp>
 #include <lennardjonesium/tools/dimensions.hpp>
+#include <lennardjonesium/tools/cell_list_array.hpp>
 
 namespace engine
 {
@@ -49,7 +49,10 @@ namespace engine
         const tools::Dimensions& dimensions,
         const physics::PairwiseForce *const force
     )
-        : Dynamics::Dynamics(dimensions, force)
+        : Dynamics::Dynamics(dimensions, force),
+          // force can be nullptr here, so how do we construct the CellListArray?
+          // It probably needs a default constructor.
+          cell_list_array_{dimensions, force->cutoff_length()}
     {}
 
     physics::SystemState& CellListDynamics::operator() (physics::SystemState& state) const
