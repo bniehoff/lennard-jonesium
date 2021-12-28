@@ -29,6 +29,12 @@
 #include <lennardjonesium/physics/pairwise_force.hpp>
 #include <lennardjonesium/tools/dimensions.hpp>
 
+/**
+ * NOTE: This replaces ForceCalculation and BoundaryCondition, we are not going to support
+ * arbitrary types of forces and boundary conditions, it's too complicated.  So the assumption
+ * of pairwise short-range forces and periodic boundary conditions will be built in.
+ */
+
 namespace engine
 {
     class Dynamics
