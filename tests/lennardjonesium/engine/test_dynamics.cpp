@@ -10,8 +10,6 @@
 #include <src/lennardjonesium/tools/dimensions.hpp>
 #include <src/lennardjonesium/tools/cell_list_array.hpp>
 
-#include <src/lennardjonesium/engine/periodic_boundary_condition.hpp>
-
 // In order to test some protected methods, it is useful to define a derived class which makes
 // them public
 class TestDynamics : public engine::Dynamics
