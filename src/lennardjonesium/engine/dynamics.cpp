@@ -26,24 +26,22 @@
 
 namespace engine
 {
-    Dynamics::Dynamics(const tools::Dimensions& dimensions, const physics::PairwiseForce& force)
-        : Dynamics::Dynamics(dimensions, &force)
-    {}
-
-    Dynamics::Dynamics(const tools::Dimensions& dimensions)
-        : Dynamics::Dynamics(dimensions, nullptr)
-    {}
-
     /**
      * When setting the internal Eigen::Array4d from the bounding box dimensions, we set the
      * fourth component to 1.0 rather than 0.0.  Any non-zero number is fine; the process for
      * imposing the boundary conditions involves componentwise multiplication and division by the
      * entries in the Eigen::Array4d.
      */
-    Dynamics::Dynamics(const tools::Dimensions& dimensions,
-                       const physics::PairwiseForce *const force)
+    Dynamics::Dynamics
+        (const tools::Dimensions& dimensions, const physics::PairwiseForce& pairwise_force)
         : dimensions_{dimensions.x, dimensions.y, dimensions.z, 1.0},
-          force_(force)
+          pairwise_force_{pairwise_force},
+          cell_list_array_{dimensions, pairwise_force.cutoff_length()}
     {}
+
+    physics::SystemState& Dynamics::operator() (physics::SystemState& state) const
+    {
+        return state;
+    }
 } // namespace engine
 

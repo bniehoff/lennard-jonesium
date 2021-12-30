@@ -55,6 +55,8 @@ namespace tools
          * an interface for iterating over each unique pair of neighboring cells.
          * 
          * This is basically a wrapper around boost::multi_array which adds functionality.
+         * (But also removes functionality, since we've hidden the boost::multi_array
+         * implementation.  Should we make a derived class from it instead?)
          */
 
         public:
@@ -74,6 +76,9 @@ namespace tools
             // These are always used in a non-const context, so we do not write const versions.
             std::generator<CellList&> cell_view();
             std::generator<NeighborPair&&> neighbor_view();
+
+            // Clear the cells of the array so it can be rebuilt
+            void clear();
 
         protected:
             typedef boost::multi_array<CellList, 3> cell_list_array_type;
