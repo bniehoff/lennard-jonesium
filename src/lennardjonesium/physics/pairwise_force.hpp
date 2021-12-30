@@ -73,15 +73,23 @@ namespace physics
             virtual double square_cutoff_length() const = 0;
     };
 
-    // // Single instance of an anonymous class that imposes no forces
-    // inline const class : public PairwiseForce
-    // {
-    //     virtual ForceContribution operator() (Eigen::Vector4d separation) const override
-    //     {return ForceContribution{{0, 0, 0, 0}, 0, 0};}
-        
-    //     virtual double cutoff_length() const override {return 0;}
+    class ZeroPairwiseForce : public PairwiseForce
+    {
+        // We provide one derived class which implements the absence of forces.
 
-    //     virtual double square_cutoff_length() const override {return 0;}
-    // } null_pairwise_force;
+        public:
+            // It is necessary to provide the cutoff length, since there is no natural choice
+            // for a zero force.
+            explicit ZeroPairwiseForce(double cutoff_length);
+
+            virtual ForceContribution operator() (Eigen::Vector4d) const override;
+
+            virtual double cutoff_length() const override;
+
+            virtual double square_cutoff_length() const override;
+        
+        protected:
+            double cutoff_length_;
+    };
 } // namespace physics
 #endif

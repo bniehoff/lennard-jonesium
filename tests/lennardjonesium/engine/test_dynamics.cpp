@@ -38,22 +38,21 @@ SCENARIO("Imposing boundary conditions")
     // Set up a box of side length 1.5
     tools::Dimensions dimensions{1.5};
 
-    /**
-     * TODO: Can't write tests until we have defined more about PairwiseForce.
-     * 
-     * Paste in old PBC test, we will use the values
-     */
+    // Set up a PairwiseForce that represents the absence of forces
+    physics::ZeroPairwiseForce pairwise_force{0.5};
 
-    // Use a bounding box of side length 1.5
-    engine::PeriodicBoundaryCondition boundary_condition(1.5);
+    // Set up the Dynamics object
+    TestDynamics dynamics(dimensions, pairwise_force);
 
-    WHEN( "I impose the boundary conditions on the system" ) {
-        state | boundary_condition;
+    WHEN("I impose the boundary conditions on the system")
+    {
+        dynamics.impose_boundary_conditions_(state);
 
-        THEN( "The particle positions are set to the correct locations within the box" ) {
-            REQUIRE( Approx(0.2) == state.positions(0, 0) );
-            REQUIRE( Approx(0.2) == state.positions(1, 1) );
-            REQUIRE( Approx(0.2) == state.positions(2, 2) );
+        THEN("The particle positions are set to the correct locations within the box")
+        {
+            REQUIRE(Approx(0.2) == state.positions(0, 0));
+            REQUIRE(Approx(0.2) == state.positions(1, 1));
+            REQUIRE(Approx(0.2) == state.positions(2, 2));
         }
     }
 }
