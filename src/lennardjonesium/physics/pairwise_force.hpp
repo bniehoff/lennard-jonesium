@@ -66,7 +66,7 @@ namespace physics
          */
 
         public:
-            virtual ForceContribution operator() (Eigen::Vector4d) const = 0;
+            virtual ForceContribution operator() (Eigen::Vector4d separation) const = 0;
 
             virtual double cutoff_length() const = 0;
 

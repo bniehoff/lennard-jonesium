@@ -84,6 +84,61 @@ namespace engine
 
     void Dynamics::compute_forces_(physics::SystemState& state)
     {
+        // First, clear all the dynamics information from the state
+        state.forces.setZero();
+        state.potential_energy = 0;
+        state.virial = 0;
+
+        // Next, go over all the particles within a single cell
+        for (const auto& cell : cell_list_array_.cell_view())
+        {
+            // For every distinct pair of particles, compute the force contribution and add it
+            for (int i = 0; i < cell.size(); i++)
+            {
+                for (int j = i + 1; j < cell.size(); j++)
+                {
+                    Eigen::Vector4d separation = (
+                        state.positions.col(cell[i]) - state.positions.col(cell[j])
+                    );
+
+                    physics::ForceContribution fc = pairwise_force_(separation);
+
+                    state.forces.col(cell[i]) += fc.force;
+                    state.forces.col(cell[j]) -= fc.force;
+
+                    state.potential_energy += fc.potential;
+                    state.virial += fc.virial;
+                }
+            }
+        }
+
+        // Finally, go over pairs of neighboring cells
+        for (const auto& neighbor_pair : cell_list_array_.neighbor_view())
+        {
+            // Compute the real-distance offset from the neighbor pair "unit offset"
+            auto offset = (dimensions_ * neighbor_pair.offset.array().cast<double>()).matrix();
+
+            // For every pair of particles taking one from each cell, compute contributions
+            for (int i = 0; i < neighbor_pair.first.size(); i++)
+            {
+                for (int j = 0; j < neighbor_pair.second.size(); j++)
+                {
+                    Eigen::Vector4d separation = (
+                        state.positions.col(neighbor_pair.first[i])
+                        - state.positions.col(neighbor_pair.second[j])
+                        - offset
+                    );
+
+                    physics::ForceContribution fc = pairwise_force_(separation);
+
+                    state.forces.col(neighbor_pair.first[i]) += fc.force;
+                    state.forces.col(neighbor_pair.second[j]) -= fc.force;
+
+                    state.potential_energy += fc.potential;
+                    state.virial += fc.virial;
+                }
+            }
+        }
     }
 } // namespace engine
 
