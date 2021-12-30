@@ -28,12 +28,7 @@
 #include <lennardjonesium/physics/system_state.hpp>
 #include <lennardjonesium/physics/pairwise_force.hpp>
 #include <lennardjonesium/tools/dimensions.hpp>
-
-/**
- * NOTE: This replaces ForceCalculation and BoundaryCondition, we are not going to support
- * arbitrary types of forces and boundary conditions, it's too complicated.  So the assumption
- * of pairwise short-range forces and periodic boundary conditions will be built in.
- */
+#include <lennardjonesium/tools/cell_list_array.hpp>
 
 namespace engine
 {
@@ -59,31 +54,21 @@ namespace engine
 
         public:
             // Imposes the boundary conditions and calculates the forces of the system
-            virtual physics::SystemState& operator() (physics::SystemState&) const = 0;
+            physics::SystemState& operator() (physics::SystemState&) const;
 
             // Construct the system's Dynamics from a bounding box and pairwise force
             Dynamics(const tools::Dimensions&, const physics::PairwiseForce&);
 
-            // Construct a trivial Dynamics that only imposes boundary conditions, and has no forces
-            Dynamics(const tools::Dimensions&);
-
         protected:
-            /**
-             * We store the bounding box internally as an array type so that it can more easily
-             * be used in Eigen broadcasting expressions.
-             */
+            // We store the bounding box internally as an array type so that it can be used with
+            // Eigen broadcasting expressions.
             const Eigen::Array4d dimensions_;
 
-            /**
-             * Internally, we use a pointer to the PairwiseForce, which may be null in the case
-             * that there are no forces.  (There is no sense in which a zero force can be thought
-             * of as short-range, so we cannot formulate the lack of forces as some sort of
-             * "default pairwise force".)
-             */
-            const physics::PairwiseForce *const force_;
+            // The pairwise interparticle force
+            const physics::PairwiseForce& pairwise_force_;
 
-            // Internal constructor that directly assigns the member variables
-            Dynamics(const tools::Dimensions&, const physics::PairwiseForce *const);
+            // The CellListArray which will be used to implement pairwise forces efficiently
+            tools::CellListArray cell_list_array_;
     };
 } // namespace engine
 

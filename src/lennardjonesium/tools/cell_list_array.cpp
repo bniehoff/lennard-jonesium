@@ -131,6 +131,12 @@ namespace tools
                         co_yield get_neighbor_pair_(multi_index_type{i, j, k}, displacement);
     }
 
+    void CellListArray::clear()
+    {
+        for (auto& cell_list : cell_view())
+            cell_list.clear();
+    }
+
     NeighborPair CellListArray::get_neighbor_pair_
         (const multi_index_type index, const multi_index_type displacement)
     {
