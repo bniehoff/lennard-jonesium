@@ -19,8 +19,6 @@ set(SOURCES
     src/lennardjonesium/draft_cpp23/generator.hpp
     src/lennardjonesium/draft_cpp23/examples.hpp
 
-    src/lennardjonesium/tools/aligned_vectors.hpp
-    src/lennardjonesium/tools/volume.hpp
     src/lennardjonesium/tools/dimensions.hpp
     src/lennardjonesium/tools/dimensions.cpp
     src/lennardjonesium/tools/cell_list_array.hpp
