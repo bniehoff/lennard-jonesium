@@ -1,5 +1,5 @@
 /**
- * Test for PeriodicBoundaryCondition
+ * Test for Dynamics
  */
 
 #include <catch2/catch.hpp>
@@ -9,6 +9,8 @@
 #include <src/lennardjonesium/physics/system_state.hpp>
 #include <src/lennardjonesium/tools/dimensions.hpp>
 #include <src/lennardjonesium/tools/cell_list_array.hpp>
+
+#include <tests/lennardjonesium/physics/constant_pairwise_force.hpp>
 
 // In order to test some protected methods, it is useful to define a derived class which makes
 // them public
@@ -39,7 +41,7 @@ SCENARIO("Imposing boundary conditions")
     tools::Dimensions dimensions{1.5};
 
     // Set up a PairwiseForce that represents the absence of forces
-    physics::ZeroPairwiseForce pairwise_force{0.5};
+    ConstantPairwiseForce pairwise_force{0, 0.5};
 
     // Set up the Dynamics object
     TestDynamics dynamics(dimensions, pairwise_force);
@@ -70,7 +72,7 @@ SCENARIO("Building/rebuilding the cell lists")
 
     // Set up the Dynamics object
     tools::Dimensions dimensions{1.5};
-    physics::ZeroPairwiseForce pairwise_force{0.5};
+    ConstantPairwiseForce pairwise_force{0, 0.5};
     TestDynamics dynamics(dimensions, pairwise_force);
 
     WHEN("I build the cell lists")
