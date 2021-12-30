@@ -67,7 +67,7 @@ namespace tools
             const CellList& operator() (int, int, int) const;
 
             // Get the shape of the array as an Eigen 4-vector (the 4th entry is 0).
-            const Eigen::Vector4i shape() const;
+            const Eigen::Array4i shape() const;
 
             // Generators for iterating over cells and pairs of adjacent cells.
             // These are always used in a non-const context, so we do not write const versions.
