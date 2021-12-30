@@ -36,8 +36,6 @@ set(SOURCES
     src/lennardjonesium/engine/boundary_condition.hpp
     src/lennardjonesium/engine/periodic_boundary_condition.hpp
     src/lennardjonesium/engine/periodic_boundary_condition.cpp
-    # src/lennardjonesium/engine/cell_list_dynamics.hpp
-    # src/lennardjonesium/engine/cell_list_dynamics.cpp
 
     # Use these instead
     src/lennardjonesium/engine/dynamics.hpp
