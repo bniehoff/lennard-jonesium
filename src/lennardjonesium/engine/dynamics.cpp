@@ -64,11 +64,22 @@ namespace engine
 
     void Dynamics::rebuild_cell_lists_(const physics::SystemState& state)
     {
-        // First clear the current cell list array
+        // First compute the cell indices of every particle
+        auto cell_indices = (
+            state.positions.array().colwise()
+            * cell_list_array_.shape().cast<double>()
+            / dimensions_
+        ).floor().cast<int>();
+
+        // Next clear the existing cell list array
         cell_list_array_.clear();
 
-        // Now assign every particle to a cell based on its location
-        
+        // Finally, assign each particle to its corresponding cell
+        for (int i = 0; i < cell_indices.cols(); i++)
+        {
+            auto cell_index = cell_indices.col(i);
+            cell_list_array_(cell_index.x(), cell_index.y(), cell_index.z()).push_back(i);
+        }
     }
 
     void Dynamics::compute_forces_(physics::SystemState& state)

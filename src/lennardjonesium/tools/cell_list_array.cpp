@@ -76,13 +76,13 @@ namespace tools
         return const_cast<CellList&>(static_cast<const CellListArray&>(*this)(x, y, z));
     }
 
-    const Eigen::Vector4i CellListArray::shape() const
+    const Eigen::Array4i CellListArray::shape() const
     {
         /**
          * The entries of cell_lists_.shape() are of type unsigned long.  Boost is expecting very
          * large arrays.  In our case this will not happen, so the cast to int should be safe.
          */
-        return Eigen::Vector4i{
+        return Eigen::Array4i{
             static_cast<int>(cell_lists_.shape()[0]),
             static_cast<int>(cell_lists_.shape()[1]),
             static_cast<int>(cell_lists_.shape()[2]),
