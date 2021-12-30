@@ -8,6 +8,7 @@
 #include <src/lennardjonesium/engine/dynamics.hpp>
 #include <src/lennardjonesium/physics/system_state.hpp>
 #include <src/lennardjonesium/tools/dimensions.hpp>
+#include <src/lennardjonesium/tools/cell_list_array.hpp>
 
 #include <src/lennardjonesium/engine/periodic_boundary_condition.hpp>
 
@@ -20,6 +21,7 @@ class TestDynamics : public engine::Dynamics
         using engine::Dynamics::impose_boundary_conditions_;
         using engine::Dynamics::rebuild_cell_lists_;
         using engine::Dynamics::compute_forces_;
+        using engine::Dynamics::cell_list_array_;
 };
 
 SCENARIO("Imposing boundary conditions")
@@ -53,6 +55,69 @@ SCENARIO("Imposing boundary conditions")
             REQUIRE(Approx(0.2) == state.positions(0, 0));
             REQUIRE(Approx(0.2) == state.positions(1, 1));
             REQUIRE(Approx(0.2) == state.positions(2, 2));
+        }
+    }
+}
+
+SCENARIO("Building/rebuilding the cell lists")
+{
+    // System of 3 particles
+    physics::SystemState state(3);
+    state.positions = Eigen::Matrix4Xd{
+        {0.3, 0.2,  1.1},
+        {1.1, 1.2,  0.2},
+        {0.7, 0.1,  0.8},
+        {0,     0,    0}
+    };
+
+    // Set up the Dynamics object
+    tools::Dimensions dimensions{1.5};
+    physics::ZeroPairwiseForce pairwise_force{0.5};
+    TestDynamics dynamics(dimensions, pairwise_force);
+
+    WHEN("I build the cell lists")
+    {
+        dynamics.rebuild_cell_lists_(state);
+
+        THEN("I find the particles in the expected cells")
+        {
+            int particle_count{0};
+
+            for (const auto& cell : dynamics.cell_list_array_.cell_view())
+                particle_count += cell.size();
+            
+            REQUIRE(3 == particle_count);
+
+            REQUIRE(tools::CellList{0} == dynamics.cell_list_array_(0, 2, 1));
+            REQUIRE(tools::CellList{1} == dynamics.cell_list_array_(0, 2, 0));
+            REQUIRE(tools::CellList{2} == dynamics.cell_list_array_(2, 0, 1));
+        }
+    }
+
+    WHEN("I move one of the particles")
+    {
+        state.positions = Eigen::Matrix4Xd{
+            {0.3, 0.2,  0.4},
+            {1.1, 1.2,  1.4},
+            {0.7, 0.1,  0.8},
+            {0,     0,    0}
+        };
+
+        dynamics.rebuild_cell_lists_(state);
+
+        THEN("I find the particles in the expected cells")
+        {
+            int particle_count{0};
+
+            for (const auto& cell : dynamics.cell_list_array_.cell_view())
+            {
+                particle_count += cell.size();
+            }
+            
+            REQUIRE(3 == particle_count);
+
+            REQUIRE(tools::CellList{0, 2} == dynamics.cell_list_array_(0, 2, 1));
+            REQUIRE(tools::CellList{1} == dynamics.cell_list_array_(0, 2, 0));
         }
     }
 }
