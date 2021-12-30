@@ -54,7 +54,7 @@ namespace engine
 
         public:
             // Imposes the boundary conditions and calculates the forces of the system
-            physics::SystemState& operator() (physics::SystemState&) const;
+            physics::SystemState& operator() (physics::SystemState&);
 
             // Construct the system's Dynamics from a bounding box and pairwise force
             Dynamics(const tools::Dimensions&, const physics::PairwiseForce&);
@@ -69,6 +69,11 @@ namespace engine
 
             // The CellListArray which will be used to implement pairwise forces efficiently
             tools::CellListArray cell_list_array_;
+
+            // Methods for performing the various steps of imposing dynamics
+            void impose_boundary_conditions_(physics::SystemState&);
+            void rebuild_cell_lists_(const physics::SystemState&);
+            void compute_forces_(physics::SystemState&);
     };
 } // namespace engine
 
