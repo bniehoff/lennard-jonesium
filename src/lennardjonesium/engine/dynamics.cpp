@@ -66,8 +66,8 @@ namespace engine
     {
         // First compute the cell indices of every particle
         auto cell_indices = (
-            state.positions.array().colwise()
-            * cell_list_array_.shape().cast<double>()
+            (state.positions.array().colwise()
+                * cell_list_array_.shape().cast<double>()).colwise()
             / dimensions_
         ).floor().cast<int>();
 
