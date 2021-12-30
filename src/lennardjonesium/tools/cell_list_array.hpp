@@ -54,7 +54,8 @@ namespace tools
          * A CellListArray stores the cell lists in a 3-dimensional array structure and implements
          * an interface for iterating over each unique pair of neighboring cells.
          * 
-         * This is basically a wrapper around boost::multi_array which adds functionality.
+         * This is basically a wrapper around boost::multi_array which adds functionality and hides
+         * some details.
          */
 
         public:
@@ -65,15 +66,16 @@ namespace tools
             CellList& operator() (int, int, int);
             const CellList& operator() (int, int, int) const;
 
-            // Get the shape of the array (should not be needed for iteration usually; instead
-            // use the generator methods below)
-            // The type here is a raw pointer to a C-style array of size_t
-            const boost::multi_array_types::size_type* shape();
+            // Get the shape of the array as an Eigen 4-vector (the 4th entry is 0).
+            const Eigen::Vector4i shape() const;
 
             // Generators for iterating over cells and pairs of adjacent cells.
             // These are always used in a non-const context, so we do not write const versions.
             std::generator<CellList&> cell_view();
             std::generator<NeighborPair&&> neighbor_view();
+
+            // Clear the cells of the array so it can be rebuilt
+            void clear();
 
         protected:
             typedef boost::multi_array<CellList, 3> cell_list_array_type;

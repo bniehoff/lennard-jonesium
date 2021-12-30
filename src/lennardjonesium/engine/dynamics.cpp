@@ -26,24 +26,53 @@
 
 namespace engine
 {
-    Dynamics::Dynamics(const tools::Dimensions& dimensions, const physics::PairwiseForce& force)
-        : Dynamics::Dynamics(dimensions, &force)
-    {}
-
-    Dynamics::Dynamics(const tools::Dimensions& dimensions)
-        : Dynamics::Dynamics(dimensions, nullptr)
-    {}
-
     /**
      * When setting the internal Eigen::Array4d from the bounding box dimensions, we set the
      * fourth component to 1.0 rather than 0.0.  Any non-zero number is fine; the process for
      * imposing the boundary conditions involves componentwise multiplication and division by the
      * entries in the Eigen::Array4d.
      */
-    Dynamics::Dynamics(const tools::Dimensions& dimensions,
-                       const physics::PairwiseForce *const force)
+    Dynamics::Dynamics
+        (const tools::Dimensions& dimensions, const physics::PairwiseForce& pairwise_force)
         : dimensions_{dimensions.x, dimensions.y, dimensions.z, 1.0},
-          force_(force)
+          pairwise_force_{pairwise_force},
+          cell_list_array_{dimensions, pairwise_force.cutoff_length()}
     {}
+
+    physics::SystemState& Dynamics::operator() (physics::SystemState& state)
+    {
+        impose_boundary_conditions_(state);
+        rebuild_cell_lists_(state);
+        compute_forces_(state);
+
+        return state;
+    }
+
+    void Dynamics::impose_boundary_conditions_(physics::SystemState& state)
+    {
+        /**
+         * This would be slightly more elegant if Eigen provided a componentwise fractional part.
+         * Instead we have to subtract the integer part (floor), appropriately rescaled by the
+         * size of the box.
+         */
+
+        state.positions -= (
+            (state.positions.array().colwise() / dimensions_).floor().array().colwise()
+            * dimensions_
+        ).matrix();
+    }
+
+    void Dynamics::rebuild_cell_lists_(const physics::SystemState& state)
+    {
+        // First clear the current cell list array
+        cell_list_array_.clear();
+
+        // Now assign every particle to a cell based on its location
+        
+    }
+
+    void Dynamics::compute_forces_(physics::SystemState& state)
+    {
+    }
 } // namespace engine
 

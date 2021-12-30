@@ -30,11 +30,14 @@ set(SOURCES
     src/lennardjonesium/physics/system_state.cpp
     src/lennardjonesium/physics/pairwise_force.hpp
 
+    # These will be removed
     src/lennardjonesium/engine/force_calculation.hpp
     src/lennardjonesium/engine/cutoff_force_calculation.hpp
     src/lennardjonesium/engine/boundary_condition.hpp
     src/lennardjonesium/engine/periodic_boundary_condition.hpp
     src/lennardjonesium/engine/periodic_boundary_condition.cpp
+
+    # Use these instead
     src/lennardjonesium/engine/dynamics.hpp
     src/lennardjonesium/engine/dynamics.cpp
     src/lennardjonesium/engine/integrator.hpp

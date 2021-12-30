@@ -72,5 +72,16 @@ namespace physics
 
             virtual double square_cutoff_length() const = 0;
     };
+
+    // // Single instance of an anonymous class that imposes no forces
+    // inline const class : public PairwiseForce
+    // {
+    //     virtual ForceContribution operator() (Eigen::Vector4d separation) const override
+    //     {return ForceContribution{{0, 0, 0, 0}, 0, 0};}
+        
+    //     virtual double cutoff_length() const override {return 0;}
+
+    //     virtual double square_cutoff_length() const override {return 0;}
+    // } null_pairwise_force;
 } // namespace physics
 #endif

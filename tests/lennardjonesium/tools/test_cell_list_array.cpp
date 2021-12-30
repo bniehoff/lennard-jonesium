@@ -80,6 +80,25 @@ void setup_cell_list_array(tools::CellListArray& cell_list_array)
                 cell_list_array(i, j, k) = tools::CellList{i, j, k};
 }
 
+SCENARIO( "Clearing the array" ) {
+    GIVEN( "A 3x3x3 array set up with its own indices" ) {
+        tools::Dimensions dimensions{1.0};
+        double cutoff_length{0.3};
+
+        tools::CellListArray cell_list_array{dimensions, cutoff_length};
+        setup_cell_list_array(cell_list_array);
+
+        WHEN( "I clear the array" ) {
+            cell_list_array.clear();
+
+            THEN( "Every cell is empty" ) {
+                for (auto& cell : cell_list_array.cell_view())
+                    REQUIRE( cell.empty() );
+            }
+        }
+    }
+}
+
 SCENARIO( "Getting a neighbor pair from index and displacement" ) {
     // To access a protected method for testing, we define a derived class which makes it public
     class TestCellListArray : public tools::CellListArray

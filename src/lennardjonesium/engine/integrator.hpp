@@ -24,6 +24,8 @@
 #define LJ_INTEGRATOR_HPP
 
 #include <lennardjonesium/physics/system_state.hpp>
+#include <lennardjonesium/engine/dynamics.hpp>
+
 #include <lennardjonesium/engine/force_calculation.hpp>
 #include <lennardjonesium/engine/boundary_condition.hpp>
 
@@ -56,6 +58,10 @@ namespace engine
         protected:
             // The time step by which we will increment (assumed fixed)
             const double timestep_;
+
+            // The operator which implements the dynamics.  This computes forces, potential energy,
+            // virial, and may impose boundary conditions.
+            // const Dynamics& dynamics_;
 
             // A state operator that computes the forces, potential energy, and virial
             const ForceCalculation& force_calculation_;
