@@ -29,7 +29,6 @@ set(SOURCES
     src/lennardjonesium/physics/system_state.hpp
     src/lennardjonesium/physics/system_state.cpp
     src/lennardjonesium/physics/pairwise_force.hpp
-    src/lennardjonesium/physics/pairwise_force.cpp
 
     # These will be removed
     src/lennardjonesium/engine/force_calculation.hpp
@@ -57,6 +56,9 @@ set(TEST_SOURCES
     tests/lennardjonesium/tools/test_cell_list_array.cpp
 
     tests/lennardjonesium/physics/test_system_state.cpp
+    tests/lennardjonesium/physics/constant_pairwise_force.hpp
+    tests/lennardjonesium/physics/constant_pairwise_force.cpp
+    tests/lennardjonesium/physics/test_constant_pairwise_force.cpp
 
     tests/lennardjonesium/engine/test_dynamics.cpp
     tests/lennardjonesium/engine/test_velocity_verlet_integrator.cpp

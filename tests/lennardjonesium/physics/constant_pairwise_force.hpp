@@ -1,5 +1,5 @@
 /**
- * pairwise_force.cpp
+ * constant_pairwise_force.hpp
  * 
  * Copyright (c) 2021 Benjamin E. Niehoff
  * 
@@ -20,25 +20,24 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include <Eigen/Dense>
+#ifndef LJ_CONSTANT_PAIRWISE_FORCE_HPP
+#define LJ_CONSTANT_PAIRWISE_FORCE_HPP
 
-#include <lennardjonesium/physics/pairwise_force.hpp>
+#include <src/lennardjonesium/physics/pairwise_force.hpp>
 
-namespace physics
+// We define this derived class for testing purposes only
+class ConstantPairwiseForce : public physics::PairwiseForce
 {
-    ZeroPairwiseForce::ZeroPairwiseForce(double cutoff_length)
-        : cutoff_length_{cutoff_length}
-    {}
+    public:
+        ConstantPairwiseForce(double force, double cutoff_length);
 
-    ForceContribution ZeroPairwiseForce::operator() (Eigen::Vector4d separation) const
-    {
-        return ForceContribution{{0, 0, 0, 0}, 0, 0};
-    }
-
-    double ZeroPairwiseForce::cutoff_length() const
-    {return cutoff_length_;}
+        virtual physics::ForceContribution operator() (Eigen::Vector4d) const override;
+        virtual double cutoff_length() const override;
+        virtual double square_cutoff_length() const override;
     
-    double ZeroPairwiseForce::square_cutoff_length() const
-    {return cutoff_length_ * cutoff_length_;}
-} // namespace physics
+    protected:
+        const double force_;
+        const double cutoff_length_;
+};
 
+#endif

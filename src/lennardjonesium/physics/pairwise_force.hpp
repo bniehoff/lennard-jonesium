@@ -66,30 +66,11 @@ namespace physics
          */
 
         public:
-            virtual ForceContribution operator() (Eigen::Vector4d) const = 0;
+            virtual ForceContribution operator() (Eigen::Vector4d separation) const = 0;
 
             virtual double cutoff_length() const = 0;
 
             virtual double square_cutoff_length() const = 0;
-    };
-
-    class ZeroPairwiseForce : public PairwiseForce
-    {
-        // We provide one derived class which implements the absence of forces.
-
-        public:
-            // It is necessary to provide the cutoff length, since there is no natural choice
-            // for a zero force.
-            explicit ZeroPairwiseForce(double cutoff_length);
-
-            virtual ForceContribution operator() (Eigen::Vector4d) const override;
-
-            virtual double cutoff_length() const override;
-
-            virtual double square_cutoff_length() const override;
-        
-        protected:
-            double cutoff_length_;
     };
 } // namespace physics
 #endif
