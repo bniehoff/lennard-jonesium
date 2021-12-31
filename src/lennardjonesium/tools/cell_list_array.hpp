@@ -50,7 +50,6 @@ namespace tools
 
     // Generators for going over pairs of particle indices in CellLists
     std::generator<IndexPair> index_pairs(const CellList&);
-    std::generator<IndexPair> index_pairs(const CellList&, const CellList&);
     std::generator<IndexPair> index_pairs(const NeighborPair&);
 
     class CellListArray
