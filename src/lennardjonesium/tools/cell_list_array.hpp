@@ -35,10 +35,11 @@
 namespace tools
 {
     typedef std::vector<int> CellList;
+    typedef std::tuple<int, int> IndexPair;
 
     // Generators for going over pairs of particle indices in CellLists
-    std::generator<std::tuple<int, int>> index_pairs(const CellList&);
-    std::generator<std::tuple<int, int>> index_pairs(const CellList&, const CellList&);
+    std::generator<IndexPair> index_pairs(const CellList&);
+    std::generator<IndexPair> index_pairs(const CellList&, const CellList&);
 
     struct NeighborPair
     {
