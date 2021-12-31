@@ -25,7 +25,6 @@
 
 #include <vector>
 #include <tuple>
-#include <ranges>
 
 #include <boost/multi_array.hpp>
 #include <Eigen/Dense>
@@ -36,6 +35,10 @@
 namespace tools
 {
     typedef std::vector<int> CellList;
+
+    // Generators for going over pairs of particle indices in CellLists
+    std::generator<std::tuple<int, int>> index_pairs(const CellList&);
+    std::generator<std::tuple<int, int>> index_pairs(const CellList&, const CellList&);
 
     struct NeighborPair
     {
@@ -72,7 +75,7 @@ namespace tools
             // Generators for iterating over cells and pairs of adjacent cells.
             // These are always used in a non-const context, so we do not write const versions.
             std::generator<CellList&> cell_view();
-            std::generator<NeighborPair&&> neighbor_view();
+            std::generator<NeighborPair> neighbor_view();
 
             // Clear the cells of the array so it can be rebuilt
             void clear();
