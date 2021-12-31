@@ -40,39 +40,16 @@ SCENARIO("Using the index_pairs generator")
 
         WHEN("I iterate over pairs from both CellLists")
         {
+            tools::NeighborPair neighbor_pair{a, b, {0, 0, 0, 0}};
+
             std::vector<tools::IndexPair> result;
 
-            for (auto index_pair : tools::index_pairs(a, b))
+            for (auto index_pair : tools::index_pairs(neighbor_pair))
                 result.push_back(index_pair);
             
             std::sort(result.begin(), result.end());
 
             THEN("I get the expected list of pairs")
-            {
-                std::vector<tools::IndexPair> expected{
-                    {1, 2}, {1, 4}, {1, 6}, {1, 8}, {3, 2}, {3, 4}, {3, 6}, {3, 8},
-                    {5, 2}, {5, 4}, {5, 6}, {5, 8}, {7, 2}, {7, 4}, {7, 6}, {7, 8},
-                    {9, 2}, {9, 4}, {9, 6}, {9, 8}
-                };
-
-                std::sort(expected.begin(), expected.end());
-
-                REQUIRE(expected == result);
-            }
-        }
-
-        WHEN("I package the CellLists into a NeighborPair")
-        {
-            tools::NeighborPair np{a, b, {0, 0, 0, 0}};
-
-            std::vector<tools::IndexPair> result;
-
-            for (auto index_pair : tools::index_pairs(np))
-                result.push_back(index_pair);
-            
-            std::sort(result.begin(), result.end());
-
-            THEN("I get the same result")
             {
                 std::vector<tools::IndexPair> expected{
                     {1, 2}, {1, 4}, {1, 6}, {1, 8}, {3, 2}, {3, 4}, {3, 6}, {3, 8},
