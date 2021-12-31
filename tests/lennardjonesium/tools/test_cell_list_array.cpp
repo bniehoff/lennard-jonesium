@@ -2,6 +2,7 @@
  * Testing CellListArray object
  */
 
+#include <vector>
 #include <algorithm>
 
 #include <catch2/catch.hpp>
@@ -9,6 +10,58 @@
 
 #include <src/lennardjonesium/tools/dimensions.hpp>
 #include <src/lennardjonesium/tools/cell_list_array.hpp>
+
+SCENARIO("Using the index_pairs generator")
+{
+    GIVEN("Two CellLists")
+    {
+        tools::CellList a{1, 3, 5, 7, 9};
+        tools::CellList b{2, 4, 6, 8};
+
+        WHEN("I iterate over the index pairs in one CellList")
+        {
+            std::vector<tools::IndexPair> result;
+
+            for (auto index_pair : tools::index_pairs(a))
+                result.push_back(index_pair);
+            
+            std::sort(result.begin(), result.end());
+
+            THEN("I get the expected list of pairs")
+            {
+                std::vector<tools::IndexPair> expected{
+                    {1, 3}, {1, 5}, {1, 7}, {1, 9}, {3, 5}, {3, 7}, {3, 9},
+                    {5, 7}, {5, 9}, {7, 9}
+                };
+
+                REQUIRE(expected == result);
+            }
+        }
+
+        WHEN("I iterate over pairs from both CellLists")
+        {
+            std::vector<tools::IndexPair> result;
+
+            for (auto index_pair : tools::index_pairs(a, b))
+                result.push_back(index_pair);
+            
+            std::sort(result.begin(), result.end());
+
+            THEN("I get the expected list of pairs")
+            {
+                std::vector<tools::IndexPair> expected{
+                    {1, 2}, {1, 4}, {1, 6}, {1, 8}, {3, 2}, {3, 4}, {3, 6}, {3, 8},
+                    {5, 2}, {5, 4}, {5, 6}, {5, 8}, {7, 2}, {7, 4}, {7, 6}, {7, 8},
+                    {9, 2}, {9, 4}, {9, 6}, {9, 8}
+                };
+
+                std::sort(expected.begin(), expected.end());
+
+                REQUIRE(expected == result);
+            }
+        }
+    }
+}
 
 SCENARIO("Creating a CellListArray and accessing elements")
 {
