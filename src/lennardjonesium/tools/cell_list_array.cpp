@@ -32,21 +32,27 @@
 
 namespace tools
 {   
-    std::generator<std::tuple<int, int>> index_pairs(const CellList& cell_list)
+    std::generator<IndexPair> index_pairs(const CellList& cell_list)
     {
         // Generate all the distinct pairs of entries in the CellList
         for (int i = 0; i < cell_list.size(); i++)
             for (int j = i + 1; j < cell_list.size(); j++)
-                co_yield std::tuple<int, int>{cell_list[i], cell_list[j]};
+                co_yield IndexPair{cell_list[i], cell_list[j]};
     }
 
-    std::generator<std::tuple<int, int>> index_pairs
+    std::generator<IndexPair> index_pairs
         (const CellList& first, const CellList& second)
     {
         // Generate all distinct pairs taking one entry from the first list and one from the second
         for (int i = 0; i < first.size(); i++)
             for (int j = 0; j < second.size(); j++)
-                co_yield std::tuple<int, int>{first[i], second[j]};
+                co_yield IndexPair{first[i], second[j]};
+    }
+
+    std::generator<IndexPair> index_pairs(const NeighborPair& neighbor_pair)
+    {
+        // Delegate to the version with two CellLists
+        co_yield std::elements_of(index_pairs(neighbor_pair.first, neighbor_pair.second));
     }
 
     CellListArray::CellListArray(tools::Dimensions dimensions, double cutoff_length)

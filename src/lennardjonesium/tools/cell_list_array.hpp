@@ -35,10 +35,7 @@
 namespace tools
 {
     typedef std::vector<int> CellList;
-
-    // Generators for going over pairs of particle indices in CellLists
-    std::generator<std::tuple<int, int>> index_pairs(const CellList&);
-    std::generator<std::tuple<int, int>> index_pairs(const CellList&, const CellList&);
+    typedef std::tuple<int, int> IndexPair;
 
     struct NeighborPair
     {
@@ -50,6 +47,11 @@ namespace tools
         // (assuming periodic boundary conditions).
         Eigen::Vector4i offset;
     };
+
+    // Generators for going over pairs of particle indices in CellLists
+    std::generator<IndexPair> index_pairs(const CellList&);
+    std::generator<IndexPair> index_pairs(const CellList&, const CellList&);
+    std::generator<IndexPair> index_pairs(const NeighborPair&);
 
     class CellListArray
     {
