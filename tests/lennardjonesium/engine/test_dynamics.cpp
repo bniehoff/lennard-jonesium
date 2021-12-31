@@ -122,7 +122,134 @@ SCENARIO("Building/rebuilding the cell lists")
     }
 }
 
-SCENARIO("Computing forces")
+SCENARIO("Computing forces between particles")
 {
-    
+    GIVEN("A state with 2 particles")
+    {
+        // Let's just use 2 particles
+        physics::SystemState state(2);
+
+        // Set up the Dynamics object
+        tools::Dimensions dimensions{3.0};
+        ConstantPairwiseForce pairwise_force{10.0, 1.0};
+        TestDynamics dynamics(dimensions, pairwise_force);
+
+        WHEN("I put the particles near each other in the same cell")
+        {
+            state.positions = Eigen::Matrix4Xd{
+                {0.2, 0.2},
+                {0.2, 0.2},
+                {0.2, 0.6},
+                {  0,   0}
+            };
+
+            dynamics.rebuild_cell_lists_(state);
+            Eigen::Vector4d force_up{0, 0, 10.0, 0};
+            Eigen::Vector4d force_down{0, 0, -10.0, 0};
+
+            THEN("I find the expected forces between them")
+            {
+                dynamics.compute_forces_(state);
+
+                REQUIRE(force_up.isApprox(state.forces.col(0)));
+                REQUIRE(force_down.isApprox(state.forces.col(1)));
+
+                REQUIRE(Approx(-6.0) == state.potential_energy);
+                REQUIRE(Approx(-4.0) == state.virial);
+            }
+        }
+
+        WHEN("I put the particles near each other in adjacent cells")
+        {
+            state.positions = Eigen::Matrix4Xd{
+                {0.2, 0.2},
+                {0.2, 0.2},
+                {0.8, 1.2},
+                {  0,   0}
+            };
+
+            dynamics.rebuild_cell_lists_(state);
+            Eigen::Vector4d force_up{0, 0, 10.0, 0};
+            Eigen::Vector4d force_down{0, 0, -10.0, 0};
+
+            THEN("I find the expected forces between them")
+            {
+                dynamics.compute_forces_(state);
+
+                REQUIRE(force_up.isApprox(state.forces.col(0)));
+                REQUIRE(force_down.isApprox(state.forces.col(1)));
+
+                REQUIRE(Approx(-6.0) == state.potential_energy);
+                REQUIRE(Approx(-4.0) == state.virial);
+            }
+        }
+
+        WHEN("I put the particles near each other across the periodic boundary")
+        {
+            state.positions = Eigen::Matrix4Xd{
+                {0.2, 0.2},
+                {0.2, 0.2},
+                {2.8, 0.2},
+                {  0,   0}
+            };
+
+            dynamics.rebuild_cell_lists_(state);
+            Eigen::Vector4d force_up{0, 0, 10.0, 0};
+            Eigen::Vector4d force_down{0, 0, -10.0, 0};
+
+            THEN("I find the expected forces between them")
+            {
+                dynamics.compute_forces_(state);
+
+                REQUIRE(force_up.isApprox(state.forces.col(0)));
+                REQUIRE(force_down.isApprox(state.forces.col(1)));
+
+                REQUIRE(Approx(-6.0) == state.potential_energy);
+                REQUIRE(Approx(-4.0) == state.virial);
+            }
+        }
+    }
+
+    GIVEN("A state with 3 particles")
+    {
+        // Create state
+        physics::SystemState state(3);
+
+        // Set up the Dynamics object
+        tools::Dimensions dimensions{3.0};
+        ConstantPairwiseForce pairwise_force{10.0, 1.0};
+        TestDynamics dynamics(dimensions, pairwise_force);
+
+        WHEN("I put the particles near each other in an L shape")
+        {
+            state.positions = Eigen::Matrix4Xd{
+                {0.6, 1.4, 0.6},
+                {0.6, 0.6, 1.4},
+                {0.2, 0.2, 0.2},
+                {  0,   0,   0}
+            };
+
+            dynamics.rebuild_cell_lists_(state);
+
+            Eigen::Matrix4Xd expected_forces{
+                {10.0, -10.0,   0.0},
+                {10.0,   0.0, -10.0},
+                { 0.0,   0.0,   0.0},
+                { 0.0,   0.0,   0.0}
+            };
+
+            double expected_potential{-4.0};
+            double expected_virial{-16.0};
+
+            THEN("I find the expected forces between them")
+            {
+                dynamics.compute_forces_(state);
+
+                REQUIRE(expected_forces.isApprox(state.forces));
+
+                REQUIRE(Approx(expected_potential) == state.potential_energy);
+                REQUIRE(Approx(expected_virial) == state.virial);
+            }
+        }
+    }
 }
