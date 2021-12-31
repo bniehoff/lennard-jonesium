@@ -22,8 +22,7 @@
 
 #include <cmath>
 #include <cassert>
-#include <ranges>
-#include <array>
+#include <tuple>
 
 #include <Eigen/Dense>
 
@@ -33,6 +32,23 @@
 
 namespace tools
 {   
+    std::generator<std::tuple<int, int>> index_pairs(const CellList& cell_list)
+    {
+        // Generate all the distinct pairs of entries in the CellList
+        for (int i = 0; i < cell_list.size(); i++)
+            for (int j = i + 1; j < cell_list.size(); j++)
+                co_yield std::tuple<int, int>{cell_list[i], cell_list[j]};
+    }
+
+    std::generator<std::tuple<int, int>> index_pairs
+        (const CellList& first, const CellList& second)
+    {
+        // Generate all distinct pairs taking one entry from the first list and one from the second
+        for (int i = 0; i < first.size(); i++)
+            for (int j = 0; j < second.size(); j++)
+                co_yield std::tuple<int, int>{first[i], second[j]};
+    }
+
     CellListArray::CellListArray(tools::Dimensions dimensions, double cutoff_length)
     {
         /**
@@ -100,7 +116,7 @@ namespace tools
                     co_yield cell_lists_(multi_index_type{i, j, k});
     }
 
-    std::generator<NeighborPair&&> CellListArray::neighbor_view()
+    std::generator<NeighborPair> CellListArray::neighbor_view()
     {
         /**
          * Each cell (i, j, k) has 26 neighbors, given by
