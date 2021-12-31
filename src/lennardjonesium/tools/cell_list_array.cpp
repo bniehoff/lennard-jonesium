@@ -75,6 +75,8 @@ namespace tools
         auto y = static_cast<int>(std::floor(dimensions.y / cutoff_length));
         auto z = static_cast<int>(std::floor(dimensions.z / cutoff_length));
 
+        // Set the shape array
+        shape_ = Eigen::Array4i{x, y, z, 0};
 
         // Resize the cell lists array according to the cell counts
         cell_lists_.resize(boost::extents[x][y][z]);
@@ -92,18 +94,7 @@ namespace tools
     }
 
     const Eigen::Array4i CellListArray::shape() const
-    {
-        /**
-         * The entries of cell_lists_.shape() are of type unsigned long.  Boost is expecting very
-         * large arrays.  In our case this will not happen, so the cast to int should be safe.
-         */
-        return Eigen::Array4i{
-            static_cast<int>(cell_lists_.shape()[0]),
-            static_cast<int>(cell_lists_.shape()[1]),
-            static_cast<int>(cell_lists_.shape()[2]),
-            0
-        };
-    }
+    {return shape_;}
 
     std::generator<CellList&> CellListArray::cell_view()
     {
