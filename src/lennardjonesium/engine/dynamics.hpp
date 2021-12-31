@@ -74,6 +74,8 @@ namespace engine
             void impose_boundary_conditions_(physics::SystemState&);
             void rebuild_cell_lists_(const physics::SystemState&);
             void compute_forces_(physics::SystemState&);
+            void add_force_contribution_
+                (physics::SystemState&, const tools::IndexPair&, const Eigen::Vector4d&);
     };
 } // namespace engine
 

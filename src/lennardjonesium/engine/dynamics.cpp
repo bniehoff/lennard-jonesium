@@ -91,24 +91,11 @@ namespace engine
 
         // Next, go over all the particles within a single cell
         for (const auto& cell : cell_list_array_.cell_view())
-        {
+        {   
             // For every distinct pair of particles, compute the force contribution and add it
-            for (int i = 0; i < cell.size(); i++)
+            for (const auto& index_pair : tools::index_pairs(cell))
             {
-                for (int j = i + 1; j < cell.size(); j++)
-                {
-                    Eigen::Vector4d separation = (
-                        state.positions.col(cell[i]) - state.positions.col(cell[j])
-                    );
-
-                    physics::ForceContribution fc = pairwise_force_(separation);
-
-                    state.forces.col(cell[i]) += fc.force;
-                    state.forces.col(cell[j]) -= fc.force;
-
-                    state.potential_energy += fc.potential;
-                    state.virial += fc.virial;
-                }
+                add_force_contribution_(state, index_pair, Eigen::Vector4d::Zero());
             }
         }
 
@@ -119,25 +106,33 @@ namespace engine
             auto offset = (dimensions_ * neighbor_pair.offset.array().cast<double>()).matrix();
 
             // For every pair of particles taking one from each cell, compute contributions
-            for (int i = 0; i < neighbor_pair.first.size(); i++)
+            for (const auto& index_pair : tools::index_pairs(neighbor_pair))
             {
-                for (int j = 0; j < neighbor_pair.second.size(); j++)
-                {
-                    Eigen::Vector4d separation = (
-                        state.positions.col(neighbor_pair.first[i])
-                        - state.positions.col(neighbor_pair.second[j])
-                        - offset
-                    );
-
-                    physics::ForceContribution fc = pairwise_force_(separation);
-
-                    state.forces.col(neighbor_pair.first[i]) += fc.force;
-                    state.forces.col(neighbor_pair.second[j]) -= fc.force;
-
-                    state.potential_energy += fc.potential;
-                    state.virial += fc.virial;
-                }
+                add_force_contribution_(state, index_pair, offset);
             }
+        }
+    }
+
+    void Dynamics::add_force_contribution_
+        (physics::SystemState& state,
+         const tools::IndexPair& index_pair,
+         const Eigen::Vector4d& offset)
+    {
+        auto [first, second] = index_pair;
+
+        Eigen::Vector4d separation = (
+            state.positions.col(first) - state.positions.col(second) - offset
+        );
+
+        if (separation.squaredNorm() < pairwise_force_.square_cutoff_length())
+        {
+            physics::ForceContribution force_constribution = pairwise_force_(separation);
+
+            state.forces.col(first) += force_constribution.force;
+            state.forces.col(second) -= force_constribution.force;
+
+            state.potential_energy += force_constribution.potential;
+            state.virial += force_constribution.virial;
         }
     }
 } // namespace engine
