@@ -40,19 +40,12 @@ namespace tools
                 co_yield IndexPair{cell_list[i], cell_list[j]};
     }
 
-    std::generator<IndexPair> index_pairs
-        (const CellList& first, const CellList& second)
-    {
-        // Generate all distinct pairs taking one entry from the first list and one from the second
-        for (int i = 0; i < first.size(); i++)
-            for (int j = 0; j < second.size(); j++)
-                co_yield IndexPair{first[i], second[j]};
-    }
-
     std::generator<IndexPair> index_pairs(const NeighborPair& neighbor_pair)
     {
-        // Delegate to the version with two CellLists
-        co_yield std::elements_of(index_pairs(neighbor_pair.first, neighbor_pair.second));
+        // Generate all distinct pairs taking one entry from the first list and one from the second
+        for (int i = 0; i < neighbor_pair.first.size(); i++)
+            for (int j = 0; j < neighbor_pair.second.size(); j++)
+                co_yield IndexPair{neighbor_pair.first[i], neighbor_pair.second[j]};
     }
 
     CellListArray::CellListArray(tools::Dimensions dimensions, double cutoff_length)
