@@ -44,4 +44,13 @@ namespace physics
 
         return *this;
     }
+
+    SystemState& SystemState::reset_dynamical_quantities()
+    {
+        forces.setZero();
+        potential_energy = 0;
+        virial = 0;
+
+        return *this;
+    }
 } // namespace physics

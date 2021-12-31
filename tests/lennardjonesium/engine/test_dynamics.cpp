@@ -222,6 +222,11 @@ SCENARIO("Computing forces between particles")
 
         WHEN("I put the particles near each other in an L shape")
         {
+            /**
+             * We put the particles far enough apart that the forces should only act along the
+             * horizontal and vertical directions.  The diagonal distance between the last two
+             * particles is too far for the force to act.
+             */
             state.positions = Eigen::Matrix4Xd{
                 {0.6, 1.4, 0.6},
                 {0.6, 0.6, 1.4},
