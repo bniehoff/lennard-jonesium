@@ -66,6 +66,9 @@ namespace physics
          * This both sets the particle count AND initializes all array data to zero.
          */
         SystemState& set_particle_count(int particle_count);
+
+        // Resets the dynamical quantities to zero (to prepare to accumulate the next ones).
+        SystemState& reset_dynamical_quantities();
     };
 
     /**
