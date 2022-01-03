@@ -13,6 +13,8 @@ include_directories(
 set(CMAKE_CXX_STANDARD 20)
 
 set(SOURCES
+    src/lennardjonesium/abstract/overview.hpp
+    
     src/lennardjonesium/greeter/greeter.hpp
     src/lennardjonesium/greeter/greeter.cpp
 
