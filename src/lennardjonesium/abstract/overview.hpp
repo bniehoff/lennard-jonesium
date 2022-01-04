@@ -36,8 +36,11 @@
  */
 
 #include <functional>
-#include <vector>
+#include <concepts>
+#include <type_traits>
 #include <memory>
+#include <utility>
+#include <vector>
 
 #include <Eigen/Dense>
 
@@ -158,14 +161,14 @@ namespace physics
          *  (virial tensor)
          * 
          * The last two are not necessary for the most basic simulator, but may be interesting in
-         * the future for measuring things like shear stress.
+         * the future for measuring things like shear stress and pressure.
          * 
          * SystemState only contains this information, and doesn't do anything with it.  It is
-         * acted upon by Operators
+         * acted upon by Operators.
          */
 
         // An Operator is a function that acts on the SystemState
-        typedef std::function<SystemState& (SystemState&)> Operator;
+        using Operator = std::function<SystemState& (SystemState&)>;
 
         // Construct a zero-initialized state with a given number of particles
         explicit SystemState(int particle_count = 0);

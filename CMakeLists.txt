@@ -26,8 +26,9 @@ set(SOURCES
     src/lennardjonesium/tools/cell_list_array.hpp
     src/lennardjonesium/tools/cell_list_array.cpp
 
-    # src/lennardjonesium/physics/system_state.hpp
-    # src/lennardjonesium/physics/system_state.cpp
+    src/lennardjonesium/physics/system_state.hpp
+    src/lennardjonesium/physics/system_state.cpp
+    
     # src/lennardjonesium/physics/pairwise_force.hpp
 
     # src/lennardjonesium/engine/force_calculation.hpp
@@ -52,7 +53,8 @@ set(TEST_SOURCES
     tests/lennardjonesium/tools/test_bounding_box.cpp
     tests/lennardjonesium/tools/test_cell_list_array.cpp
 
-    # tests/lennardjonesium/physics/test_system_state.cpp
+    tests/lennardjonesium/physics/test_system_state.cpp
+
     # tests/lennardjonesium/physics/constant_pairwise_force.hpp
     # tests/lennardjonesium/physics/constant_pairwise_force.cpp
     # tests/lennardjonesium/physics/test_constant_pairwise_force.cpp
