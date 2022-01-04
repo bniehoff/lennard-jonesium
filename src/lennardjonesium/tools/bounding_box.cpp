@@ -1,5 +1,5 @@
 /**
- * dimensions.hpp
+ * bounding_box.cpp
  * 
  * Copyright (c) 2021 Benjamin E. Niehoff
  * 
@@ -20,28 +20,19 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LJ_DIMENSIONS_HPP
-#define LJ_DIMENSIONS_HPP
+#include <Eigen/Dense>
+
+#include <lennardjonesium/tools/bounding_box.hpp>
 
 namespace tools
 {
-    struct Dimensions
-    {
-        /**
-         * Used to give bounding box dimensions.
-         */
+    BoundingBox::BoundingBox(double s) : BoundingBox{{s, s, s, 1.0}}
+    {}
 
-        double x;
-        double y;
-        double z;
+    BoundingBox::BoundingBox(double x, double y, double z) : BoundingBox{{x, y, z, 1.0}}
+    {}
 
-        // Construct bounding box of specified dimensions
-        Dimensions(double x, double y, double z);
-
-        // Construct cubical bounding box with given side length
-        explicit Dimensions(double dimension);
-    };
+    BoundingBox::BoundingBox(Eigen::Array4d dimensions) : dimensions_{dimensions}
+    {}
 } // namespace tools
 
-
-#endif

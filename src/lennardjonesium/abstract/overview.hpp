@@ -70,6 +70,10 @@ namespace tools
          * just a thin wrapper around an Eigen::Vector4d which gives some convenient constructors
          * and helps encapsulate the 4d vectors being used to represent the system, despite it
          * being only 3d.
+         * 
+         * Note that BoundingBox is always used _multiplicatively_ (e.g., to check whether something
+         * is in the box, one can use `position.array() / box.array()`).  So, the 4th component of
+         * the array representation is always 1.0.
          */
 
         public:
@@ -83,7 +87,7 @@ namespace tools
      * A CellList is used to keep track of which particles are in a particular cell, or rectilinear
      * subregion of the simulation box.
      */
-    typedef std::vector<int> CellList;
+    using CellList = std::vector<int>;
 
     struct CellListPair
     {
@@ -262,7 +266,7 @@ namespace engine
             ParticlePairFilter(const tools::BoundingBox& bounding_box, double cutoff_distance);
 
             // Generate the ParticlePairs filtered by separation distance
-            std::generator<ParticlePair> operator() (const physics::SystemState&) const;
+            virtual std::generator<ParticlePair> operator() (const physics::SystemState&) const = 0;
     };
 
     class BoundaryCondition
