@@ -32,6 +32,8 @@ set(SOURCES
     
     # src/lennardjonesium/physics/pairwise_force.hpp
 
+    src/lennardjonesium/engine/particle_pair_filter.hpp
+
     # src/lennardjonesium/engine/force_calculation.hpp
     # src/lennardjonesium/engine/cutoff_force_calculation.hpp
     # src/lennardjonesium/engine/boundary_condition.hpp
