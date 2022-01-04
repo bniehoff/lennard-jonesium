@@ -35,8 +35,8 @@ set(SOURCES
     src/lennardjonesium/engine/particle_pair_filter.hpp
     src/lennardjonesium/engine/boundary_condition.hpp
     src/lennardjonesium/engine/force_calculation.hpp
-    # src/lennardjonesium/engine/periodic_boundary_condition.hpp
-    # src/lennardjonesium/engine/periodic_boundary_condition.cpp
+    src/lennardjonesium/engine/periodic_boundary_condition.hpp
+    src/lennardjonesium/engine/periodic_boundary_condition.cpp
     src/lennardjonesium/engine/integrator.hpp
     src/lennardjonesium/engine/integrator.cpp
 
@@ -61,6 +61,8 @@ set(TEST_SOURCES
     # tests/lennardjonesium/physics/constant_pairwise_force.hpp
     # tests/lennardjonesium/physics/constant_pairwise_force.cpp
     # tests/lennardjonesium/physics/test_constant_pairwise_force.cpp
+
+    tests/lennardjonesium/engine/test_periodic_boundary_condition.cpp
 
     # tests/lennardjonesium/engine/test_dynamics.cpp
     # tests/lennardjonesium/engine/test_velocity_verlet_integrator.cpp
