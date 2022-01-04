@@ -1,5 +1,5 @@
 /**
- * constant_pairwise_force.hpp
+ * constant_short_range_force.hpp
  * 
  * Copyright (c) 2021 Benjamin E. Niehoff
  * 
@@ -20,24 +20,25 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LJ_CONSTANT_PAIRWISE_FORCE_HPP
-#define LJ_CONSTANT_PAIRWISE_FORCE_HPP
+#ifndef LJ_CONSTANT_SHORT_RANGE_FORCE_HPP
+#define LJ_CONSTANT_SHORT_RANGE_FORCE_HPP
 
-#include <src/lennardjonesium/physics/pairwise_force.hpp>
+#include <src/lennardjonesium/physics/forces.hpp>
 
 // We define this derived class for testing purposes only
-class ConstantPairwiseForce : public physics::PairwiseForce
+class ConstantShortRangeForce : public physics::ShortRangeForce
 {
     public:
-        ConstantPairwiseForce(double force, double cutoff_length);
+        ConstantShortRangeForce(double force, double cutoff_length);
 
-        virtual physics::ForceContribution operator() (Eigen::Vector4d) const override;
-        virtual double cutoff_length() const override;
-        virtual double square_cutoff_length() const override;
+        virtual physics::ForceContribution
+        operator() (const Eigen::Ref<const Eigen::Vector4d>& separation) const override;
+
+        virtual double cutoff_distance() const override;
     
     protected:
         const double force_;
-        const double cutoff_length_;
+        const double cutoff_distance_;
 };
 
 #endif

@@ -1,13 +1,13 @@
 /**
- * Test for ConstantPairwiseForce
+ * Test ConstantShortRangeForce
  */
 
 #include <catch2/catch.hpp>
 #include <Eigen/Dense>
 
-#include <src/lennardjonesium/physics/pairwise_force.hpp>
+#include <src/lennardjonesium/physics/forces.hpp>
 
-#include <tests/lennardjonesium/physics/constant_pairwise_force.hpp>
+#include <tests/lennardjonesium/physics/constant_short_range_force.hpp>
 
 SCENARIO("Constant forces with cutoff distance")
 {
@@ -16,14 +16,14 @@ SCENARIO("Constant forces with cutoff distance")
         double force = 3.0;
         double cutoff_distance = 5.0;
 
-        ConstantPairwiseForce pairwise_force{force, cutoff_distance};
+        ConstantShortRangeForce short_range_force{force, cutoff_distance};
 
         WHEN("I ask for the force at separation distance 2.0")
         {
             double distance = 2.0;
 
             Eigen::Vector4d separation{0, 0, distance, 0};
-            physics::ForceContribution fc = pairwise_force(separation);
+            physics::ForceContribution fc = short_range_force(separation);
 
             THEN("I get the expected values")
             {
@@ -41,7 +41,7 @@ SCENARIO("Constant forces with cutoff distance")
             double distance = 4.0;
 
             Eigen::Vector4d separation{0, 0, distance, 0};
-            physics::ForceContribution fc = pairwise_force(separation);
+            physics::ForceContribution fc = short_range_force(separation);
 
             THEN("I get the expected values")
             {
@@ -59,7 +59,7 @@ SCENARIO("Constant forces with cutoff distance")
             double distance = 8.0;
 
             Eigen::Vector4d separation{0, 0, distance, 0};
-            physics::ForceContribution fc = pairwise_force(separation);
+            physics::ForceContribution fc = short_range_force(separation);
 
             THEN("I get zero")
             {
