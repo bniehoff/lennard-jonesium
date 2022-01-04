@@ -24,76 +24,84 @@
 #define LJ_CELL_LIST_ARRAY_HPP
 
 #include <vector>
-#include <tuple>
 
 #include <boost/multi_array.hpp>
 #include <Eigen/Dense>
 
 #include <lennardjonesium/draft_cpp23/generator.hpp>
-#include <lennardjonesium/tools/dimensions.hpp>
+#include <lennardjonesium/tools/bounding_box.hpp>
 
 namespace tools
 {
-    typedef std::vector<int> CellList;
-    typedef std::tuple<int, int> IndexPair;
+    /**
+     * A CellList is used to keep track of which particles are in a particular cell, or rectilinear
+     * subregion of the simulation box.
+     */
+    using CellList = std::vector<int>;
 
-    struct NeighborPair
+    struct CellListPair
     {
+        /**
+         * CellListPair contains references to two adjacent cells, as well as an array that gives
+         * the coordinates of the lattice image of the periodic bounding box to which the second
+         * CellList belongs (this is to account for "neighboring cells" which wrap around the
+         * boundary).  So, e.g., if lattice_image is {0, 0, 1, 0}, then the second CellList should
+         * be interpreted as belonging to a copy of the simulation box that is displaced in the
+         * z direction by 1 (multiple of the box's z dimension).
+         */
+
+        Eigen::Array4i lattice_image;
+
         const CellList& first;
         const CellList& second;
-
-        // A vector of integers which indicates how the second cell should be offset, in multiples
-        // of the total simulation box dimensions, in order to appear next to the first cell
-        // (assuming periodic boundary conditions).
-        Eigen::Vector4i offset;
     };
-
-    // Generators for going over pairs of particle indices in CellLists
-    std::generator<IndexPair> index_pairs(const CellList&);
-    std::generator<IndexPair> index_pairs(const NeighborPair&);
 
     class CellListArray
     {
         /**
-         * A CellListArray stores the cell lists in a 3-dimensional array structure and implements
-         * an interface for iterating over each unique pair of neighboring cells.
+         * CellListArray maintains a structure of Cell Lists which are used to find pairs of
+         * particles that are within the cutoff distance of each other.  A CellList is a list
+         * of indices into the SystemState.
          * 
-         * This is basically a wrapper around boost::multi_array which adds functionality and hides
-         * some details.
+         * Note that we do not depend on the SystemState, and CellListArray is responsible only
+         * for maintaining the CellLists and not for populating them in the first place.  The only
+         * information needed is the shape (i.e. integer dimensions) of the multidimensional array
+         * of cells, which can be deduced from the cutoff distance and the full dimensions of the
+         * simulation box.
          */
 
         public:
-            // Construct the cell list array from a simulation box size, and a minimum cell size
-            CellListArray(Dimensions dimensions, double cutoff_length);
+            CellListArray(const BoundingBox& bounding_box, double cutoff_distance);
 
-            // Access a given element (cannot use operator[] with more than one parameter)
+            // Access an element
             CellList& operator() (int, int, int);
+
+            // Access an element on a const object (not sure if needed)
             const CellList& operator() (int, int, int) const;
 
-            // Get the shape of the array as an Eigen 4-vector (the 4th entry is 0).
-            const Eigen::Array4i shape() const;
+            // Get the shape of the multidimensional array
+            Eigen::Array4i shape() {return shape_;};
 
-            // Generators for iterating over cells and pairs of adjacent cells.
-            // These are always used in a non-const context, so we do not write const versions.
-            std::generator<CellList&> cell_view();
-            std::generator<NeighborPair> neighbor_view();
-
-            // Clear the cells of the array so it can be rebuilt
+            // Clear the elements of the array
             void clear();
 
-        protected:
-            typedef boost::multi_array<CellList, 3> cell_list_array_type;
-            typedef boost::array<cell_list_array_type::index, 3> multi_index_type;
+            // Generator to traverse the individual cells
+            std::generator<const CellList&> cells() const;
 
-            // We store the cell lists internally in a multidimensional array
-            cell_list_array_type cell_lists_;
+            // Generator to traverse adjacent pairs of cells (including periodic wrap around)
+            std::generator<CellListPair> adjacent_pairs() const;
+        
+        private:
+            using array_type = boost::multi_array<CellList, 3>;
+            using index_type = boost::array<array_type::index, 3>;
 
-            // We also store the shape array
+            std::generator<index_type> cell_indices_() const;
+
+            // We store the cell lists internally in a boost::multi_array
+            array_type cell_array_;
+
+            // We also store the shape
             Eigen::Array4i shape_;
-
-            // Computes a NeighborPair from the first index and a displacement.
-            NeighborPair get_neighbor_pair_
-                (const multi_index_type index, const multi_index_type displacement);
     };
 } // namespace tools
 

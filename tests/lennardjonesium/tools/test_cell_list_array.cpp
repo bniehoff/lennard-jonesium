@@ -1,5 +1,5 @@
 /**
- * Testing CellListArray object
+ * Test CellListArray
  */
 
 #include <vector>
@@ -8,78 +8,22 @@
 #include <catch2/catch.hpp>
 #include <Eigen/Dense>
 
-#include <src/lennardjonesium/tools/dimensions.hpp>
+#include <src/lennardjonesium/tools/bounding_box.hpp>
 #include <src/lennardjonesium/tools/cell_list_array.hpp>
-
-SCENARIO("Using the index_pairs generator")
-{
-    GIVEN("Two CellLists")
-    {
-        tools::CellList a{1, 3, 5, 7, 9};
-        tools::CellList b{2, 4, 6, 8};
-
-        WHEN("I iterate over the index pairs in one CellList")
-        {
-            std::vector<tools::IndexPair> result;
-
-            for (auto index_pair : tools::index_pairs(a))
-                result.push_back(index_pair);
-            
-            std::sort(result.begin(), result.end());
-
-            THEN("I get the expected list of pairs")
-            {
-                std::vector<tools::IndexPair> expected{
-                    {1, 3}, {1, 5}, {1, 7}, {1, 9}, {3, 5}, {3, 7}, {3, 9},
-                    {5, 7}, {5, 9}, {7, 9}
-                };
-
-                REQUIRE(expected == result);
-            }
-        }
-
-        WHEN("I iterate over pairs from both CellLists")
-        {
-            tools::NeighborPair neighbor_pair{a, b, {0, 0, 0, 0}};
-
-            std::vector<tools::IndexPair> result;
-
-            for (auto index_pair : tools::index_pairs(neighbor_pair))
-                result.push_back(index_pair);
-            
-            std::sort(result.begin(), result.end());
-
-            THEN("I get the expected list of pairs")
-            {
-                std::vector<tools::IndexPair> expected{
-                    {1, 2}, {1, 4}, {1, 6}, {1, 8}, {3, 2}, {3, 4}, {3, 6}, {3, 8},
-                    {5, 2}, {5, 4}, {5, 6}, {5, 8}, {7, 2}, {7, 4}, {7, 6}, {7, 8},
-                    {9, 2}, {9, 4}, {9, 6}, {9, 8}
-                };
-
-                std::sort(expected.begin(), expected.end());
-
-                REQUIRE(expected == result);
-            }
-        }
-    }
-}
 
 SCENARIO("Creating a CellListArray and accessing elements")
 {
-    tools::Dimensions dimensions{1.0};
+    tools::BoundingBox bounding_box{1.0};
 
     WHEN("I create a CellListArray with 0.3 cutoff")
     {
-        double cutoff_length{0.3};
+        double cutoff_distance{0.3};
 
-        tools::CellListArray cell_list_array{dimensions, cutoff_length};
+        tools::CellListArray cell_list_array{bounding_box, cutoff_distance};
 
         THEN("It has 3x3x3 elements")
         {
-            REQUIRE(3 == cell_list_array.shape()[0]);
-            REQUIRE(3 == cell_list_array.shape()[1]);
-            REQUIRE(3 == cell_list_array.shape()[2]);
+            REQUIRE((Eigen::Array4i{3, 3, 3, 0} == cell_list_array.shape()).all());
         }
 
         THEN("I can access the elements as expected")
@@ -93,42 +37,23 @@ SCENARIO("Creating a CellListArray and accessing elements")
     }
 }
 
-SCENARIO("Using the cell_view() generator on a 3x3x3 array")
+SCENARIO("Using the cells() generator on a 3x3x3 array")
 {
-    tools::Dimensions dimensions{1.0};
-    double cutoff_length{0.3};
-    tools::CellListArray cell_list_array{dimensions, cutoff_length};
+    tools::BoundingBox bounding_box{1.0};
+    double cutoff_distance{0.3};
+    tools::CellListArray cell_list_array{bounding_box, cutoff_distance};
 
     WHEN("I iterate over the cells in a 3x3x3 array")
     {
         int count{0};
 
-        for (auto& cell_list : cell_list_array.cell_view()) {
+        for (const auto& cell : cell_list_array.cells()) {
             count++;
         }
 
         THEN("I get the correct number of cells")
         {
             REQUIRE(27 == count);
-        }
-    }
-
-    WHEN("I record the order in which cells are visited")
-    {
-        int index{0};
-
-        for (auto& cell_list : cell_list_array.cell_view()) {
-            cell_list.push_back(index);
-            index++;
-        }
-
-        THEN("I get the expected order of access") {
-            for (int i = 0; i < cell_list_array.shape()[0]; i++)
-                for (int j = 0; j < cell_list_array.shape()[1]; j++)
-                    for (int k = 0; k < cell_list_array.shape()[2]; k++) {
-                        index = 9*i + 3*j + k;
-                        REQUIRE(index == cell_list_array(i, j, k)[0]);
-                    }
         }
     }
 }
@@ -145,83 +70,40 @@ void setup_cell_list_array(tools::CellListArray& cell_list_array)
 
 SCENARIO("Clearing the array") {
     GIVEN("A 3x3x3 array set up with its own indices") {
-        tools::Dimensions dimensions{1.0};
-        double cutoff_length{0.3};
+        tools::BoundingBox bounding_box{1.0};
+        double cutoff_distance{0.3};
 
-        tools::CellListArray cell_list_array{dimensions, cutoff_length};
+        tools::CellListArray cell_list_array{bounding_box, cutoff_distance};
         setup_cell_list_array(cell_list_array);
 
         WHEN("I clear the array") {
             cell_list_array.clear();
 
             THEN("Every cell is empty") {
-                for (auto& cell : cell_list_array.cell_view())
+                for (const auto& cell : cell_list_array.cells())
                     REQUIRE(cell.empty());
             }
         }
     }
 }
 
-SCENARIO("Getting a neighbor pair from index and displacement")
-{
-    // To access a protected method for testing, we define a derived class which makes it public
-    class TestCellListArray : public tools::CellListArray
-    {
-        public:
-            using tools::CellListArray::get_neighbor_pair_;
-            using tools::CellListArray::multi_index_type;
-            using tools::CellListArray::CellListArray;
-    };
-
-    // Now create a 3x3x3 cell list array so that we can test different corner cases
-    tools::Dimensions dimensions{1.0};
-    double cutoff_length{0.3};
-    TestCellListArray cell_list_array{dimensions, cutoff_length};
-
-    setup_cell_list_array(cell_list_array);
-    
-    WHEN("I try a displacement that does not wrap around")
-    {
-        auto neighbor_pair = cell_list_array.get_neighbor_pair_(
-            TestCellListArray::multi_index_type {1, 1, 1},
-            TestCellListArray::multi_index_type {0, 0, 1}
-        );
-
-        THEN("I get the correct pair of cells, with zero offset")
-        {
-            REQUIRE(tools::CellList {1, 1, 1}    == neighbor_pair.first );
-            REQUIRE(tools::CellList {1, 1, 2}    == neighbor_pair.second);
-            REQUIRE(Eigen::Vector4i {0, 0, 0, 0} == neighbor_pair.offset);
-        }
-    }
-
-    WHEN("I try a displacement that wraps around")
-    {
-        auto neighbor_pair = cell_list_array.get_neighbor_pair_(
-            TestCellListArray::multi_index_type {0, 1, 2},
-            TestCellListArray::multi_index_type {-1, 1, 1}
-        );
-
-        THEN("I get the correct pair of cells, with correct offset")
-        {
-            REQUIRE(tools::CellList {0, 1, 2}     == neighbor_pair.first );
-            REQUIRE(tools::CellList {2, 2, 0}     == neighbor_pair.second);
-            REQUIRE(Eigen::Vector4i {-1, 0, 1, 0} == neighbor_pair.offset);
-        }
-    }
-}
+/**
+ * To test the adjacent_pairs() generator, we need some helping functions.  The idea is to
+ * encode the "difference" between any two cells into a single integer.  We can later check whether
+ * all distinct possible integers were seen exactly once.
+ */
 
 // This function will be useful in the following tests:
 struct NeighborCodes {int first; int second;};
 
-NeighborCodes get_neighbor_codes(tools::NeighborPair np, tools::CellListArray cla)
+NeighborCodes get_neighbor_codes(tools::CellListPair pair, tools::CellListArray cla)
 {
     // We assume that the cell lists have been set up to store their own indices using
     // setup_cell_list_array() above
     int displacement[3];
     
     for (int d = 0; d < 3; d++)
-        displacement[d] = np.second[d] - np.first[d] + np.offset[d] * cla.shape()[d];
+        displacement[d] = pair.second[d] - pair.first[d] + pair.lattice_image[d] * cla.shape()[d];
     
     // Each possible displacement is then mapped to a number from 0 to 26.
     // {0, 0, 0} is mapped to 13.
@@ -231,7 +113,7 @@ NeighborCodes get_neighbor_codes(tools::NeighborPair np, tools::CellListArray cl
     };
 }
 
-SCENARIO("Using the neighbor_view() generator various-sized arrays")
+SCENARIO("Using the adjacent_pairs() generator various-sized arrays")
 {
     // The list of neighbor codes should contain every entry from 0 to 26, except 13
     const tools::CellList all_neighbor_codes {
@@ -241,18 +123,18 @@ SCENARIO("Using the neighbor_view() generator various-sized arrays")
 
     GIVEN("A 3x3x3 array set up with its own indices")
     {
-        tools::Dimensions dimensions{1.0};
-        double cutoff_length{0.3};
+        tools::BoundingBox bounding_box{1.0};
+        double cutoff_distance{0.3};
 
-        tools::CellListArray cell_list_array{dimensions, cutoff_length};
+        tools::CellListArray cell_list_array{bounding_box, cutoff_distance};
         setup_cell_list_array(cell_list_array);
 
         // Separate result array, since the elements of a NeighborPair are const
-        tools::CellListArray neighbor_codes_array(dimensions, cutoff_length);
+        tools::CellListArray neighbor_codes_array(bounding_box, cutoff_distance);
 
         WHEN("I append neighbor codes to all neighbors in pairs")
         {
-            for (auto neighbor_pair : cell_list_array.neighbor_view())
+            for (auto neighbor_pair : cell_list_array.adjacent_pairs())
             {
                 auto neighbor_codes = get_neighbor_codes(neighbor_pair, cell_list_array);
 
@@ -267,10 +149,13 @@ SCENARIO("Using the neighbor_view() generator various-sized arrays")
 
             THEN("Every cell has interacted with each of its 26 neighbors exactly once")
             {
-                for (auto& neighbor_code_list : neighbor_codes_array.cell_view())
+                for (const auto& neighbor_code_list : neighbor_codes_array.cells())
                 {
-                    std::sort(neighbor_code_list.begin(), neighbor_code_list.end());
-                    REQUIRE(all_neighbor_codes == neighbor_code_list);
+                    // Need a mutable copy to be able to sort it
+                    tools::CellList temp{neighbor_code_list};
+
+                    std::sort(temp.begin(), temp.end());
+                    REQUIRE(all_neighbor_codes == temp);
                 }
             }
         }
@@ -278,18 +163,18 @@ SCENARIO("Using the neighbor_view() generator various-sized arrays")
 
     GIVEN("A 2x2x2 array set up with its own indices")
     {
-        tools::Dimensions dimensions{1.0};
-        double cutoff_length{0.48};
+        tools::BoundingBox bounding_box{1.0};
+        double cutoff_distance{0.48};
 
-        tools::CellListArray cell_list_array{dimensions, cutoff_length};
+        tools::CellListArray cell_list_array{bounding_box, cutoff_distance};
         setup_cell_list_array(cell_list_array);
 
         // Separate result array, since the elements of a NeighborPair are const
-        tools::CellListArray neighbor_codes_array(dimensions, cutoff_length);
+        tools::CellListArray neighbor_codes_array(bounding_box, cutoff_distance);
 
         WHEN("I append neighbor codes to all neighbors in pairs")
         {
-            for (auto neighbor_pair : cell_list_array.neighbor_view())
+            for (auto neighbor_pair : cell_list_array.adjacent_pairs())
             {
                 auto neighbor_codes = get_neighbor_codes(neighbor_pair, cell_list_array);
 
@@ -304,10 +189,13 @@ SCENARIO("Using the neighbor_view() generator various-sized arrays")
 
             THEN("Every cell has interacted with each of its 26 neighbors exactly once")
             {
-                for (auto& neighbor_code_list : neighbor_codes_array.cell_view())
+                for (const auto& neighbor_code_list : neighbor_codes_array.cells())
                 {
-                    std::sort(neighbor_code_list.begin(), neighbor_code_list.end());
-                    REQUIRE(all_neighbor_codes == neighbor_code_list);
+                    // Need a mutable copy to be able to sort it
+                    tools::CellList temp = neighbor_code_list;
+
+                    std::sort(temp.begin(), temp.end());
+                    REQUIRE(all_neighbor_codes == temp);
                 }
             }
         }
@@ -315,18 +203,18 @@ SCENARIO("Using the neighbor_view() generator various-sized arrays")
 
     GIVEN("A 1x1x1 array set up with its own indices")
     {
-        tools::Dimensions dimensions{1.0};
-        double cutoff_length{0.67};
+        tools::BoundingBox bounding_box{1.0};
+        double cutoff_distance{0.67};
 
-        tools::CellListArray cell_list_array{dimensions, cutoff_length};
+        tools::CellListArray cell_list_array{bounding_box, cutoff_distance};
         setup_cell_list_array(cell_list_array);
 
         // Separate result array, since the elements of a NeighborPair are const
-        tools::CellListArray neighbor_codes_array(dimensions, cutoff_length);
+        tools::CellListArray neighbor_codes_array(bounding_box, cutoff_distance);
 
         WHEN("I append neighbor codes to all neighbors in pairs")
         {
-            for (auto neighbor_pair : cell_list_array.neighbor_view())
+            for (auto neighbor_pair : cell_list_array.adjacent_pairs())
             {
                 auto neighbor_codes = get_neighbor_codes(neighbor_pair, cell_list_array);
 
@@ -341,10 +229,13 @@ SCENARIO("Using the neighbor_view() generator various-sized arrays")
 
             THEN("Every cell has interacted with each of its 26 neighbors exactly once")
             {
-                for (auto& neighbor_code_list : neighbor_codes_array.cell_view())
+                for (const auto& neighbor_code_list : neighbor_codes_array.cells())
                 {
-                    std::sort(neighbor_code_list.begin(), neighbor_code_list.end());
-                    REQUIRE(all_neighbor_codes == neighbor_code_list);
+                    // Need a mutable copy to be able to sort it
+                    tools::CellList temp = neighbor_code_list;
+
+                    std::sort(temp.begin(), temp.end());
+                    REQUIRE(all_neighbor_codes == temp);
                 }
             }
         }
