@@ -23,11 +23,8 @@ set(SOURCES
 
     src/lennardjonesium/tools/bounding_box.hpp
     src/lennardjonesium/tools/bounding_box.cpp
-
-    # src/lennardjonesium/tools/dimensions.hpp
-    # src/lennardjonesium/tools/dimensions.cpp
-    # src/lennardjonesium/tools/cell_list_array.hpp
-    # src/lennardjonesium/tools/cell_list_array.cpp
+    src/lennardjonesium/tools/cell_list_array.hpp
+    src/lennardjonesium/tools/cell_list_array.cpp
 
     # src/lennardjonesium/physics/system_state.hpp
     # src/lennardjonesium/physics/system_state.cpp
@@ -53,9 +50,7 @@ set(TEST_SOURCES
     tests/lennardjonesium/greeter/test_greeter.cpp
 
     tests/lennardjonesium/tools/test_bounding_box.cpp
-
-    # tests/lennardjonesium/tools/test_dimensions.cpp
-    # tests/lennardjonesium/tools/test_cell_list_array.cpp
+    tests/lennardjonesium/tools/test_cell_list_array.cpp
 
     # tests/lennardjonesium/physics/test_system_state.cpp
     # tests/lennardjonesium/physics/constant_pairwise_force.hpp
