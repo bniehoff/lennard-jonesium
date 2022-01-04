@@ -22,70 +22,46 @@
 
 #include <cmath>
 #include <cassert>
-#include <tuple>
 
+#include <boost/multi_array.hpp>
 #include <Eigen/Dense>
 
 #include <lennardjonesium/draft_cpp23/generator.hpp>
-#include <lennardjonesium/tools/dimensions.hpp>
+#include <lennardjonesium/tools/bounding_box.hpp>
 #include <lennardjonesium/tools/cell_list_array.hpp>
 
 namespace tools
-{   
-    std::generator<IndexPair> index_pairs(const CellList& cell_list)
-    {
-        // Generate all the distinct pairs of entries in the CellList
-        for (int i = 0; i < cell_list.size(); i++)
-            for (int j = i + 1; j < cell_list.size(); j++)
-                co_yield IndexPair{cell_list[i], cell_list[j]};
-    }
-
-    std::generator<IndexPair> index_pairs(const NeighborPair& neighbor_pair)
-    {
-        // Generate all distinct pairs taking one entry from the first list and one from the second
-        for (int i = 0; i < neighbor_pair.first.size(); i++)
-            for (int j = 0; j < neighbor_pair.second.size(); j++)
-                co_yield IndexPair{neighbor_pair.first[i], neighbor_pair.second[j]};
-    }
-
-    CellListArray::CellListArray(tools::Dimensions dimensions, double cutoff_length)
+{
+    CellListArray::CellListArray(const BoundingBox& bounding_box, double cutoff_distance)
     {
         /**
          * We need to determine how to divide the given volume into rectilinear cells.  Every
-         * dimension of the cell must be at least as big as cutoff_length.  However, the volume
+         * dimension of the cell must be at least as big as cutoff_distance.  However, the volume
          * must be divided into a whole number of cells.  Along a single axis, we can obtain
          * the appropriate number of cells via
          * 
-         *      cell_count = floor(dimension / cutoff_length)
+         *      cell_count = floor(dimension / cutoff_distance)
          * 
-         * NOTE: The simulation volume must be larger than the cutoff_length along all of its
-         * dimensions.  Otherwise it is not valid to treat a force with this cutoff_length as a
-         * short-range force.
+         * NOTE: The simulation volume must be larger than the cutoff_distance along all of its
+         * dimensions.
          */
 
         assert((
-            "Simulation box size is less than the cutoff length",
-            (dimensions.x > cutoff_length &&
-             dimensions.y > cutoff_length &&
-             dimensions.z > cutoff_length)
+            "Simulation box size is less than the cutoff distance",
+            (bounding_box.array().head<3>() > cutoff_distance).all()
         ));
 
-        // Obtain the cell counts along the three axes
-        auto x = static_cast<int>(std::floor(dimensions.x / cutoff_length));
-        auto y = static_cast<int>(std::floor(dimensions.y / cutoff_length));
-        auto z = static_cast<int>(std::floor(dimensions.z / cutoff_length));
+        // Compute the dimensions of the cell array
+        shape_ = Eigen::Array4i::Zero();
 
-        // Set the shape array
-        shape_ = Eigen::Array4i{x, y, z, 0};
+        shape_.head<3>() = (bounding_box.array().head<3>() / cutoff_distance).floor().cast<int>();
 
-        // Resize the cell lists array according to the cell counts
-        cell_lists_.resize(boost::extents[x][y][z]);
+        // Resize the cell array to these dimensions
+        cell_array_.resize(boost::extents[shape_[0]][shape_[1]][shape_[2]]);
     }
 
     const CellList& CellListArray::operator() (int x, int y, int z) const
-    {
-        return cell_lists_(multi_index_type{x, y, z});
-    }
+    {return cell_array_(index_type{x, y, z});}
 
     CellList& CellListArray::operator() (int x, int y, int z)
     {
@@ -93,20 +69,27 @@ namespace tools
         return const_cast<CellList&>(static_cast<const CellListArray&>(*this)(x, y, z));
     }
 
-    const Eigen::Array4i CellListArray::shape() const
-    {return shape_;}
-
-    std::generator<CellList&> CellListArray::cell_view()
+    std::generator<CellListArray::index_type> CellListArray::cell_indices_() const
     {
-        // It is important to iterate over the innermost index first, to take advantage of storage
-        // order w.r.t. locality of reference.
-        for (cell_list_array_type::index i = 0; i < cell_lists_.shape()[0]; ++i)
-            for (cell_list_array_type::index j = 0; j < cell_lists_.shape()[1]; ++j)
-                for (cell_list_array_type::index k = 0; k < cell_lists_.shape()[2]; ++k)
-                    co_yield cell_lists_(multi_index_type{i, j, k});
+        for (array_type::index i = 0; i < shape_[0]; ++i)
+            for (array_type::index j = 0; j < shape_[1]; ++j)
+                for (array_type::index k = 0; k < shape_[2]; ++k)
+                    co_yield index_type{i, j, k};
     }
 
-    std::generator<NeighborPair> CellListArray::neighbor_view()
+    void CellListArray::clear()
+    {
+        for (auto index : cell_indices_())
+            cell_array_(index).clear();
+    }
+
+    std::generator<const CellList&> CellListArray::cells() const
+    {
+        for (auto index : cell_indices_())
+            co_yield cell_array_(index);
+    }
+
+    std::generator<CellListPair> CellListArray::adjacent_pairs() const
     {
         /**
          * Each cell (i, j, k) has 26 neighbors, given by
@@ -131,7 +114,7 @@ namespace tools
          * above list, whose leading nonzero term is +1.
          */
 
-        constexpr CellListArray::multi_index_type displacements[13] = {
+        constexpr CellListArray::index_type neighbor_steps[13] = {
             {1,  1,  1},    {1,  1,  0},    {1,  1,  -1},
             {1,  0,  1},    {1,  0,  0},    {1,  0,  -1},
             {1, -1,  1},    {1, -1,  0},    {1, -1,  -1},
@@ -139,48 +122,50 @@ namespace tools
             {0,  0,  1}
         };
 
-        for (cell_list_array_type::index i = 0; i < cell_lists_.shape()[0]; ++i)
-            for (cell_list_array_type::index j = 0; j < cell_lists_.shape()[1]; ++j)
-                for (cell_list_array_type::index k = 0; k < cell_lists_.shape()[2]; ++k)
-                    for (auto displacement : displacements)
-                        co_yield get_neighbor_pair_(multi_index_type{i, j, k}, displacement);
-    }
-
-    void CellListArray::clear()
-    {
-        for (auto& cell_list : cell_view())
-            cell_list.clear();
-    }
-
-    NeighborPair CellListArray::get_neighbor_pair_
-        (const multi_index_type index, const multi_index_type displacement)
-    {
-        multi_index_type neighbor_index = index;
-        Eigen::Vector4i offset {0, 0, 0, 0};
-
-        /**
-         * Note: We assume that displacement is one of {-1, 0, 1}.  We cannot use the modulo
-         * operator % naively because it does not have the correct behavior for negative
-         * displacements.
-         */
-
-        for (int d = 0; d < 3; d++)
+        // Now loop over the cell indices and neighbor steps, and compute the neighbor index and
+        // lattice image
+        for (const auto index : cell_indices_())
         {
-            // First compute the displaced index without imposing modulo arithmetic
-            neighbor_index[d] += displacement[d];
+            for (const auto step : neighbor_steps)
+            {
+                using index_array_type = Eigen::Array<array_type::index, 3, 1>;
 
-            // Since the displacement can only be {-1, 0, 1}, we can compute the offset without
-            // the modulo operator and without branching.  If we are outside of the correct index
-            // range, then shift in the direction of displacement.
-            offset[d] = displacement[d] * (
-                (neighbor_index[d] < 0) || (neighbor_index[d] >= cell_lists_.shape()[d])
-            );
+                // Create the neighbor index
+                index_type neighbor;
 
-            // Once we have the offset, use it to find the correct neighbor index in the index range
-            neighbor_index[d] -= offset[d] * cell_lists_.shape()[d];
+                // Prepare Eigen array views of index data
+                Eigen::Map<const index_array_type> index_array(index.data());
+                Eigen::Map<const index_array_type> step_array(step.data());
+                Eigen::Map<index_array_type> neighbor_array(neighbor.data());
+
+                // Compute the array index of the neighbor cell
+                neighbor_array = index_array + step_array;
+
+                /**
+                 * Next compute the lattice image coordinates.  Since step_array can only contain
+                 * {-1, 0, 1}, then the neighbor lies in a lattice image that is displaced by at
+                 * most 1 in any direction from the origin.  So, simply check if we are outside
+                 * of the allowed index range, and if so, the lattice image coordinate is the same
+                 * as the step value in that direction.
+                 */
+                Eigen::Array4i lattice_image = Eigen::Array4i::Zero();
+
+                lattice_image.head<3>() = (
+                    step_array.cast<int>() *
+                    (
+                        neighbor_array < index_array_type::Zero() ||
+                        neighbor_array >= shape_.head<3>().cast<array_type::index>()
+                    ).cast<int>()
+                );
+
+                // Once we have the lattice image coordinate, use it to map the neighbor index
+                // back into the appropriate bounds
+                neighbor_array -= (lattice_image * shape_).head<3>().cast<array_type::index>();
+
+                // Finally, compose the return structure
+                co_yield CellListPair{lattice_image, cell_array_(index), cell_array_(neighbor)};
+            }
         }
-
-        return NeighborPair{cell_lists_(index), cell_lists_(neighbor_index), offset};
     }
 } // namespace tools
 

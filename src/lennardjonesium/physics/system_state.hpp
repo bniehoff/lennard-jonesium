@@ -23,6 +23,11 @@
 #ifndef LJ_SYSTEM_STATE_HPP
 #define LJ_SYSTEM_STATE_HPP
 
+#include <utility>
+#include <concepts>
+#include <type_traits>
+#include <functional>
+
 #include <Eigen/Dense>
 
 namespace physics
@@ -30,15 +35,35 @@ namespace physics
     struct SystemState
     {
         /**
+         * SystemState will contain all the information about the particles in the system:
+         * 
+         *  positions
+         *  velocities
+         *  forces/accelerations
+         *  total displacements (disregarding boundary conditions)
+         *  kinetic energy
+         *  potential energy
+         *  virial
+         *  (kinetic energy tensor)
+         *  (virial tensor)
+         * 
+         * The last two are not necessary for the most basic simulator, but may be interesting in
+         * the future for measuring things like shear stress and pressure.
+         * 
+         * SystemState only contains this information, and doesn't do anything with it.  It is
+         * acted upon by Operators.
+         */
+
+        // An Operator is a function that acts on the SystemState
+        using Operator = std::function<SystemState& (SystemState&)>;
+
+        /**
          * We use 4xN matrices so that each of the columns will be aligned for vectorization.
          * 
          * Eigen names the components of a 4-vector .x(), .y(), .z(), .w(), in that order.  So,
          * we will leave the 4th component unused (it must be set to zero in order for arithmetic
          * with += to work nicely).
          */
-
-        // It will be useful to talk about functions acting on the SystemState
-        typedef std::function<SystemState& (SystemState&)> Operator;
 
         // Kinematic quantities (properties of the motion itself)
         Eigen::Matrix4Xd positions;        // Position within the bounding box
@@ -51,30 +76,9 @@ namespace physics
         double potential_energy;    // Potential energy from particle interactions
         double virial;              // Virial from pairwise forces
 
-        /**
-         * TODO: Consider defining kinetic energy tensor and virial tensor, which can be used
-         * to compute shear stresses as well as pressure.
-         */
-
-        /**
-         * The argument specifies the size of the system, not any of the data in it, so we use
-         * explicit to make sure this constructor can't be used for implicit conversions from int.
-         */
+        // Construct a SystemState with a given particle count
         explicit SystemState(int particle_count = 0);
-
-        /**
-         * This both sets the particle count AND initializes all array data to zero.
-         */
-        SystemState& set_particle_count(int particle_count);
     };
-
-    /**
-     * Let's also define the concept of an Operator that acts on the SystemState.
-     * 
-     * This definition is more generic than necessary, we will only use the SystemState version.
-     */
-    template <typename Op, typename S = SystemState>
-    concept Operator = std::invocable<Op, S&> and std::is_invocable_r_v<S&, Op, S&>;
 
     /**
      * Operator that simply returns the state without change
@@ -82,14 +86,18 @@ namespace physics
     inline auto identity_operator = [](SystemState& s) -> SystemState& {return s;};
 
     /**
+     * The Operator concept allows us to define some syntax for functions that act on the
+     * SystemState.
+     */
+    template <typename Op, typename S = SystemState>
+    concept Operator = std::invocable<Op, S&> and std::is_invocable_r_v<S&, Op, S&>;
+
+    /**
      * Operators can act on SystemStates via the pipe syntax
      * 
      *      state | op1 | op2 | ...;
      */
-    SystemState& operator| (SystemState& s, const Operator auto& op)
-    {
-        return op(s);
-    }
+    SystemState& operator| (SystemState& s, const Operator auto& op) {return op(s);}
 
     /**
      * Operators together in a pipeline can also be combined into a single operator
@@ -98,10 +106,8 @@ namespace physics
      */
     Operator auto operator| (const Operator auto& op1, const Operator auto& op2)
     {
-        return [op1=std::move(op1), op2=std::move(op2)](SystemState& s) -> SystemState&
-            {
-                return op2(op1(s));
-            };
+        typedef SystemState S;
+        return [op1=std::move(op1), op2=std::move(op2)](S& s) -> S& {return op2(op1(s));};
     }
 } // namespace physics
 

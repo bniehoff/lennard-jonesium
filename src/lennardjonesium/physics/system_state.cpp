@@ -27,21 +27,11 @@ namespace physics
     SystemState::SystemState(int particle_count)
         : kinetic_energy{0}, potential_energy{0}, virial{0}
     {
-        set_particle_count(particle_count);
-    }
-
-    SystemState& SystemState::set_particle_count(int particle_count)
-    {
-        /**
-         * Create initial SystemState with all entries set to zero.  The particle count is not
-         * known until runtime, so we can't use a template class.
-         */
+        // Create initial state with all quantities set to zero
 
         positions.setZero(4, particle_count);
         velocities.setZero(4, particle_count);
         displacements.setZero(4, particle_count);
         forces.setZero(4, particle_count);
-
-        return *this;
     }
 } // namespace physics

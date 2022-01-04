@@ -85,9 +85,7 @@ namespace engine
     void Dynamics::compute_forces_(physics::SystemState& state)
     {
         // First, clear all the dynamics information from the state
-        state.forces.setZero();
-        state.potential_energy = 0;
-        state.virial = 0;
+        state.reset_dynamical_quantities();
 
         // Next, go over all the particles within a single cell
         for (const auto& cell : cell_list_array_.cell_view())

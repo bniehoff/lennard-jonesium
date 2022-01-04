@@ -30,21 +30,6 @@ SCENARIO("Representing the system state")
         }
     }
 
-    WHEN("I set the number of particles at runtime")
-    {
-        SystemState s;
-
-        s.set_particle_count(7);
-
-        THEN("It has the expected number of particles")
-        {
-            REQUIRE(7 == s.positions.cols());
-            REQUIRE(7 == s.velocities.cols());
-            REQUIRE(7 == s.forces.cols());
-            REQUIRE(7 == s.displacements.cols());
-        }
-    }
-
     WHEN("I set some of the column vectors")
     {
         int count = 7;
