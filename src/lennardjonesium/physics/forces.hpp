@@ -74,7 +74,7 @@ namespace physics
 
         public:
             // Compute a ForceContribution from a separation vector
-            virtual ForceContribution&
+            virtual ForceContribution
             operator() (const Eigen::Ref<const Eigen::Vector4d>& separation) const = 0;
 
             // Get the cutoff distance
@@ -90,7 +90,7 @@ namespace physics
          */
 
         public:
-            virtual ForceContribution&
+            virtual ForceContribution
             operator() (const Eigen::Ref<const Eigen::Vector4d>& position) const = 0;
     };
 } // namespace physics
