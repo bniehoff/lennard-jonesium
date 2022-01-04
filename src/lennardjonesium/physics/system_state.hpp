@@ -106,7 +106,7 @@ namespace physics
      */
     Operator auto operator| (const Operator auto& op1, const Operator auto& op2)
     {
-        typedef SystemState S;
+        using S = SystemState;
         return [op1=std::move(op1), op2=std::move(op2)](S& s) -> S& {return op2(op1(s));};
     }
 } // namespace physics
