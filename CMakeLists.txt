@@ -29,8 +29,6 @@ set(SOURCES
     src/lennardjonesium/physics/system_state.hpp
     src/lennardjonesium/physics/system_state.cpp
     src/lennardjonesium/physics/forces.hpp
-    
-    # src/lennardjonesium/physics/pairwise_force.hpp
 
     src/lennardjonesium/engine/particle_pair_filter.hpp
     src/lennardjonesium/engine/boundary_condition.hpp
@@ -57,10 +55,9 @@ set(TEST_SOURCES
     tests/lennardjonesium/tools/test_cell_list_array.cpp
 
     tests/lennardjonesium/physics/test_system_state.cpp
-
-    # tests/lennardjonesium/physics/constant_pairwise_force.hpp
-    # tests/lennardjonesium/physics/constant_pairwise_force.cpp
-    # tests/lennardjonesium/physics/test_constant_pairwise_force.cpp
+    tests/lennardjonesium/physics/constant_short_range_force.hpp
+    tests/lennardjonesium/physics/constant_short_range_force.cpp
+    tests/lennardjonesium/physics/test_constant_short_range_force.cpp
 
     tests/lennardjonesium/engine/test_periodic_boundary_condition.cpp
 
