@@ -28,6 +28,7 @@ set(SOURCES
 
     src/lennardjonesium/physics/system_state.hpp
     src/lennardjonesium/physics/system_state.cpp
+    src/lennardjonesium/physics/forces.hpp
     
     # src/lennardjonesium/physics/pairwise_force.hpp
 
