@@ -5,9 +5,10 @@
 #include <catch2/catch.hpp>
 #include <Eigen/Dense>
 
+#include <src/lennardjonesium/tools/bounding_box.hpp>
+#include <src/lennardjonesium/physics/system_state.hpp>
 #include <src/lennardjonesium/engine/velocity_verlet_integrator.hpp>
 #include <src/lennardjonesium/engine/periodic_boundary_condition.hpp>
-#include <src/lennardjonesium/physics/system_state.hpp>
 
 using Eigen::Matrix4Xd;
 using Eigen::Vector4d;
@@ -15,6 +16,7 @@ using Eigen::Vector4d;
 using engine::VelocityVerletIntegrator;
 using engine::PeriodicBoundaryCondition;
 using physics::SystemState;
+using tools::BoundingBox;
 
 SCENARIO("Inertial motion without forces")
 {
@@ -101,11 +103,12 @@ SCENARIO("Inertial motion with boundary conditions")
     state.velocities.col(1) = Vector4d{0, 1.0, 0, 0};
 
     // Put the particles in a 3x3x3 box
-    auto boundary_condition = PeriodicBoundaryCondition(3.0);
+    auto bounding_box = BoundingBox{3.0};
+    auto boundary_condition = PeriodicBoundaryCondition{bounding_box};
 
     // Configure integrator with time step 1
     auto integrator = VelocityVerletIntegrator(
-        1.0, engine::null_force_calculation, boundary_condition
+        1.0, boundary_condition, engine::null_force_calculation
     );
 
     WHEN("I evolve the state by 4 time steps")
@@ -144,11 +147,12 @@ SCENARIO("Motion under a gravitational force with boundary conditions")
     state.forces.col(0) = state.forces.col(1) = Vector4d{0, 0, -1.0, 0};
 
     // Put the particles in a 3x3x3 box
-    auto boundary_condition = PeriodicBoundaryCondition(3.0);
+    auto bounding_box = BoundingBox{3.0};
+    auto boundary_condition = PeriodicBoundaryCondition{bounding_box};
 
     // Configure integrator with time step 1
     auto integrator = VelocityVerletIntegrator(
-        1.0, engine::null_force_calculation, boundary_condition
+        1.0, boundary_condition, engine::null_force_calculation
     );
 
     WHEN("I evolve the state by 4 time steps")
