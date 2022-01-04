@@ -35,12 +35,12 @@ set(SOURCES
     src/lennardjonesium/engine/particle_pair_filter.hpp
     src/lennardjonesium/engine/boundary_condition.hpp
     src/lennardjonesium/engine/force_calculation.hpp
+    # src/lennardjonesium/engine/periodic_boundary_condition.hpp
+    # src/lennardjonesium/engine/periodic_boundary_condition.cpp
     src/lennardjonesium/engine/integrator.hpp
     src/lennardjonesium/engine/integrator.cpp
 
     # src/lennardjonesium/engine/cutoff_force_calculation.hpp
-    # src/lennardjonesium/engine/periodic_boundary_condition.hpp
-    # src/lennardjonesium/engine/periodic_boundary_condition.cpp
     # src/lennardjonesium/engine/dynamics.hpp
     # src/lennardjonesium/engine/dynamics.cpp
     # src/lennardjonesium/engine/velocity_verlet_integrator.hpp

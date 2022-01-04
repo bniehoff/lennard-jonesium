@@ -20,9 +20,6 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-// Similar functionality to gsl::not_null, but doesn't require a huge dependency
-#include <ktl/not_null.hpp>
-
 #include <lennardjonesium/engine/force_calculation.hpp>
 #include <lennardjonesium/engine/boundary_condition.hpp>
 #include <lennardjonesium/engine/integrator.hpp>
@@ -32,8 +29,8 @@ namespace engine
     // Create an integrator with the given time step, force_calculation, and boundary condition
     Integrator::Integrator(
         double timestep,
-        ktl::not_null<const BoundaryCondition*> boundary_condition,
-        ktl::not_null<const ForceCalculation*> force_calculation
+        const BoundaryCondition& boundary_condition,
+        const ForceCalculation& force_calculation
     )
         : timestep_(timestep),
           force_calculation_(force_calculation),
@@ -43,7 +40,7 @@ namespace engine
     // Delegate to the above constructor with null force calculation and boundary condition
     Integrator::Integrator(double timestep)
         : Integrator::Integrator(
-            timestep, &engine::null_boundary_condition, &engine::null_force_calculation
+            timestep, engine::null_boundary_condition, engine::null_force_calculation
         )
     {}
 } // namespace engine
