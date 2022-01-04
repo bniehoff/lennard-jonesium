@@ -25,8 +25,9 @@
 
 #include <Eigen/Dense>
 
-#include <lennardjonesium/engine/boundary_condition.hpp>
+#include <lennardjonesium/tools/bounding_box.hpp>
 #include <lennardjonesium/physics/system_state.hpp>
+#include <lennardjonesium/engine/boundary_condition.hpp>
 
 namespace engine
 {
@@ -41,21 +42,11 @@ namespace engine
             // Imposes the boundary conditions on the system state
             virtual physics::SystemState& operator() (physics::SystemState&) const override;
 
-            // Create a rectilinear box with given x, y, z dimensions
-            PeriodicBoundaryCondition(double x, double y, double z);
-
-            // Create a cubical box with the same dimension in all three directions
-            explicit PeriodicBoundaryCondition(double dimension);
+            // Create a PeriodicBoundaryCondition from a BoundingBox
+            explicit PeriodicBoundaryCondition(const tools::BoundingBox&);
         
-        protected:
-            /**
-             * We store the bounding box internally as an array type so that it can more easily
-             * be used in Eigen broadcasting expressions.
-             */
-            const Eigen::Array4d bounding_box_;
-
-            // Directly assign the bounding box from a given array; the 4th element must be 1.0
-            PeriodicBoundaryCondition(Eigen::Array4d);
+        private:
+            const tools::BoundingBox& bounding_box_;
             
     };
 } // namespace engine
