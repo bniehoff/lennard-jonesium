@@ -30,21 +30,6 @@ SCENARIO("Representing the system state")
         }
     }
 
-    WHEN("I set the number of particles at runtime")
-    {
-        SystemState s;
-
-        s.set_particle_count(7);
-
-        THEN("It has the expected number of particles")
-        {
-            REQUIRE(7 == s.positions.cols());
-            REQUIRE(7 == s.velocities.cols());
-            REQUIRE(7 == s.forces.cols());
-            REQUIRE(7 == s.displacements.cols());
-        }
-    }
-
     WHEN("I set some of the column vectors")
     {
         int count = 7;
@@ -57,32 +42,6 @@ SCENARIO("Representing the system state")
         THEN("I can read back the same vectors")
         {
             REQUIRE(Vector4d{3, 4, 5, 6} == s.positions.col(3));
-        }
-    }
-
-    GIVEN("A state with some dynamical quantities")
-    {
-        int count = 3;
-        SystemState s(count);
-
-        s.forces = Eigen::Matrix4Xd{
-            {3, 4, 5}, {2, 4, 6}, {3, 6, 9}, {0, 0, 0}
-        };
-        s.potential_energy = 107.2;
-        s.virial = 123.3;
-
-        WHEN("I reset the dynamical quantities")
-        {
-            s.reset_dynamical_quantities();
-
-            THEN("They are all zero")
-            {
-                Eigen::Matrix4Xd expected_forces{{0, 0, 0}, {0, 0, 0,}, {0, 0, 0}, {0, 0, 0}};
-
-                REQUIRE(expected_forces == s.forces);
-                REQUIRE(0 == s.potential_energy);
-                REQUIRE(0 == s.virial);
-            }
         }
     }
 }
