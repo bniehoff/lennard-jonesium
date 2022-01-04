@@ -10,6 +10,8 @@ add_library(_lennardjonesium MODULE ${_lennardjonesium}
 
 target_link_libraries(_lennardjonesium
     Eigen3::Eigen
+    # Microsoft.GSL::GSL
+    ktl::ktl
 )
 
 python_extension_module(_lennardjonesium)

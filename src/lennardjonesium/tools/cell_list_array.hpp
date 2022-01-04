@@ -80,7 +80,7 @@ namespace tools
             const CellList& operator() (int, int, int) const;
 
             // Get the shape of the multidimensional array
-            Eigen::Array4i shape() {return shape_;};
+            const Eigen::Array4i shape() const {return shape_;};
 
             // Clear the elements of the array
             void clear();
