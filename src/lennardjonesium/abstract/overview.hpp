@@ -209,9 +209,6 @@ namespace physics
 
             // Get the cutoff distance
             virtual double cutoff_distance() const = 0;
-
-            // Get the square of the cutoff distance (useful for avoiding square roots)
-            virtual double square_cutoff_distance() const = 0;
     };
 
     /**
