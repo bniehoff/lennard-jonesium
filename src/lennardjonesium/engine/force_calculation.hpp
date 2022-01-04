@@ -30,12 +30,20 @@ namespace engine
     class ForceCalculation
     {
         /**
-         * An ForceCalculation acts on the SystemState to impose forces on the particles.  Forces
-         * may be background forces (like gravity), long-range forces (like electrostatic forces),
-         * or short-range forces (like the Lennard-Jones force).
+         * ForceCalculation will take the current SystemState and calculate all the forces (and
+         * related dynamical quantities, such as potential energy and virial). 
          * 
-         * The action of an ForceCalculation object is executed by operator().  It should compute
-         * the forces that result from the physical interaction it represents.
+         * The particular concrete implementations of ForceCalculation and BoundaryCondition are
+         * not independent.  For example, a constant background force (like gravity) does not make
+         * sense with periodic boundary conditons, which are intended to represent an infinite
+         * system.  Even with short-range forces in a finite system, one needs to use different
+         * computation methods in the case of periodic boundary conditions (infinite system) vs.
+         * reflecting boundary conditions (particles trapped in a literal box).
+         * 
+         * To make the code fully generic while allowing runtime control over the types of problems
+         * being simulated (useful if we want to provide that feature in the Python interface),
+         * then we should consider implementing this "parallel dependency" via the Abstract Factory
+         * pattern.  However, this is a bit complicated and is beyond the scope of this project.
          */
 
         public:

@@ -29,22 +29,20 @@ set(SOURCES
     src/lennardjonesium/physics/system_state.hpp
     src/lennardjonesium/physics/system_state.cpp
     src/lennardjonesium/physics/forces.hpp
-    
-    # src/lennardjonesium/physics/pairwise_force.hpp
 
     src/lennardjonesium/engine/particle_pair_filter.hpp
     src/lennardjonesium/engine/boundary_condition.hpp
     src/lennardjonesium/engine/force_calculation.hpp
+    src/lennardjonesium/engine/periodic_boundary_condition.hpp
+    src/lennardjonesium/engine/periodic_boundary_condition.cpp
     src/lennardjonesium/engine/integrator.hpp
     src/lennardjonesium/engine/integrator.cpp
+    src/lennardjonesium/engine/velocity_verlet_integrator.hpp
+    src/lennardjonesium/engine/velocity_verlet_integrator.cpp
 
     # src/lennardjonesium/engine/cutoff_force_calculation.hpp
-    # src/lennardjonesium/engine/periodic_boundary_condition.hpp
-    # src/lennardjonesium/engine/periodic_boundary_condition.cpp
     # src/lennardjonesium/engine/dynamics.hpp
     # src/lennardjonesium/engine/dynamics.cpp
-    # src/lennardjonesium/engine/velocity_verlet_integrator.hpp
-    # src/lennardjonesium/engine/velocity_verlet_integrator.cpp
 )
 
 set(TEST_SOURCES
@@ -57,13 +55,14 @@ set(TEST_SOURCES
     tests/lennardjonesium/tools/test_cell_list_array.cpp
 
     tests/lennardjonesium/physics/test_system_state.cpp
+    tests/lennardjonesium/physics/constant_short_range_force.hpp
+    tests/lennardjonesium/physics/constant_short_range_force.cpp
+    tests/lennardjonesium/physics/test_constant_short_range_force.cpp
 
-    # tests/lennardjonesium/physics/constant_pairwise_force.hpp
-    # tests/lennardjonesium/physics/constant_pairwise_force.cpp
-    # tests/lennardjonesium/physics/test_constant_pairwise_force.cpp
+    tests/lennardjonesium/engine/test_periodic_boundary_condition.cpp
+    tests/lennardjonesium/engine/test_velocity_verlet_integrator.cpp
 
     # tests/lennardjonesium/engine/test_dynamics.cpp
-    # tests/lennardjonesium/engine/test_velocity_verlet_integrator.cpp
 )
 
 find_package(Eigen3 3.4 REQUIRED NO_MODULE)

@@ -1,5 +1,5 @@
 /**
- * thermodynamics.cpp
+ * constant_short_range_force.hpp
  * 
  * Copyright (c) 2021 Benjamin E. Niehoff
  * 
@@ -19,3 +19,26 @@
  * License along with Lennard-Jonesium.  If not, see
  * <https://www.gnu.org/licenses/>.
  */
+
+#ifndef LJ_CONSTANT_SHORT_RANGE_FORCE_HPP
+#define LJ_CONSTANT_SHORT_RANGE_FORCE_HPP
+
+#include <src/lennardjonesium/physics/forces.hpp>
+
+// We define this derived class for testing purposes only
+class ConstantShortRangeForce : public physics::ShortRangeForce
+{
+    public:
+        ConstantShortRangeForce(double force, double cutoff_length);
+
+        virtual physics::ForceContribution
+        operator() (const Eigen::Ref<const Eigen::Vector4d>& separation) const override;
+
+        virtual double cutoff_distance() const override;
+    
+    protected:
+        const double force_;
+        const double cutoff_distance_;
+};
+
+#endif

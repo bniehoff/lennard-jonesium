@@ -42,11 +42,8 @@ namespace engine
         state.positions += position_increment;
         state.displacements += position_increment;
 
-        // Need to impose boundary conditions here
-        state | boundary_condition_;
-
-        // Now with the new positions, compute the new forces
-        state | force_calculation_;
+        // Next impose boundary conditions and calculate forces
+        state | boundary_condition_ | force_calculation_;
 
         // Finally, update the velocities using the first half increment and a second half
         // increment based on the new forces:

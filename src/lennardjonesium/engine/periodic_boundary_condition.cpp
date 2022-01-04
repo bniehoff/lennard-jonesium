@@ -30,23 +30,8 @@ using physics::SystemState;
 
 namespace engine
 {
-    /**
-     * The .w() component of bounding_box must be nonzero in order to prevent division by zero
-     * in expressions.  The public constructors delegate to this constructor by explicitly
-     * passing 1.0 for the fourth component.
-     */
-    PeriodicBoundaryCondition::PeriodicBoundaryCondition(Array4d bounding_box)
-        : bounding_box_(bounding_box)
-    {}
-
-    // Set the side lengths equal to x, y, z
-    PeriodicBoundaryCondition::PeriodicBoundaryCondition(double x, double y, double z)
-        : PeriodicBoundaryCondition::PeriodicBoundaryCondition{{x, y, z, 1.0}}
-    {}
-
-    // Set all side lengths equal to the dimension d
-    PeriodicBoundaryCondition::PeriodicBoundaryCondition(double d)
-        : PeriodicBoundaryCondition::PeriodicBoundaryCondition{{d, d, d, 1.0}}
+    PeriodicBoundaryCondition::PeriodicBoundaryCondition(const tools::BoundingBox& bounding_box)
+        : bounding_box_{bounding_box}
     {}
 
     SystemState& PeriodicBoundaryCondition::operator() (SystemState& state) const
@@ -58,8 +43,8 @@ namespace engine
          */
 
         state.positions -= (
-            (state.positions.array().colwise() / bounding_box_).floor().array().colwise()
-            * bounding_box_
+            (state.positions.array().colwise() / bounding_box_.array()).floor().array().colwise()
+            * bounding_box_.array()
         ).matrix();
 
         return state;

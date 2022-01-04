@@ -74,14 +74,11 @@ namespace physics
 
         public:
             // Compute a ForceContribution from a separation vector
-            virtual ForceContribution&
+            virtual ForceContribution
             operator() (const Eigen::Ref<const Eigen::Vector4d>& separation) const = 0;
 
             // Get the cutoff distance
             virtual double cutoff_distance() const = 0;
-
-            // Get the square of the cutoff distance (useful for avoiding square roots)
-            virtual double square_cutoff_distance() const = 0;
     };
 
     class BackgroundForce
@@ -93,7 +90,7 @@ namespace physics
          */
 
         public:
-            virtual ForceContribution&
+            virtual ForceContribution
             operator() (const Eigen::Ref<const Eigen::Vector4d>& position) const = 0;
     };
 } // namespace physics
