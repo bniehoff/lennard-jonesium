@@ -23,9 +23,6 @@
 #ifndef LJ_INTEGRATOR_HPP
 #define LJ_INTEGRATOR_HPP
 
-// Similar functionality to gsl::not_null, but doesn't require a huge dependency
-#include <ktl/not_null.hpp>
-
 #include <lennardjonesium/physics/system_state.hpp>
 #include <lennardjonesium/engine/force_calculation.hpp>
 #include <lennardjonesium/engine/boundary_condition.hpp>
@@ -54,21 +51,17 @@ namespace engine
             explicit Integrator(double timestep);
 
             // Create an integrator with the given time step, interaction, and boundary condition
-            Integrator(
-                double timestep,
-                ktl::not_null<const BoundaryCondition*>,
-                ktl::not_null<const ForceCalculation*>
-            );
+            Integrator(double timestep, const BoundaryCondition&, const ForceCalculation&);
 
         protected:
             // The time step by which we will increment (assumed fixed)
             const double timestep_;
 
             //A state operator that imposes the boundary condition
-            ktl::not_null<const BoundaryCondition*> boundary_condition_;
+            const BoundaryCondition& boundary_condition_;
 
             // A state operator that computes the forces, potential energy, and virial
-            ktl::not_null<const ForceCalculation*> force_calculation_;
+            const ForceCalculation& force_calculation_;
     };
 } // namespace engine
 
