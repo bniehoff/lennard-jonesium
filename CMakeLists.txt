@@ -40,7 +40,6 @@ set(SOURCES
     src/lennardjonesium/engine/velocity_verlet_integrator.hpp
     src/lennardjonesium/engine/velocity_verlet_integrator.cpp
 
-    # src/lennardjonesium/engine/cutoff_force_calculation.hpp
     # src/lennardjonesium/engine/dynamics.hpp
     # src/lennardjonesium/engine/dynamics.cpp
 )
@@ -101,11 +100,13 @@ endif()
 add_subdirectory(external/ktl)
 
 if(SKBUILD)
+    # If we are building the Python package, add the subdirectory where __init__.py is
     find_package(PythonExtensions REQUIRED)
     find_package(Cython REQUIRED)
 
     add_subdirectory(src/lennardjonesium)
 else()
+    # Otherwise, build the C++ unit tests
     include(CTest)
     enable_testing()
 

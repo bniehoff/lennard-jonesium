@@ -78,6 +78,9 @@ namespace physics
 
         // Construct a SystemState with a given particle count
         explicit SystemState(int particle_count = 0);
+
+        // Get the particle count if needed
+        int particle_count() const {return positions.cols();};
     };
 
     /**
