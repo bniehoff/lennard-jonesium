@@ -8,5 +8,5 @@ The project is not yet finished.  For now, it is possible to build and run the C
 CMake.  Eventually one will be able to build and install the Python package, but the project is not
 yet configured for this.
 
-To begin reading and understanding the code, I suggest starting with <src/design.md> and
-<src/lennardjonesium/abstract/overview.hpp>.
+To begin reading and understanding the code, I suggest starting with [design.md](src/design.md) and
+[overview.hpp](src/lennardjonesium/abstract/overview.hpp).
