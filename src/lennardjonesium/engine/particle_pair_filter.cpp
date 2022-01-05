@@ -29,6 +29,19 @@
 
 namespace engine
 {
+    bool operator== (const ParticlePair& a, const ParticlePair& b)
+    {
+        /**
+         * The elements of a pair could have been given in the opposite order, in which case the
+         * separation vector would be in the opposite direction.
+         */
+        return (
+            (a.first == b.first) && (a.second == b.second) && (a.separation.isApprox(b.separation))
+            or
+            (a.first == b.second) && (a.second == b.first) && (a.separation.isApprox(-b.separation))
+        );
+    }
+
     ParticlePairFilter::ParticlePairFilter
         (const tools::BoundingBox& bounding_box, double cutoff_distance)
         : bounding_box_{bounding_box}, cutoff_distance_{cutoff_distance}

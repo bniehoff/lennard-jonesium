@@ -47,6 +47,9 @@ namespace engine
         int second;
     };
 
+    // It is useful to be able to compare ParticlePairs
+    bool operator== (const ParticlePair&, const ParticlePair&);
+
     class ParticlePairFilter
     {
         /**
