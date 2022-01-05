@@ -1,7 +1,7 @@
 /**
  * forces.hpp
  * 
- * Copyright (c) 2021 Benjamin E. Niehoff
+ * Copyright (c) 2021-2022 Benjamin E. Niehoff
  * 
  * This file is part of Lennard-Jonesium.
  * 

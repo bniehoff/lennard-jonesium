@@ -143,10 +143,6 @@ cache sizes:
 At the moment I have no plans to parallelize the simulation.  A single core L1 cache (32KB) can hold
 262144 particles, which is more than enough for the whole simulation.  If the whole simulation fits
 in L1 cache, then it seems there is little to be gained by using arrays over linked lists.  A single
-cache line is 64 bytes, which is only half of a Particle, so I conclude there is no performance
-benefit to be squeezed out by storing the Particles in an array.
-
-So, we will use a linked list structure for each Cell (which is the same structure used in the C
-version of this project).  This will also allow us to take advantage of *move semantics* when
-transferring Particles between Cells.  This introduces some additional overhead to the Particle
-structure; namely, it must hold two pointers (8 bytes each), but this is not significant.
+cache line is 64 bytes, which is only half of a Particle, so there is not likely to be much
+performance benefit to using an array over a linked list.  Nevertheless, the array implementation
+is a bit simpler, so I will stick with that.
