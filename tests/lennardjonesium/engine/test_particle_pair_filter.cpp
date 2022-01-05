@@ -2,8 +2,6 @@
  * Test various ParticlePairFilters
  */
 
-#include <iostream>
-
 #include <catch2/catch.hpp>
 #include <Eigen/Dense>
 
@@ -119,7 +117,6 @@ SCENARIO("Finding ParticlePairs within a cutoff distance")
 
         for (engine::ParticlePair pair : filter(state))
         {
-            std::cout << "Received pair" << std::endl;
             result_pairs.push_back(pair);
         }
         
