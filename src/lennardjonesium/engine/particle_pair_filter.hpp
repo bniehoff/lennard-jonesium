@@ -26,6 +26,8 @@
 #include <Eigen/Dense>
 
 #include <lennardjonesium/draft_cpp23/generator.hpp>
+
+#include <lennardjonesium/tools/bounding_box.hpp>
 #include <lennardjonesium/physics/system_state.hpp>
 
 namespace engine
@@ -65,7 +67,7 @@ namespace engine
             ParticlePairFilter(const tools::BoundingBox& bounding_box, double cutoff_distance);
 
             // Generate the ParticlePairs filtered by separation distance
-            virtual std::generator<ParticlePair> operator() (const physics::SystemState&) const = 0;
+            virtual std::generator<ParticlePair> operator() (const physics::SystemState&) = 0;
         
         protected:
             const tools::BoundingBox& bounding_box_;
