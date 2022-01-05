@@ -35,7 +35,7 @@
 namespace engine
 {
     std::generator<ParticlePair>
-    NaiveParticlePairFilter::operator() (const physics::SystemState& state) const
+    NaiveParticlePairFilter::operator() (const physics::SystemState& state)
     {
         /**
          * Naively, we do a double loop over every pair of particles in the system, and return

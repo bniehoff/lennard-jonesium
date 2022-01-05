@@ -1,5 +1,5 @@
 /**
- * naive_particle_pair_filter.hpp
+ * cell_list_particle_pair_filter.hpp
  * 
  * Copyright (c) 2021 Benjamin E. Niehoff
  * 
@@ -20,23 +20,29 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LJ_NAIVE_PARTICLE_PAIR_FILTER_HPP
-#define LJ_NAIVE_PARTICLE_PAIR_FILTER_HPP
+#ifndef LJ_CELL_LIST_PAIR_FILTER_HPP
+#define LJ_CELL_LIST_PAIR_FILTER_HPP
 
 #include <lennardjonesium/draft_cpp23/generator.hpp>
 
+#include <lennardjonesium/tools/bounding_box.hpp>
+#include <lennardjonesium/tools/cell_list_array.hpp>
 #include <lennardjonesium/physics/system_state.hpp>
 #include <lennardjonesium/engine/particle_pair_filter.hpp>
 
 namespace engine
 {
-    class NaiveParticlePairFilter : public ParticlePairFilter
+    class CellListParticlePairFilter : public ParticlePairFilter
     {
         public:
-            using ParticlePairFilter::ParticlePairFilter;
-
+            CellListParticlePairFilter
+                (const tools::BoundingBox& bounding_box, double cutoff_distance);
+            
             // Generate the ParticlePairs filtered by separation distance
             virtual std::generator<ParticlePair> operator() (const physics::SystemState&) override;
+        
+        protected:
+            tools::CellListArray cell_list_array_;
     };
 } // namespace engine
 
