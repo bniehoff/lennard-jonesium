@@ -47,6 +47,9 @@ namespace engine
         int second;
     };
 
+    // It is useful to be able to compare ParticlePairs
+    bool operator== (const ParticlePair&, const ParticlePair&);
+
     class ParticlePairFilter
     {
         /**
@@ -58,8 +61,15 @@ namespace engine
          */
 
         public:
+            // This constructor should be inherited by derived classes with `using`
+            ParticlePairFilter(const tools::BoundingBox& bounding_box, double cutoff_distance);
+
             // Generate the ParticlePairs filtered by separation distance
             virtual std::generator<ParticlePair> operator() (const physics::SystemState&) const = 0;
+        
+        protected:
+            const tools::BoundingBox& bounding_box_;
+            double cutoff_distance_;
     };
 } // namespace engine
 
