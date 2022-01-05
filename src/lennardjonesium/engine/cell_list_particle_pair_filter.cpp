@@ -83,7 +83,7 @@ namespace engine
         }
 
         // 3. Find the particle pairs from adjacent cells
-        for (auto pair : cell_list_array_.adjacent_pairs())
+        for (const auto& pair : cell_list_array_.adjacent_pairs())
         {
             for (int i : std::views::iota(0, static_cast<int>(pair.first.size())))
             {
