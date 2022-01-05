@@ -2,6 +2,8 @@
  * Test various ParticlePairFilters
  */
 
+#include <iostream>
+
 #include <catch2/catch.hpp>
 #include <Eigen/Dense>
 
@@ -9,6 +11,7 @@
 #include <src/lennardjonesium/physics/system_state.hpp>
 #include <src/lennardjonesium/engine/particle_pair_filter.hpp>
 #include <src/lennardjonesium/engine/naive_particle_pair_filter.hpp>
+#include <src/lennardjonesium/engine/cell_list_particle_pair_filter.hpp>
 
 SCENARIO("Equality operator of ParticlePair")
 {
@@ -98,7 +101,27 @@ SCENARIO("Finding ParticlePairs within a cutoff distance")
         std::vector<engine::ParticlePair> result_pairs;
 
         for (engine::ParticlePair pair : filter(state))
+        {
             result_pairs.push_back(pair);
+        }
+        
+        THEN("I get the expected pairs")
+        {
+            REQUIRE_THAT(result_pairs, Catch::UnorderedEquals(expected_pairs));
+        }
+    }
+
+    WHEN("I look for ParticlePairs using a cell list filter")
+    {
+        engine::CellListParticlePairFilter filter{bounding_box, cutoff_distance};
+
+        std::vector<engine::ParticlePair> result_pairs;
+
+        for (engine::ParticlePair pair : filter(state))
+        {
+            std::cout << "Received pair" << std::endl;
+            result_pairs.push_back(pair);
+        }
         
         THEN("I get the expected pairs")
         {

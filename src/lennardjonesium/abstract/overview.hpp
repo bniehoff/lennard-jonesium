@@ -272,7 +272,8 @@ namespace engine
             ParticlePairFilter(const tools::BoundingBox& bounding_box, double cutoff_distance);
 
             // Generate the ParticlePairs filtered by separation distance
-            virtual std::generator<ParticlePair> operator() (const physics::SystemState&) const = 0;
+            // NOTE: It is _not_ const, because the process may involve using internal state
+            virtual std::generator<ParticlePair> operator() (const physics::SystemState&) = 0;
     };
 
     class BoundaryCondition
