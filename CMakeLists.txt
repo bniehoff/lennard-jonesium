@@ -89,24 +89,24 @@ add_compile_definitions(
     BOOST_DISABLE_ASSERTS   # Disables range checking for boost::multi_array
 )
 
-# Make sure submodules are present
-function(update_submodules)
-    execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
-        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-        RESULT_VARIABLE UPDATE_SUBMODULES_RESULT
-    )
-    if(NOT UPDATE_SUBMODULES_RESULT EQUAL "0")
-        message(FATAL_ERROR "git submodule update failed!")
-    endif()
-endfunction()
+# # Make sure submodules are present
+# function(update_submodules)
+#     execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
+#         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+#         RESULT_VARIABLE UPDATE_SUBMODULES_RESULT
+#     )
+#     if(NOT UPDATE_SUBMODULES_RESULT EQUAL "0")
+#         message(FATAL_ERROR "git submodule update failed!")
+#     endif()
+# endfunction()
 
-find_package(Git QUIET)
-if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
-    update_submodules()
-endif()
+# find_package(Git QUIET)
+# if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
+#     update_submodules()
+# endif()
 
-# Add Karnage's lightweight utilities
-add_subdirectory(external/ktl)
+# # Add Karnage's lightweight utilities <https://github.com/karnkaul/ktl.git>
+# add_subdirectory(external/ktl)
 
 if(SKBUILD)
     # If we are building the Python package, add the subdirectory where __init__.py is
@@ -130,7 +130,7 @@ else()
         PRIVATE Eigen3::Eigen
         PRIVATE Catch2::Catch2WithMain
         # PRIVATE Microsoft.GSL::GSL
-        PRIVATE ktl::ktl
+        # PRIVATE ktl::ktl
     )
 
     include(Catch)
