@@ -36,10 +36,17 @@ set(SOURCES
     src/lennardjonesium/engine/naive_particle_pair_filter.cpp
     src/lennardjonesium/engine/cell_list_particle_pair_filter.hpp
     src/lennardjonesium/engine/cell_list_particle_pair_filter.cpp
+
     src/lennardjonesium/engine/boundary_condition.hpp
-    src/lennardjonesium/engine/force_calculation.hpp
     src/lennardjonesium/engine/periodic_boundary_condition.hpp
     src/lennardjonesium/engine/periodic_boundary_condition.cpp
+
+    src/lennardjonesium/engine/force_calculation.hpp
+    src/lennardjonesium/engine/background_force_calculation.hpp
+    src/lennardjonesium/engine/background_force_calculation.cpp
+    src/lennardjonesium/engine/short_range_force_calculation.hpp
+    src/lennardjonesium/engine/short_range_force_calculation.cpp
+    
     src/lennardjonesium/engine/integrator.hpp
     src/lennardjonesium/engine/integrator.cpp
     src/lennardjonesium/engine/velocity_verlet_integrator.hpp
