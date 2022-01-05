@@ -20,7 +20,6 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
 #include <ranges>
 
 #include <Eigen/Dense>
