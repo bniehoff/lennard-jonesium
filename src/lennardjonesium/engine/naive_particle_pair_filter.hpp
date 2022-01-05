@@ -1,5 +1,5 @@
 /**
- * system_state.cpp
+ * naive_particle_pair_filter.hpp
  * 
  * Copyright (c) 2021 Benjamin E. Niehoff
  * 
@@ -20,25 +20,26 @@
  * <https://www.gnu.org/licenses/>.
  */
 
+#ifndef LJ_NAIVE_PARTICLE_PAIR_FILTER_HPP
+#define LJ_NAIVE_PARTICLE_PAIR_FILTER_HPP
+
+#include <lennardjonesium/draft_cpp23/generator.hpp>
+
 #include <lennardjonesium/physics/system_state.hpp>
+#include <lennardjonesium/engine/particle_pair_filter.hpp>
 
-namespace physics
+namespace engine
 {
-    SystemState::SystemState(int particle_count)
-        : kinetic_energy{0}, potential_energy{0}, virial{0}
+    class NaiveParticlePairFilter : public ParticlePairFilter
     {
-        // Create initial state with all quantities set to zero
+        public:
+            using ParticlePairFilter::ParticlePairFilter;
 
-        positions.setZero(4, particle_count);
-        velocities.setZero(4, particle_count);
-        displacements.setZero(4, particle_count);
-        forces.setZero(4, particle_count);
-    }
+            // Generate the ParticlePairs filtered by separation distance
+            virtual std::generator<ParticlePair>
+            operator() (const physics::SystemState&) const override;
+    };
+} // namespace engine
 
-    void SystemState::clear_dynamical_quantities()
-    {
-        forces.setZero(4, particle_count());
-        potential_energy = 0;
-        virial = 0;
-    }
-} // namespace physics
+
+#endif

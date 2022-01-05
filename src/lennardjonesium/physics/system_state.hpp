@@ -81,6 +81,9 @@ namespace physics
 
         // Get the particle count if needed
         int particle_count() const {return positions.cols();};
+
+        // Clear the dynamical quantities (forces, potential, virial)
+        void clear_dynamical_quantities();
     };
 
     /**

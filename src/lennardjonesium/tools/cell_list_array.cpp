@@ -20,8 +20,7 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include <cmath>
-#include <cassert>
+#include <ranges>
 
 #include <boost/multi_array.hpp>
 #include <Eigen/Dense>
@@ -41,15 +40,7 @@ namespace tools
          * the appropriate number of cells via
          * 
          *      cell_count = floor(dimension / cutoff_distance)
-         * 
-         * NOTE: The simulation volume must be larger than the cutoff_distance along all of its
-         * dimensions.
          */
-
-        assert((
-            "Simulation box size is less than the cutoff distance",
-            (bounding_box.array().head<3>() > cutoff_distance).all()
-        ));
 
         // Compute the dimensions of the cell array
         shape_ = Eigen::Array4i::Zero();
@@ -71,9 +62,9 @@ namespace tools
 
     std::generator<CellListArray::index_type> CellListArray::cell_indices_() const
     {
-        for (array_type::index i = 0; i < shape_[0]; ++i)
-            for (array_type::index j = 0; j < shape_[1]; ++j)
-                for (array_type::index k = 0; k < shape_[2]; ++k)
+        for (auto i : std::views::iota(0, shape_[0]))
+            for (auto j : std::views::iota(0, shape_[1]))
+                for (auto k : std::views::iota(0, shape_[2]))
                     co_yield index_type{i, j, k};
     }
 
@@ -150,13 +141,10 @@ namespace tools
                  */
                 Eigen::Array4i lattice_image = Eigen::Array4i::Zero();
 
-                lattice_image.head<3>() = (
-                    step_array.cast<int>() *
-                    (
-                        neighbor_array < index_array_type::Zero() ||
-                        neighbor_array >= shape_.head<3>().cast<array_type::index>()
-                    ).cast<int>()
-                );
+                lattice_image.head<3>() = step_array.cast<int>() * (
+                    neighbor_array < index_array_type::Zero() ||
+                    neighbor_array >= shape_.head<3>().cast<array_type::index>()
+                ).cast<int>();
 
                 // Once we have the lattice image coordinate, use it to map the neighbor index
                 // back into the appropriate bounds

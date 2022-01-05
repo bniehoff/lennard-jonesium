@@ -172,6 +172,12 @@ namespace physics
 
         // Construct a zero-initialized state with a given number of particles
         explicit SystemState(int particle_count = 0);
+
+        // Get the particle count if needed
+        int particle_count() const;
+
+        // Clear the dynamical quantities (forces, potential, virial)
+        void clear_dynamical_quantities();
     };
 
     struct ForceContribution
