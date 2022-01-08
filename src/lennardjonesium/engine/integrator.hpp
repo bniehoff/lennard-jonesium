@@ -45,6 +45,14 @@ namespace engine
             virtual physics::SystemState& operator() (physics::SystemState&) const = 0;
 
             /**
+             * Returns a lambda which evolves the SystemState forward `steps` number of times.
+             * The reason to return a lambda is it allows a nice way to use the piping syntax:
+             * 
+             *      s | integrator | integrator(n) | etc...
+             */
+            virtual physics::SystemState::Operator operator() (int steps) const final;
+
+            /**
              * Create a "default" integrator with the given timestep, and no interactions or
              * boundary conditions.
              */
