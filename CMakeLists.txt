@@ -29,6 +29,8 @@ set(SOURCES
     src/lennardjonesium/physics/system_state.hpp
     src/lennardjonesium/physics/system_state.cpp
     src/lennardjonesium/physics/forces.hpp
+    src/lennardjonesium/physics/measurements.hpp
+    src/lennardjonesium/physics/measurements.cpp
 
     src/lennardjonesium/engine/particle_pair_filter.hpp
     src/lennardjonesium/engine/particle_pair_filter.cpp
