@@ -24,8 +24,7 @@
 
 namespace physics
 {
-    SystemState::SystemState(int particle_count)
-        : kinetic_energy{0}, potential_energy{0}, virial{0}
+    SystemState::SystemState(int particle_count) : potential_energy{0}, virial{0}
     {
         // Create initial state with all quantities set to zero
 
