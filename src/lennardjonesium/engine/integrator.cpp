@@ -35,9 +35,9 @@ namespace engine
         const BoundaryCondition& boundary_condition,
         const ForceCalculation& force_calculation
     )
-        : timestep_(timestep),
-          force_calculation_(force_calculation),
-          boundary_condition_(boundary_condition)
+        : timestep_{timestep},
+          boundary_condition_{boundary_condition},
+          force_calculation_{force_calculation}
     {}
 
     // Delegate to the above constructor with null force calculation and boundary condition
@@ -53,7 +53,7 @@ namespace engine
         using S = physics::SystemState;
         return [this, steps](S& s) -> S&
             {
-                for (int i : std::views::iota(0, steps)) {s | *this;}
+                for ([[maybe_unused]] int i : std::views::iota(0, steps)) {s | *this;}
                 return s;
             };
     }

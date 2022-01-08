@@ -47,7 +47,7 @@ SCENARIO("Using the cells() generator on a 3x3x3 array")
     {
         int count{0};
 
-        for (const auto& cell : cell_list_array.cells()) {
+        for ([[maybe_unused]] const auto& cell : cell_list_array.cells()) {
             count++;
         }
 
