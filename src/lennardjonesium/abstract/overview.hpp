@@ -240,21 +240,15 @@ namespace physics
 
     /**
      * We also define some various types of measurements that can be made on the SystemState.
-     * These are Operators, so that they can be chained together with piping.  They accept a
-     * SystemState and return the SystemState unchanged; they store the result of the measurement
-     * internally.  They only need to be defined once and are not polymorphic.
-     * 
-     * Each of these classes is a functor which should define operator().
-     * 
-     * TODO: Not fully convinced if this is the best way to do measurements.
+     * These are simply functions, which return a value of the appropriate type
      */
 
-    class KineticEnergy;
-    class TotalMomentum;
-    class TotalForce;
-    class CenterOfMass;
-    class TotalAngularMomentum;
-    class InertiaTensor;
+    double kinetic_energy(const SystemState&);
+    Eigen::Vector4d total_momentum(const SystemState&);
+    Eigen::Vector4d total_force(const SystemState&);
+    Eigen::Vector4d center_of_mass(const SystemState&);
+    Eigen::Vector4d total_angular_momentum(const SystemState&);
+    Eigen::Matrix4d inertia_tensor(const SystemState&);
 } // namespace physics
 
 namespace engine
