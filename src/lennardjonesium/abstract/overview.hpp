@@ -237,6 +237,24 @@ namespace physics
             virtual ForceContribution&
             operator() (const Eigen::Ref<const Eigen::Vector4d>& position) const = 0;
     };
+
+    /**
+     * We also define some various types of measurements that can be made on the SystemState.
+     * These are Operators, so that they can be chained together with piping.  They accept a
+     * SystemState and return the SystemState unchanged; they store the result of the measurement
+     * internally.  They only need to be defined once and are not polymorphic.
+     * 
+     * Each of these classes is a functor which should define operator().
+     * 
+     * TODO: Not fully convinced if this is the best way to do measurements.
+     */
+
+    class KineticEnergy;
+    class TotalMomentum;
+    class TotalForce;
+    class CenterOfMass;
+    class TotalAngularMomentum;
+    class InertiaTensor;
 } // namespace physics
 
 namespace engine
