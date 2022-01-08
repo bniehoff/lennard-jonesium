@@ -36,9 +36,9 @@ namespace engine
          * separation vector would be in the opposite direction.
          */
         return (
-            (a.first == b.first) && (a.second == b.second) && (a.separation.isApprox(b.separation))
+            (a.first == b.first && a.second == b.second && a.separation.isApprox(b.separation))
             or
-            (a.first == b.second) && (a.second == b.first) && (a.separation.isApprox(-b.separation))
+            (a.first == b.second && a.second == b.first && a.separation.isApprox(-b.separation))
         );
     }
 
@@ -53,10 +53,10 @@ namespace engine
          * itself, and this needs special treatment that is beyond the scope of this project.)
          */
 
-        assert((
-            "Simulation box size is less than the cutoff distance",
-            (bounding_box.array().head<3>() >= cutoff_distance).all()
-        ));
+        assert(
+            (bounding_box.array().head<3>() >= cutoff_distance).all() &&
+            "Simulation box size is less than the cutoff distance"
+        );
     }
 } // namespace engine
 
