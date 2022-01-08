@@ -354,6 +354,39 @@ namespace engine
              */
             virtual ~Integrator() = default;
     };
+
+    class InitialStateFactory
+    {
+        /**
+         * InitialStateFactory will build the initial SystemState.  This includes putting the
+         * particles in their initial positions, and giving them a velocity distribution that
+         * corresponds to the desired temperature.
+         */
+    };
+
+    class Equilibrator
+    {
+        /**
+         * Equilibrator will handle the first phase of the simulation, which attempts to reach
+         * equilibrium at the correct temperature.  Since temperature is a dependent variable in
+         * the microcanonical ensemble, we cannot actually set a temperature directly; it must be
+         * measured instead.  The InitialStateFactory attempts to build a state which is close to
+         * the desired temperature by using a Maxwell distribution of velocities.  However, this
+         * process is not perfect.  So, the Equilibrator evolves the system for some time, taking
+         * temperature readings, and occasionally rescaling the velocities until the desired
+         * temperature is reached and remains sufficiently stable for some amount of time.
+         */
+    };
+
+    class Simulator
+    {
+        /**
+         * Simulator runs the main part of the simulation after equilibrium has been reached.  At
+         * this point, we assume that the time evolution of the system is physically correct, and
+         * we take relevant measurements which can be used to compute quantities of physical
+         * interest.
+         */
+    };
 } // namespace engine
 
 #endif

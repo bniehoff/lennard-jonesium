@@ -41,17 +41,19 @@ namespace physics
          *  velocities
          *  forces/accelerations
          *  total displacements (disregarding boundary conditions)
-         *  kinetic energy
          *  potential energy
          *  virial
-         *  (kinetic energy tensor)
          *  (virial tensor)
          * 
-         * The last two are not necessary for the most basic simulator, but may be interesting in
+         * The last one is not necessary for the most basic simulator, but may be interesting in
          * the future for measuring things like shear stress and pressure.
          * 
          * SystemState only contains this information, and doesn't do anything with it.  It is
          * acted upon by Operators.
+         * 
+         * NOTE: We do not include the kinetic energy or kinetic energy tensor.  These are derived
+         * quantities which can be computed from the velocities, and we don't want to compute them
+         * every time step, necessarily.
          */
 
         // An Operator is a function that acts on the SystemState
@@ -69,7 +71,6 @@ namespace physics
         Eigen::Matrix4Xd positions;        // Position within the bounding box
         Eigen::Matrix4Xd velocities;       // Velocity
         Eigen::Matrix4Xd displacements;    // Total displacement ignoring boundary conditions
-        double kinetic_energy;
 
         // Dynamic quantities (arising from the interactions between particles)
         Eigen::Matrix4Xd forces;           // Force or acceleration, since mass is normalized to 1
