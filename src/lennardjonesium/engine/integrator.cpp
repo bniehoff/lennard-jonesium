@@ -20,6 +20,9 @@
  * <https://www.gnu.org/licenses/>.
  */
 
+#include <ranges>
+
+#include <lennardjonesium/physics/system_state.hpp>
 #include <lennardjonesium/engine/force_calculation.hpp>
 #include <lennardjonesium/engine/boundary_condition.hpp>
 #include <lennardjonesium/engine/integrator.hpp>
@@ -43,4 +46,15 @@ namespace engine
             timestep, engine::null_boundary_condition, engine::null_force_calculation
         )
     {}
+
+    // Returns an Operator which integrates by count time steps
+    physics::SystemState::Operator Integrator::operator() (int steps) const
+    {
+        using S = physics::SystemState;
+        return [this, steps](S& s) -> S&
+            {
+                for (int i : std::views::iota(0, steps)) {s | *this;}
+                return s;
+            };
+    }
 } // namespace engine

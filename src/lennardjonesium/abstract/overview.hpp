@@ -367,6 +367,14 @@ namespace engine
             virtual physics::SystemState& operator() (physics::SystemState&) const = 0;
 
             /**
+             * Returns a lambda which evolves the SystemState forward `steps` number of times.
+             * The reason to return a lambda is it allows a nice way to use the piping syntax:
+             * 
+             *      s | integrator | integrator(n) | etc...
+             */
+            physics::SystemState::Operator operator() (int count) const;
+
+            /**
              * We expect Integrator to be heap-allocated, since the user will choose various
              * parameters of the simulation in Python (at run time).
              */
