@@ -65,7 +65,7 @@ namespace engine
             // The time step by which we will increment (assumed fixed)
             const double timestep_;
 
-            //A state operator that imposes the boundary condition
+            // A state operator that imposes the boundary condition
             const BoundaryCondition& boundary_condition_;
 
             // A state operator that computes the forces, potential energy, and virial

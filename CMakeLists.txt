@@ -128,6 +128,10 @@ else()
         ${TEST_SOURCES}
     )
 
+    target_compile_options(tests PRIVATE
+        -Wall -Wextra -Wpedantic -Werror
+    )
+
     target_link_libraries(tests
         PRIVATE Eigen3::Eigen
         PRIVATE Catch2::Catch2WithMain

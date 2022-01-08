@@ -74,8 +74,8 @@ namespace physics
 
         // Dynamic quantities (arising from the interactions between particles)
         Eigen::Matrix4Xd forces;           // Force or acceleration, since mass is normalized to 1
-        double potential_energy;    // Potential energy from particle interactions
-        double virial;              // Virial from pairwise forces
+        double potential_energy{0.0};      // Potential energy from particle interactions
+        double virial{0.0};                // Virial from pairwise forces
 
         // Construct a SystemState with a given particle count
         explicit SystemState(int particle_count = 0);
