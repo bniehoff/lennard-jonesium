@@ -10,7 +10,7 @@
 #include <src/lennardjonesium/engine/cell_list_particle_pair_filter.hpp>
 #include <src/lennardjonesium/engine/short_range_force_calculation.hpp>
 
-#include <tests/lennardjonesium/physics/constant_short_range_force.hpp>
+#include <tests/lennardjonesium/test_utils/constant_short_range_force.hpp>
 
 
 SCENARIO("Computing forces between particles")

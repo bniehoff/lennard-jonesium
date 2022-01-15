@@ -54,20 +54,23 @@ namespace physics
         return state.positions.rowwise().sum() / static_cast<double>(state.particle_count());
     }
 
-    Eigen::Vector4d total_angular_momentum(const SystemState& state)
+    Eigen::Vector4d total_angular_momentum
+        (const SystemState& state, const Eigen::Ref<const Eigen::Vector4d>& center)
     {
         // Unfortunately we have to write the loop explicitly
         Eigen::Vector4d angular_momentum = Eigen::Vector4d::Zero();
 
         for (int i : std::views::iota(0, state.particle_count()))
         {
-            angular_momentum += state.positions.col(i).cross3(state.velocities.col(i));
+            auto r = state.positions.col(i) - center;
+            angular_momentum += r.cross3(state.velocities.col(i));
         }
 
         return angular_momentum;
     }
 
-    Eigen::Matrix4d inertia_tensor(const SystemState& state)
+    Eigen::Matrix4d inertia_tensor
+        (const SystemState& state, const Eigen::Ref<const Eigen::Vector4d>& center)
     {
         /**
          * To get the inertia tensor, we use the formula
@@ -78,11 +81,18 @@ namespace physics
         // We also need to write this loop explicitly
         Eigen::Matrix4d inertia_tensor = Eigen::Matrix4d::Zero();
 
-        for (auto r : state.positions.colwise())
+        for (auto position : state.positions.colwise())
         {
-            inertia_tensor += r.squaredNorm() * Eigen::Matrix4d::Identity()- r * r.transpose();
+            auto r = position - center;
+            inertia_tensor += r.squaredNorm() * Eigen::Matrix4d::Identity() - r * r.transpose();
         }
 
         return inertia_tensor;
     }
+
+    Eigen::Vector4d total_angular_momentum(const SystemState& state)
+    {return total_angular_momentum(state, Eigen::Vector4d::Zero());}
+
+    Eigen::Matrix4d inertia_tensor(const SystemState& state)
+    {return inertia_tensor(state, Eigen::Vector4d::Zero());}
 } // namespace physics
