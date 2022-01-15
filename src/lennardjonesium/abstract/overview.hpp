@@ -375,13 +375,16 @@ namespace engine
             virtual ~Integrator() = default;
     };
 
-    class InitialStateFactory
+    class Initializer
     {
         /**
-         * InitialStateFactory will build the initial SystemState.  This includes putting the
+         * Initializer will build the initial SystemState.  This includes putting the
          * particles in their initial positions, and giving them a velocity distribution that
          * corresponds to the desired temperature.
          */
+
+        public:
+            Initializer(int particle_count, double density, double temperature);
     };
 
     class Equilibrator

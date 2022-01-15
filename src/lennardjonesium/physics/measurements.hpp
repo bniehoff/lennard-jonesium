@@ -44,16 +44,26 @@ namespace physics
 
     Eigen::Vector4d total_angular_momentum
         (const SystemState& state, const Eigen::Ref<const Eigen::Vector4d>& center);
+        
+    Eigen::Vector4d total_angular_momentum(const SystemState& state);
+    
+    /**
+     * The inertia tensor is given as a 4x4 matrix for alignement reasons.  The upper 3x3 block
+     * is the 3-dimensional inertia tensor.  The (i, 4) and (4, j) elements are zero.  The (4, 4)
+     * element is equal to 1/2 times the trace of the 3-dimensional inertia tensor, although its
+     * actual value should never come into play, since 3d vectors are represented as 4d vectors
+     * with a 0 as their 4th component.
+     * 
+     * Note also that the inertia tensor can have zero eigenvalues!  This happens only if all of
+     * the particles are collinear with each other and with the center point.  In most practical
+     * situations, this will not happen, but in general one must take care when inverting the
+     * inertia tensor.
+     */
 
     Eigen::Matrix4d inertia_tensor
         (const SystemState& state, const Eigen::Ref<const Eigen::Vector4d>& center);
-    
-    // We provide overloads so that the center is optional
-    Eigen::Vector4d total_angular_momentum(const SystemState& state)
-    {return total_angular_momentum(state, Eigen::Vector4d::Zero());}
 
-    Eigen::Matrix4d inertia_tensor(const SystemState& state)
-    {return inertia_tensor(state, Eigen::Vector4d::Zero());}
+    Eigen::Matrix4d inertia_tensor(const SystemState& state);
 } // namespace physics
 
 #endif
