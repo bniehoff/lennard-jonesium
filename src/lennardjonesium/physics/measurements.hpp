@@ -42,10 +42,9 @@ namespace physics
 
     Eigen::Vector4d center_of_mass(const SystemState&);
 
-    // TODO: Implement these
-    // Eigen::Vector4d total_angular_momentum(const SystemState&);
+    Eigen::Vector4d total_angular_momentum(const SystemState&);
 
-    // Eigen::Matrix4d inertia_tensor(const SystemState&);
+    Eigen::Matrix4d inertia_tensor(const SystemState&);
 } // namespace physics
 
 #endif
