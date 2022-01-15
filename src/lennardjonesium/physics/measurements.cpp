@@ -69,6 +69,9 @@ namespace physics
         return angular_momentum;
     }
 
+    Eigen::Vector4d total_angular_momentum(const SystemState& state)
+    {return total_angular_momentum(state, Eigen::Vector4d::Zero());}
+
     Eigen::Matrix4d inertia_tensor
         (const SystemState& state, const Eigen::Ref<const Eigen::Vector4d>& center)
     {
@@ -89,9 +92,6 @@ namespace physics
 
         return inertia_tensor;
     }
-
-    Eigen::Vector4d total_angular_momentum(const SystemState& state)
-    {return total_angular_momentum(state, Eigen::Vector4d::Zero());}
 
     Eigen::Matrix4d inertia_tensor(const SystemState& state)
     {return inertia_tensor(state, Eigen::Vector4d::Zero());}
