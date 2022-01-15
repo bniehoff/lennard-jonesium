@@ -42,9 +42,18 @@ namespace physics
 
     Eigen::Vector4d center_of_mass(const SystemState&);
 
-    Eigen::Vector4d total_angular_momentum(const SystemState&);
+    Eigen::Vector4d total_angular_momentum
+        (const SystemState& state, const Eigen::Ref<const Eigen::Vector4d>& center);
 
-    Eigen::Matrix4d inertia_tensor(const SystemState&);
+    Eigen::Matrix4d inertia_tensor
+        (const SystemState& state, const Eigen::Ref<const Eigen::Vector4d>& center);
+    
+    // We provide overloads so that the center is optional
+    Eigen::Vector4d total_angular_momentum(const SystemState& state)
+    {return total_angular_momentum(state, Eigen::Vector4d::Zero());}
+
+    Eigen::Matrix4d inertia_tensor(const SystemState& state)
+    {return inertia_tensor(state, Eigen::Vector4d::Zero());}
 } // namespace physics
 
 #endif
