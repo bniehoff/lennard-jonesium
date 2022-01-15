@@ -20,6 +20,8 @@
  * <https://www.gnu.org/licenses/>.
  */
 
+#include <ranges>
+
 #include <Eigen/Dense>
 
 #include <lennardjonesium/physics/system_state.hpp>
@@ -52,7 +54,35 @@ namespace physics
         return state.positions.rowwise().sum() / static_cast<double>(state.particle_count());
     }
 
-    // Eigen::Vector4d total_angular_momentum(const SystemState&);
+    Eigen::Vector4d total_angular_momentum(const SystemState& state)
+    {
+        // Unfortunately we have to write the loop explicitly
+        Eigen::Vector4d angular_momentum = Eigen::Vector4d::Zero();
 
-    // Eigen::Matrix4d inertia_tensor(const SystemState&);
+        for (int i : std::views::iota(0, state.particle_count()))
+        {
+            angular_momentum += state.positions.col(i).cross3(state.velocities.col(i));
+        }
+
+        return angular_momentum;
+    }
+
+    Eigen::Matrix4d inertia_tensor(const SystemState& state)
+    {
+        /**
+         * To get the inertia tensor, we use the formula
+         * 
+         *      I_{ij} = |r|^2 \delta_{ij} - r_i r_j
+         */
+
+        // We also need to write this loop explicitly
+        Eigen::Matrix4d inertia_tensor = Eigen::Matrix4d::Zero();
+
+        for (auto r : state.positions.colwise())
+        {
+            inertia_tensor += r.squaredNorm() * Eigen::Matrix4d::Identity()- r * r.transpose();
+        }
+
+        return inertia_tensor;
+    }
 } // namespace physics
