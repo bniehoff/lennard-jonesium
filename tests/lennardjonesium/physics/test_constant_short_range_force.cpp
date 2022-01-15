@@ -7,7 +7,7 @@
 
 #include <src/lennardjonesium/physics/forces.hpp>
 
-#include <tests/lennardjonesium/physics/constant_short_range_force.hpp>
+#include <tests/lennardjonesium/test_utils/constant_short_range_force.hpp>
 
 SCENARIO("Constant forces with cutoff distance")
 {
