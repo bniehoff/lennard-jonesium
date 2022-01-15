@@ -64,9 +64,11 @@ set(TEST_SOURCES
     tests/lennardjonesium/tools/test_bounding_box.cpp
     tests/lennardjonesium/tools/test_cell_list_array.cpp
 
+    tests/lennardjonesium/test_utils/constant_short_range_force.hpp
+    tests/lennardjonesium/test_utils/constant_short_range_force.cpp
+
     tests/lennardjonesium/physics/test_system_state.cpp
-    tests/lennardjonesium/physics/constant_short_range_force.hpp
-    tests/lennardjonesium/physics/constant_short_range_force.cpp
+    tests/lennardjonesium/physics/test_measurements.cpp
     tests/lennardjonesium/physics/test_constant_short_range_force.cpp
 
     tests/lennardjonesium/engine/test_periodic_boundary_condition.cpp

@@ -24,7 +24,7 @@
 
 #include <src/lennardjonesium/physics/forces.hpp>
 
-#include <tests/lennardjonesium/physics/constant_short_range_force.hpp>
+#include <tests/lennardjonesium/test_utils/constant_short_range_force.hpp>
 
 ConstantShortRangeForce::ConstantShortRangeForce(double force, double cutoff_length)
     : force_{force}, cutoff_distance_{cutoff_length}
