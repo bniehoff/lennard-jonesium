@@ -1,5 +1,5 @@
 /**
- * initial_condition.hpp
+ * initial_condition.cpp
  * 
  * Copyright (c) 2021-2022 Benjamin E. Niehoff
  * 
