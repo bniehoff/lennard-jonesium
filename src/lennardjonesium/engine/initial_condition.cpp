@@ -86,8 +86,6 @@ namespace engine
          * and solving this for cell_size.
          */
         cell_size = std::cbrt(static_cast<double>(lattice_sites_per_cell) / density);
-
-        // Now all of the members of the Parameters_ object have been set
     }
 
     InitialCondition::InitialCondition(InitialCondition::Parameters_ p)
@@ -105,7 +103,7 @@ namespace engine
 
         /**
          * We need the indices i, j, k, site_index to construct the various position vectors,
-         * so we are stuck either using 4 nested loops, or a single loop up the the particle_count,
+         * so we are stuck either using 4 nested loops, or a single loop up to the particle_count,
          * but then decomposing this loop index into (i, j, k, site_index) with a series of modulo
          * operations.  It is much easier to read with nested loops.
          */
