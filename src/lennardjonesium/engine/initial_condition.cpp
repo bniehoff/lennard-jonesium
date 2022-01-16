@@ -37,9 +37,9 @@ using random_number_generator = std::mt19937;
 constexpr int lattice_sites_per_cell{4};
 constexpr std::array<double, 4> lattice_sites[lattice_sites_per_cell] = {
     {0.0, 0.0, 0.0, 0.0},
-    {0.5, 0.0, 0.0, 0.0},
-    {0.0, 0.5, 0.0, 0.0},
-    {0.0, 0.0, 0.5, 0.0}
+    {0.5, 0.5, 0.0, 0.0},
+    {0.5, 0.0, 0.5, 0.0},
+    {0.0, 0.5, 0.5, 0.0}
 };
 
 // We will want to treat the above values as Eigen vectors
