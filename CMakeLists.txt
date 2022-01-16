@@ -53,6 +53,9 @@ set(SOURCES
     src/lennardjonesium/engine/integrator.cpp
     src/lennardjonesium/engine/velocity_verlet_integrator.hpp
     src/lennardjonesium/engine/velocity_verlet_integrator.cpp
+
+    src/lennardjonesium/engine/initial_condition.hpp
+    src/lennardjonesium/engine/initial_condition.cpp
 )
 
 set(TEST_SOURCES
