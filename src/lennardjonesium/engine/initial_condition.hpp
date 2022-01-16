@@ -55,14 +55,14 @@ namespace engine
                              std::random_device::result_type seed);
             
             // These return by value so that the original InitialCondition will not be modified
-            tools::BoundingBox bounding_box();
-            physics::SystemState system_state();
+            tools::BoundingBox bounding_box() {return bounding_box_;}
+            physics::SystemState system_state() {return system_state_;}
 
-            int particle_count();
-            double density();
-            double temperature();
+            int particle_count() {return system_state_.particle_count();}
+            double density() {return density_;}
+            double temperature() {return temperature_;}
 
-            std::random_device::result_type seed();
+            std::random_device::result_type seed() {return seed_;}
         
         private:
             struct Parameters_
