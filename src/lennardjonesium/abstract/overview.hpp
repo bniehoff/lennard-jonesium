@@ -242,7 +242,6 @@ namespace physics
      * We also define some various types of measurements that can be made on the SystemState.
      * These are simply functions, which return a value of the appropriate type
      */
-
     double kinetic_energy(const SystemState&);
     Eigen::Vector4d total_momentum(const SystemState&);
     Eigen::Vector4d total_force(const SystemState&);
@@ -375,16 +374,20 @@ namespace engine
             virtual ~Integrator() = default;
     };
 
-    class Initializer
+    class InitialCondition
     {
         /**
-         * Initializer will build the initial SystemState.  This includes putting the
-         * particles in their initial positions, and giving them a velocity distribution that
-         * corresponds to the desired temperature.
+         * InitialCondition is responsible for setting up the initial SystemState and BoundingBox.
+         * This includes putting the particles in their initial positions, and giving them a
+         * velocity distribution that corresponds to the desired temperature.
          */
 
         public:
-            Initializer(int particle_count, double density, double temperature);
+            InitialCondition(int particle_count, double density, double temperature);
+
+            // These methods return by value, allowing the same InitialCondition to be reused.
+            tools::BoundingBox bounding_box();
+            physics::SystemState system_state();
     };
 
     class Equilibrator
