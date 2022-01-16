@@ -31,7 +31,8 @@ namespace physics
 {
     /**
      * We define some various types of measurements that can be made on the SystemState.
-     * These are simply functions, which return a value of the appropriate type
+     * A measurement is a function which computes a quantity of interest at a given instant of
+     * time.
      */
 
     double kinetic_energy(const SystemState&);
@@ -45,7 +46,18 @@ namespace physics
     Eigen::Vector4d total_angular_momentum
         (const SystemState& state, const Eigen::Ref<const Eigen::Vector4d>& center);
         
-    Eigen::Vector4d total_angular_momentum(const SystemState& state);
+    inline Eigen::Vector4d total_angular_momentum(const SystemState& state)
+        {return total_angular_momentum(state, Eigen::Vector4d::Zero());}
+
+    /**
+     * Since the total energy requires the kinetic energy to be computed, we provide an overload
+     * which can accept a pre-computed value, in order not to waste effort.
+     */
+    inline double total_energy(const SystemState& state, double kinetic_energy)
+        {return state.potential_energy + kinetic_energy;}
+    
+    inline double total_energy(const SystemState& state)
+        {return total_energy(state, kinetic_energy(state));}
     
     /**
      * The inertia tensor is given as a 4x4 matrix for alignement reasons.  The upper 3x3 block
@@ -63,7 +75,8 @@ namespace physics
     Eigen::Matrix4d inertia_tensor
         (const SystemState& state, const Eigen::Ref<const Eigen::Vector4d>& center);
 
-    Eigen::Matrix4d inertia_tensor(const SystemState& state);
+    inline Eigen::Matrix4d inertia_tensor(const SystemState& state)
+        {return inertia_tensor(state, Eigen::Vector4d::Zero());}
 } // namespace physics
 
 #endif
