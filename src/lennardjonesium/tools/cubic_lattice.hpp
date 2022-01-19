@@ -77,7 +77,7 @@ namespace tools
                 }.transpose()
             };}
 
-            // The constructor takes a unit cell type to fully specify the cubie lattice
+            // The constructor takes a unit cell type to fully specify the cubic lattice
             CubicLattice(int particle_count, double density, UnitCell unit_cell = FaceCentered());
 
             /**
