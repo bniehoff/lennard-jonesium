@@ -141,6 +141,22 @@ namespace tools
             // Generator to traverse adjacent pairs of cells (including periodic wrap around)
             std::generator<CellListPair> adjacent_pairs() const;
     };
+
+    class CubicLattice
+    {
+        /**
+         * CubicLattice provides the coordinates of points in a cubic lattice, at the requested
+         * density.  It also computes the BoundingBox of the occupied volume.  There will be
+         * derived classes which implement simple, body-centered, and face-centered cubic lattices.
+         */
+
+        public:
+            CubicLattice(int particle_count, double density);
+
+            virtual std::generator<Eigen::Vector4d> operator() () = 0;
+
+            BoundingBox bounding_box();
+    };
 } // namespace tools
 
 namespace physics
