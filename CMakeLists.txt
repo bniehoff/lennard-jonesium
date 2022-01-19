@@ -25,6 +25,8 @@ set(SOURCES
     src/lennardjonesium/tools/bounding_box.cpp
     src/lennardjonesium/tools/cell_list_array.hpp
     src/lennardjonesium/tools/cell_list_array.cpp
+    src/lennardjonesium/tools/cubic_lattice.hpp
+    src/lennardjonesium/tools/cubic_lattice.cpp
 
     src/lennardjonesium/physics/system_state.hpp
     src/lennardjonesium/physics/system_state.cpp
