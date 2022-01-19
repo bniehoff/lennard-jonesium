@@ -31,8 +31,6 @@
 #include <lennardjonesium/physics/system_state.hpp>
 #include <lennardjonesium/engine/initial_condition.hpp>
 
-using random_number_generator = std::mt19937;
-
 // We use a face-centered cubic lattice which has 4 sites per cell, at the following locations
 constexpr int lattice_sites_per_cell{4};
 constexpr std::array<double, 4> lattice_sites[lattice_sites_per_cell] = {
@@ -47,12 +45,6 @@ using vector4d_view = Eigen::Map<const Eigen::Vector4d>;
 
 namespace engine
 {
-    InitialCondition::InitialCondition(int particle_count, double density, double temperature)
-        : InitialCondition::InitialCondition(
-            particle_count, density, temperature, random_number_generator::default_seed
-        )
-    {}
-
     InitialCondition::InitialCondition
     (int particle_count, double density, double temperature, std::random_device::result_type seed)
         : InitialCondition::InitialCondition(
@@ -136,7 +128,7 @@ namespace engine
          * Next, we choose the initial velocities from a Maxwell-Boltzmann distribution.  This is
          * just a normal distribution with mean 0 and variance equal to the temperature.
          */
-        random_number_generator gen{p.seed};
+        random_number_engine_type gen{p.seed};
         std::normal_distribution<> maxwell_boltzmann_distribution{0, std::sqrt(p.temperature)};
 
         // The individual velocity components are all independent, so we treat them as a 1d array

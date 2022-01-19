@@ -24,6 +24,7 @@
 #define LJ_INITIAL_CONDITION_HPP
 
 #include <random>
+#include <concepts>
 
 #include <lennardjonesium/tools/bounding_box.hpp>
 #include <lennardjonesium/physics/system_state.hpp>
@@ -49,10 +50,19 @@ namespace engine
          */
 
         public:
-            InitialCondition(int particle_count, double density, double temperature);
+            /**
+             * Would love to make this a template parameter, but it needs a concept that is not
+             * yet defined in the standard library, and I don't feel like defining it myself.
+             */
+            using random_number_engine_type = std::mt19937;
 
-            InitialCondition(int particle_count, double density, double temperature,
-                             std::random_device::result_type seed);
+            // Constructor
+            InitialCondition(
+                int particle_count,
+                double density,
+                double temperature,
+                std::random_device::result_type seed = random_number_engine_type::default_seed
+            );
             
             // These return by value so that the original InitialCondition will not be modified
             tools::BoundingBox bounding_box() {return bounding_box_;}
