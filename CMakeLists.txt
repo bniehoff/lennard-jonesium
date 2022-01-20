@@ -12,81 +12,12 @@ include_directories(
 
 set(CMAKE_CXX_STANDARD 20)
 
-set(SOURCES
-    src/lennardjonesium/abstract/overview.hpp
-    
-    src/lennardjonesium/greeter/greeter.hpp
-    src/lennardjonesium/greeter/greeter.cpp
-
-    src/lennardjonesium/draft_cpp23/generator.hpp
-    src/lennardjonesium/draft_cpp23/examples.hpp
-
-    src/lennardjonesium/tools/bounding_box.hpp
-    src/lennardjonesium/tools/bounding_box.cpp
-    src/lennardjonesium/tools/cell_list_array.hpp
-    src/lennardjonesium/tools/cell_list_array.cpp
-    src/lennardjonesium/tools/cubic_lattice.hpp
-    src/lennardjonesium/tools/cubic_lattice.cpp
-
-    src/lennardjonesium/physics/system_state.hpp
-    src/lennardjonesium/physics/system_state.cpp
-    src/lennardjonesium/physics/forces.hpp
-    src/lennardjonesium/physics/measurements.hpp
-    src/lennardjonesium/physics/measurements.cpp
-
-    src/lennardjonesium/engine/particle_pair_filter.hpp
-    src/lennardjonesium/engine/particle_pair_filter.cpp
-    src/lennardjonesium/engine/naive_particle_pair_filter.hpp
-    src/lennardjonesium/engine/naive_particle_pair_filter.cpp
-    src/lennardjonesium/engine/cell_list_particle_pair_filter.hpp
-    src/lennardjonesium/engine/cell_list_particle_pair_filter.cpp
-
-    src/lennardjonesium/engine/boundary_condition.hpp
-    src/lennardjonesium/engine/periodic_boundary_condition.hpp
-    src/lennardjonesium/engine/periodic_boundary_condition.cpp
-
-    src/lennardjonesium/engine/force_calculation.hpp
-    src/lennardjonesium/engine/background_force_calculation.hpp
-    src/lennardjonesium/engine/background_force_calculation.cpp
-    src/lennardjonesium/engine/short_range_force_calculation.hpp
-    src/lennardjonesium/engine/short_range_force_calculation.cpp
-    
-    src/lennardjonesium/engine/integrator.hpp
-    src/lennardjonesium/engine/integrator.cpp
-    src/lennardjonesium/engine/velocity_verlet_integrator.hpp
-    src/lennardjonesium/engine/velocity_verlet_integrator.cpp
-
-    src/lennardjonesium/engine/initial_condition.hpp
-    src/lennardjonesium/engine/initial_condition.cpp
-)
-
-set(TEST_SOURCES
-    tests/other/test_eigen.cpp
-    tests/other/test_modulo.cpp
-
-    tests/lennardjonesium/greeter/test_greeter.cpp
-
-    tests/lennardjonesium/tools/test_bounding_box.cpp
-    tests/lennardjonesium/tools/test_cell_list_array.cpp
-
-    tests/lennardjonesium/test_utils/constant_short_range_force.hpp
-    tests/lennardjonesium/test_utils/constant_short_range_force.cpp
-
-    tests/lennardjonesium/physics/test_system_state.cpp
-    tests/lennardjonesium/physics/test_measurements.cpp
-    tests/lennardjonesium/physics/test_constant_short_range_force.cpp
-
-    tests/lennardjonesium/engine/test_periodic_boundary_condition.cpp
-    tests/lennardjonesium/engine/test_particle_pair_filter.cpp
-    tests/lennardjonesium/engine/test_short_range_force_calculation.cpp
-    tests/lennardjonesium/engine/test_velocity_verlet_integrator.cpp
-)
-
 find_package(Eigen3 3.4 REQUIRED NO_MODULE)
 # find_package(Microsoft.GSL REQUIRED)
 
 # TODO: Make these more portable for different compilers
 add_compile_options(
+    -Wall -Wextra -Wpedantic -Werror
     -O3                 # Enable optimization level 3
     -march=native       # Enables vectorization for Eigen in GCC and Clang
     -ffast-math         # Disables adherence to error reporting and rounding rules in GCC
@@ -117,6 +48,88 @@ add_compile_definitions(
 # # Add Karnage's lightweight utilities <https://github.com/karnkaul/ktl.git>
 # add_subdirectory(external/ktl)
 
+# Define libraries out of which the main library will be built
+
+add_library(abstract INTERFACE
+    src/lennardjonesium/abstract/overview.hpp
+)
+
+add_library(greeter STATIC
+    src/lennardjonesium/greeter/greeter.hpp
+    src/lennardjonesium/greeter/greeter.cpp
+)
+
+add_library(draft_cpp23 STATIC
+    src/lennardjonesium/draft_cpp23/generator.hpp
+    src/lennardjonesium/draft_cpp23/examples.hpp
+)
+
+# This is needed because library has no .cpp files
+set_target_properties(draft_cpp23 PROPERTIES LINKER_LANGUAGE CXX)
+
+add_library(tools STATIC
+    src/lennardjonesium/tools/bounding_box.hpp
+    src/lennardjonesium/tools/bounding_box.cpp
+    src/lennardjonesium/tools/cell_list_array.hpp
+    src/lennardjonesium/tools/cell_list_array.cpp
+    src/lennardjonesium/tools/cubic_lattice.hpp
+    src/lennardjonesium/tools/cubic_lattice.cpp
+)
+
+add_library(physics STATIC
+    src/lennardjonesium/physics/system_state.hpp
+    src/lennardjonesium/physics/system_state.cpp
+    src/lennardjonesium/physics/forces.hpp
+    src/lennardjonesium/physics/measurements.hpp
+    src/lennardjonesium/physics/measurements.cpp
+)
+
+add_library(engine STATIC
+    src/lennardjonesium/engine/particle_pair_filter.hpp
+    src/lennardjonesium/engine/particle_pair_filter.cpp
+    src/lennardjonesium/engine/naive_particle_pair_filter.hpp
+    src/lennardjonesium/engine/naive_particle_pair_filter.cpp
+    src/lennardjonesium/engine/cell_list_particle_pair_filter.hpp
+    src/lennardjonesium/engine/cell_list_particle_pair_filter.cpp
+
+    src/lennardjonesium/engine/boundary_condition.hpp
+    src/lennardjonesium/engine/periodic_boundary_condition.hpp
+    src/lennardjonesium/engine/periodic_boundary_condition.cpp
+
+    src/lennardjonesium/engine/force_calculation.hpp
+    src/lennardjonesium/engine/background_force_calculation.hpp
+    src/lennardjonesium/engine/background_force_calculation.cpp
+    src/lennardjonesium/engine/short_range_force_calculation.hpp
+    src/lennardjonesium/engine/short_range_force_calculation.cpp
+
+    src/lennardjonesium/engine/integrator.hpp
+    src/lennardjonesium/engine/integrator.cpp
+    src/lennardjonesium/engine/velocity_verlet_integrator.hpp
+    src/lennardjonesium/engine/velocity_verlet_integrator.cpp
+
+    src/lennardjonesium/engine/initial_condition.hpp
+    src/lennardjonesium/engine/initial_condition.cpp
+)
+
+# Link the various dependencies
+target_link_libraries(tools
+    PRIVATE Eigen3::Eigen
+    PRIVATE draft_cpp23
+)
+
+target_link_libraries(physics
+    PRIVATE Eigen3::Eigen
+    PRIVATE draft_cpp23
+    PRIVATE tools
+)
+
+target_link_libraries(engine
+    PRIVATE Eigen3::Eigen
+    PRIVATE draft_cpp23
+    PRIVATE tools
+    PRIVATE physics
+)
+
 if(SKBUILD)
     # If we are building the Python package, add the subdirectory where __init__.py is
     find_package(PythonExtensions REQUIRED)
@@ -131,12 +144,25 @@ else()
     find_package(Catch2 REQUIRED)
 
     add_executable(tests
-        ${SOURCES}
-        ${TEST_SOURCES}
-    )
+        tests/other/test_eigen.cpp
+        tests/other/test_modulo.cpp
 
-    target_compile_options(tests PRIVATE
-        -Wall -Wextra -Wpedantic -Werror
+        tests/lennardjonesium/greeter/test_greeter.cpp
+
+        tests/lennardjonesium/tools/test_bounding_box.cpp
+        tests/lennardjonesium/tools/test_cell_list_array.cpp
+
+        tests/lennardjonesium/test_utils/constant_short_range_force.hpp
+        tests/lennardjonesium/test_utils/constant_short_range_force.cpp
+
+        tests/lennardjonesium/physics/test_system_state.cpp
+        tests/lennardjonesium/physics/test_measurements.cpp
+        tests/lennardjonesium/physics/test_constant_short_range_force.cpp
+
+        tests/lennardjonesium/engine/test_periodic_boundary_condition.cpp
+        tests/lennardjonesium/engine/test_particle_pair_filter.cpp
+        tests/lennardjonesium/engine/test_short_range_force_calculation.cpp
+        tests/lennardjonesium/engine/test_velocity_verlet_integrator.cpp
     )
 
     target_link_libraries(tests
@@ -144,6 +170,11 @@ else()
         PRIVATE Catch2::Catch2WithMain
         # PRIVATE Microsoft.GSL::GSL
         # PRIVATE ktl::ktl
+        PRIVATE greeter
+        PRIVATE draft_cpp23
+        PRIVATE tools
+        PRIVATE physics
+        PRIVATE engine
     )
 
     include(Catch)
