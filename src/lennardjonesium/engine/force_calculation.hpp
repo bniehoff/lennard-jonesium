@@ -24,6 +24,8 @@
 #define LJ_FORCE_CALCULATION_HPP
 
 #include <lennardjonesium/physics/system_state.hpp>
+#include <lennardjonesium/physics/forces.hpp>
+#include <lennardjonesium/engine/particle_pair_filter.hpp>
 
 namespace engine
 {   
@@ -58,6 +60,38 @@ namespace engine
             virtual physics::SystemState& operator() (physics::SystemState& s) const override
             {return s;}
     } null_force_calculation;
+
+    // The following derived classes will also be useful
+
+    class ShortRangeForceCalculation : public ForceCalculation
+    {
+        public:
+            ShortRangeForceCalculation(
+                const physics::ShortRangeForce& short_range_force,
+                engine::ParticlePairFilter& particle_pair_filter
+            );
+
+            // Compute the forces resulting from this interaction
+            virtual physics::SystemState& operator() (physics::SystemState&) const override;
+        
+        private:
+            const physics::ShortRangeForce& short_range_force_;
+
+            // Can't be const, because some types use internal state
+            engine::ParticlePairFilter& particle_pair_filter_;
+    };
+
+    class BackgroundForceCalculation : public ForceCalculation
+    {
+        public:
+            BackgroundForceCalculation(const physics::BackgroundForce& background_force);
+
+            // Compute the forces resulting from this interaction
+            virtual physics::SystemState& operator() (physics::SystemState&) const override;
+        
+        private:
+            const physics::BackgroundForce& background_force_;
+    };
 } // namespace physics
 
 #endif

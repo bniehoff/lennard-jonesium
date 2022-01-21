@@ -71,6 +71,18 @@ namespace engine
             // A state operator that computes the forces, potential energy, and virial
             const ForceCalculation& force_calculation_;
     };
+
+    // We implement specific integration algorithms as derived classes
+
+    class VelocityVerletIntegrator : public Integrator
+    {
+        public:
+            // Should be able to inherit constructor without problems
+            using Integrator::Integrator;
+
+            // Evolves time by one step
+            virtual physics::SystemState& operator() (physics::SystemState&) const override;
+    };
 } // namespace engine
 
 #endif

@@ -23,6 +23,9 @@
 #ifndef LJ_BOUNDARY_CONDITION_HPP
 #define LJ_BOUNDARY_CONDITION_HPP
 
+#include <Eigen/Dense>
+
+#include <lennardjonesium/tools/bounding_box.hpp>
 #include <lennardjonesium/physics/system_state.hpp>
 
 namespace engine
@@ -47,6 +50,25 @@ namespace engine
             virtual physics::SystemState& operator() (physics::SystemState& s) const override
             {return s;}
     } null_boundary_condition;
+
+    class PeriodicBoundaryCondition : public BoundaryCondition
+    {
+        /**
+         * PeriodicBoundaryConditions keep the system in a rectilinear box by causing particles
+         * that leave the box on one side to appear on the opposite side.
+         */
+        
+        public:
+            // Imposes the boundary conditions on the system state
+            virtual physics::SystemState& operator() (physics::SystemState&) const override;
+
+            // Create a PeriodicBoundaryCondition from a BoundingBox
+            explicit PeriodicBoundaryCondition(const tools::BoundingBox&);
+        
+        private:
+            const tools::BoundingBox& bounding_box_;
+            
+    };
 } // namespace engine
 
 #endif

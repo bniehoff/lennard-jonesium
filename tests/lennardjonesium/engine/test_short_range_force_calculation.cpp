@@ -7,8 +7,8 @@
 
 #include <src/lennardjonesium/tools/bounding_box.hpp>
 #include <src/lennardjonesium/physics/system_state.hpp>
-#include <src/lennardjonesium/engine/cell_list_particle_pair_filter.hpp>
-#include <src/lennardjonesium/engine/short_range_force_calculation.hpp>
+#include <src/lennardjonesium/engine/particle_pair_filter.hpp>
+#include <src/lennardjonesium/engine/force_calculation.hpp>
 
 #include <tests/lennardjonesium/test_utils/constant_short_range_force.hpp>
 
