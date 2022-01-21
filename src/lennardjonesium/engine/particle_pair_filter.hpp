@@ -28,6 +28,7 @@
 #include <lennardjonesium/draft_cpp23/generator.hpp>
 
 #include <lennardjonesium/tools/bounding_box.hpp>
+#include <lennardjonesium/tools/cell_list_array.hpp>
 #include <lennardjonesium/physics/system_state.hpp>
 
 namespace engine
@@ -72,6 +73,30 @@ namespace engine
         protected:
             const tools::BoundingBox& bounding_box_;
             double cutoff_distance_;
+    };
+
+    // We define the following useful derived classes
+
+    class NaiveParticlePairFilter : public ParticlePairFilter
+    {
+        public:
+            using ParticlePairFilter::ParticlePairFilter;
+
+            // Generate the ParticlePairs filtered by separation distance
+            virtual std::generator<ParticlePair> operator() (const physics::SystemState&) override;
+    };
+
+    class CellListParticlePairFilter : public ParticlePairFilter
+    {
+        public:
+            CellListParticlePairFilter
+                (const tools::BoundingBox& bounding_box, double cutoff_distance);
+            
+            // Generate the ParticlePairs filtered by separation distance
+            virtual std::generator<ParticlePair> operator() (const physics::SystemState&) override;
+        
+        protected:
+            tools::CellListArray cell_list_array_;
     };
 } // namespace engine
 

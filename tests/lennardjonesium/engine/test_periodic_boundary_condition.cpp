@@ -7,7 +7,7 @@
 
 #include <lennardjonesium/tools/bounding_box.hpp>
 #include <lennardjonesium/physics/system_state.hpp>
-#include <lennardjonesium/engine/periodic_boundary_condition.hpp>
+#include <lennardjonesium/engine/boundary_condition.hpp>
 
 SCENARIO("Imposing boundary conditions")
 {

@@ -1,5 +1,5 @@
 /**
- * velocity_verlet_integrator.hpp
+ * boundary_condition.cpp
  * 
  * Copyright (c) 2021-2022 Benjamin E. Niehoff
  * 
@@ -20,23 +20,34 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LJ_VELOCITY_VERLET_INTEGRATOR_HPP
-#define LJ_VELOCITY_VERLET_INTEGRATOR_HPP
+#include <Eigen/Dense>
 
+#include <lennardjonesium/engine/boundary_condition.hpp>
 #include <lennardjonesium/physics/system_state.hpp>
-#include <lennardjonesium/engine/integrator.hpp>
+
+using Eigen::Array4d;
+using physics::SystemState;
 
 namespace engine
 {
-    class VelocityVerletIntegrator : public Integrator
-    {
-        public:
-            // Should be able to inherit constructor without problems
-            using Integrator::Integrator;
+    PeriodicBoundaryCondition::PeriodicBoundaryCondition(const tools::BoundingBox& bounding_box)
+        : bounding_box_{bounding_box}
+    {}
 
-            // Evolves time by one step
-            virtual physics::SystemState& operator() (physics::SystemState&) const override;
-    };
+    SystemState& PeriodicBoundaryCondition::operator() (SystemState& state) const
+    {
+        /**
+         * This would be slightly more elegant if Eigen provided a componentwise fractional part.
+         * Instead we have to subtract the integer part (floor), appropriately rescaled by the
+         * size of the box.
+         */
+
+        state.positions -= (
+            (state.positions.array().colwise() / bounding_box_.array()).floor().array().colwise()
+            * bounding_box_.array()
+        ).matrix();
+
+        return state;
+    }
 } // namespace engine
 
-#endif
