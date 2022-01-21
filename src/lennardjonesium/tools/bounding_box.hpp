@@ -49,6 +49,9 @@ namespace tools
 
             // Get the array representation to use in Eigen expressions
             Eigen::Array4d array() const {return dimensions_;};
+
+            // Compute the volume
+            double volume() const {return dimensions_.prod();}
         
         private:
             // Construct directly from an Eigen 4-array
