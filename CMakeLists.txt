@@ -18,6 +18,7 @@ find_package(Eigen3 3.4 REQUIRED NO_MODULE)
 # TODO: Make these more portable for different compilers
 add_compile_options(
     -Wall -Wextra -Wpedantic -Werror
+    # -fsanitize=undefined
     -O3                 # Enable optimization level 3
     -march=native       # Enables vectorization for Eigen in GCC and Clang
     -ffast-math         # Disables adherence to error reporting and rounding rules in GCC
@@ -151,6 +152,7 @@ else()
 
         tests/lennardjonesium/tools/test_bounding_box.cpp
         tests/lennardjonesium/tools/test_cell_list_array.cpp
+        tests/lennardjonesium/tools/test_cubic_lattice.cpp
 
         tests/lennardjonesium/test_utils/constant_short_range_force.hpp
         tests/lennardjonesium/test_utils/constant_short_range_force.cpp
