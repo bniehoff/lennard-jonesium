@@ -27,6 +27,7 @@
 #include <concepts>
 
 #include <lennardjonesium/tools/bounding_box.hpp>
+#include <lennardjonesium/tools/cubic_lattice.hpp>
 #include <lennardjonesium/physics/system_state.hpp>
 
 namespace engine
@@ -61,6 +62,7 @@ namespace engine
                 int particle_count,
                 double density,
                 double temperature,
+                tools::CubicLattice::UnitCell unit_cell = tools::CubicLattice::FaceCentered(),
                 std::random_device::result_type seed = random_number_engine_type::default_seed
             );
             
@@ -75,34 +77,17 @@ namespace engine
             std::random_device::result_type seed() {return seed_;}
         
         private:
-            struct Parameters_
-            {
-                /**
-                 * The Parameters object is a helper struct to allow us to do some computation on
-                 * the input parameters and repackage them into a type for overload resolution.
-                 * This allows us to pre-compute some necessary information in the initializer list
-                 * before constructing the BoundingBox and the SystemState; in particular, it
-                 * allows both objects to be stack-allocated.
-                 * 
-                 * For the initial particle placement, we will use a face-centered cubic crystal
-                 * structure.  Given the input parameters, we need to calculate how many lattice
-                 * cells (along one dimension) are required, as well as the linear size of each
-                 * lattice cell.
-                 */
-
-                int lattice_size;
-                double cell_size;
-
-                double density;
-                double temperature;
-                std::random_device::result_type seed;
-
-                Parameters_(int particle_count, double density, double temperature,
-                            std::random_device::result_type seed);
-            };
-
-            // Delegate constructor
-            InitialCondition(Parameters_);
+            /**
+             * Delegate constructor requires all arguments, and substitutes complete CubicLattice
+             * for UnitCell
+             */
+            InitialCondition(
+                int particle_count,
+                double density,
+                double temperature,
+                tools::CubicLattice cubic_lattice,
+                std::random_device::result_type seed
+            );
 
             // Data members
             tools::BoundingBox bounding_box_;
