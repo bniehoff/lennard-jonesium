@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <ranges>
 
 #include <catch2/catch.hpp>
 #include <Eigen/Dense>
@@ -62,9 +63,9 @@ void setup_cell_list_array(tools::CellListArray& cell_list_array)
 {
     // To set up, let's populate the cell list array with its own index (as an array), so that we
     // can easily see which cells have been selected
-    for (int i = 0; i < cell_list_array.shape()[0]; i++)
-        for (int j = 0; j < cell_list_array.shape()[1]; j++)
-            for (int k = 0; k < cell_list_array.shape()[2]; k++)
+    for (int i : std::views::iota(0, cell_list_array.shape()[0]))
+        for (int j : std::views::iota(0, cell_list_array.shape()[1]))
+            for (int k : std::views::iota(0, cell_list_array.shape()[2]))
                 cell_list_array(i, j, k) = tools::CellList{i, j, k};
 }
 

@@ -26,6 +26,7 @@
 
 #include <Eigen/Dense>
 
+#include <lennardjonesium/tools/aligned_generator.hpp>
 #include <lennardjonesium/tools/bounding_box.hpp>
 #include <lennardjonesium/tools/cell_list_array.hpp>
 #include <lennardjonesium/physics/system_state.hpp>
@@ -63,7 +64,7 @@ namespace engine
         );
     }
 
-    std::generator<ParticlePair>
+    tools::aligned_generator<ParticlePair>
     NaiveParticlePairFilter::operator() (const physics::SystemState& state)
     {
         /**
@@ -106,9 +107,10 @@ namespace engine
                     Eigen::Map<const Eigen::Array4d> image_array(image.data());
 
                     // Find the separation vector to i from the image of j
-                    auto separation = state.positions.col(i) - state.positions.col(j) - (
-                        image_array * bounding_box_.array()
-                    ).matrix();
+                    auto separation = (
+                        state.positions.col(i) - state.positions.col(j)
+                        - (image_array * bounding_box_.array()).matrix()
+                    );
 
                     // Return if it is shorter than the cutoff distance, otherwise skip
                     if (separation.squaredNorm() < cutoff_distance_ * cutoff_distance_)
@@ -126,7 +128,7 @@ namespace engine
           cell_list_array_{bounding_box, cutoff_distance}
     {}
 
-    std::generator<ParticlePair>
+    tools::aligned_generator<ParticlePair>
     CellListParticlePairFilter::operator() (const physics::SystemState& state)
     {
         /**
@@ -145,7 +147,7 @@ namespace engine
         ).floor().cast<int>();
 
         // Then assign each particle to its corresponding cell
-        for (auto i : std::views::iota(0, cell_indices.cols()))
+        for (int i = 0; i < cell_indices.cols(); ++i)
         {
             auto cell_index = cell_indices.col(i);
             cell_list_array_(cell_index[0], cell_index[1], cell_index[2]).push_back(i);
@@ -176,8 +178,8 @@ namespace engine
                 for (int j : std::views::iota(0, static_cast<int>(pair.second.size())))
                 {
                     auto separation = (
-                        state.positions.col(pair.first[i]) - state.positions.col(pair.second[j]) -
-                        (pair.lattice_image.cast<double>() * bounding_box_.array()).matrix()
+                        state.positions.col(pair.first[i]) - state.positions.col(pair.second[j])
+                        - (pair.lattice_image.cast<double>() * bounding_box_.array()).matrix()
                     );
 
                     if (separation.squaredNorm() < cutoff_distance_ * cutoff_distance_)

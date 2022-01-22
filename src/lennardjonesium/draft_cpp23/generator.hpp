@@ -1,3 +1,21 @@
+/**
+ * NOTE: (Ben Niehoff 22.01.2022)
+ * 
+ * I have made a number of changes based on suggestions from #include Discord to hopefully correct
+ * some shortcomings of https://godbolt.org/z/T58h1W with respect to overaligned local variables
+ * in the coroutine frame.  The original code blocks are commented out, and below are modified
+ * versions.  The original std::generator implementation did not take into account overalignment
+ * of a supplied allocator in the third template argument.
+ * 
+ * It appears that there is a GCC bug regarding coroutine frame alignment
+ * (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=104177), although it is debateable whether this
+ * is a failure to align, or a failure to give a compiler message about alignment, or whether it
+ * is actually a defect in the wording of the standard.
+ * 
+ * In any case, the code here seems to work, although it may require some investigation to make
+ * sure that the custom allocate/deallocate functions do not leak memory.
+ */
+
 ////////////////////////////////////////////////////////////////
 // Reference implementation of std::generator proposal P2168R0.
 //
@@ -183,6 +201,11 @@ constexpr size_t aligned_allocation_size(size_t s, size_t a) {
     return (s + a - 1) & ~(a - 1);
 }
 
+// Ben Niehoff: Added this function to get the number of alignment-sized blocks to be allocated
+constexpr size_t aligned_allocation_count(size_t size, size_t alignment) {
+    return aligned_allocation_size(size, alignment) / alignment;
+}
+
 template<proto_allocator Alloc>
 class promise_base_alloc;
 
@@ -269,30 +292,73 @@ public:
     }
 };
 
-template<proto_allocator Alloc>
-class promise_base_alloc {
-    using bytes_alloc = typename std::allocator_traits<Alloc>::template rebind_alloc<std::byte>;
+// template<proto_allocator Alloc>
+// class promise_base_alloc {
+//     using bytes_alloc = typename std::allocator_traits<Alloc>::template rebind_alloc<std::byte>;
 
     
+//     static constexpr std::size_t offset_of_allocator(std::size_t frameSize) {
+//         return aligned_allocation_size(frameSize, alignof(bytes_alloc));
+//     }
+
+//     static constexpr std::size_t padded_frame_size(std::size_t frameSize) {
+//         return offset_of_allocator(frameSize) + sizeof(bytes_alloc);
+//     }
+
+//     static bytes_alloc& get_allocator(void* frame, std::size_t frameSize) {
+//         return *reinterpret_cast<bytes_alloc*>(
+//             static_cast<char*>(frame) + offset_of_allocator(frameSize));
+//     }
+
+// public:
+//     template<typename... Args>
+//     static void* operator new(std::size_t frameSize, std::allocator_arg_t, Alloc alloc, Args&...) {
+//         bytes_alloc balloc = std::move(alloc);
+
+        
+//         void* frame = balloc.allocate(padded_frame_size(frameSize));
+
+//         // Store allocator at end of the coroutine frame.
+//         // Assuming the allocator's move constructor is non-throwing (a requirement for allocators)
+//         ::new (static_cast<void*>(std::addressof(get_allocator(frame, frameSize)))) Alloc(std::move(balloc));
+
+//         return frame;
+//     }
+
+//     template<typename This, typename... Args>
+//     static void* operator new(std::size_t frameSize, This&, std::allocator_arg_t, Alloc alloc, Args&...) {
+//         return promise_base_alloc::operator new(frameSize, std::allocator_arg, std::move(alloc));
+//     }
+
+//     static void operator delete(void* ptr, std::size_t frameSize) {
+//         bytes_alloc& alloc = get_allocator(ptr, frameSize);
+//         bytes_alloc localAlloc(std::move(alloc));
+//         alloc.~Alloc();
+//         localAlloc.deallocate(static_cast<char*>(ptr), padded_frame_size(frameSize));
+//     }
+// };
+
+// Ben Niehoff: Replaced original version of this class with the following version
+// TODO: Allocation sizes here are still computed wrongly in the case of overalignment.
+template<proto_allocator Alloc>
+class promise_base_alloc {
     static constexpr std::size_t offset_of_allocator(std::size_t frameSize) {
-        return aligned_allocation_size(frameSize, alignof(bytes_alloc));
+        return aligned_allocation_size(frameSize, alignof(Alloc));
     }
 
     static constexpr std::size_t padded_frame_size(std::size_t frameSize) {
-        return offset_of_allocator(frameSize) + sizeof(bytes_alloc);
+        return offset_of_allocator(frameSize) + sizeof(Alloc);
     }
 
-    static bytes_alloc& get_allocator(void* frame, std::size_t frameSize) {
-        return *reinterpret_cast<bytes_alloc*>(
+    static Alloc& get_allocator(void* frame, std::size_t frameSize) {
+        return *reinterpret_cast<Alloc*>(
             static_cast<char*>(frame) + offset_of_allocator(frameSize));
     }
 
 public:
     template<typename... Args>
     static void* operator new(std::size_t frameSize, std::allocator_arg_t, Alloc alloc, Args&...) {
-        bytes_alloc balloc = std::move(alloc);
-
-        
+        Alloc balloc = std::move(alloc);
         void* frame = balloc.allocate(padded_frame_size(frameSize));
 
         // Store allocator at end of the coroutine frame.
@@ -308,28 +374,47 @@ public:
     }
 
     static void operator delete(void* ptr, std::size_t frameSize) {
-        bytes_alloc& alloc = get_allocator(ptr, frameSize);
-        bytes_alloc localAlloc(std::move(alloc));
+        auto& alloc = get_allocator(ptr, frameSize);
+        auto localAlloc(std::move(alloc));
         alloc.~Alloc();
         localAlloc.deallocate(static_cast<char*>(ptr), padded_frame_size(frameSize));
     }
 };
 
 
+// template<proto_allocator Alloc>
+// requires (!allocator_needs_to_be_stored<Alloc>)
+// class promise_base_alloc<Alloc> {
+//     using bytes_alloc = typename std::allocator_traits<Alloc>::template rebind_alloc<std::byte>;
+
+// public:
+//     static void* operator new(std::size_t size) {
+//         bytes_alloc alloc;
+//         return alloc.allocate(size);
+//     }
+
+//     static void operator delete(void* ptr, std::size_t size) {
+//         bytes_alloc alloc;
+//         alloc.deallocate(static_cast<std::byte*>(ptr), size);
+//     }
+// };
+
+// Ben Niehoff: Replaced original version of this class with the following version
 template<proto_allocator Alloc>
 requires (!allocator_needs_to_be_stored<Alloc>)
 class promise_base_alloc<Alloc> {
-    using bytes_alloc = typename std::allocator_traits<Alloc>::template rebind_alloc<std::byte>;
-
 public:
     static void* operator new(std::size_t size) {
-        bytes_alloc alloc;
-        return alloc.allocate(size);
+        Alloc alloc;
+        return alloc.allocate(aligned_allocation_count(size, alignof(typename Alloc::value_type)));
     }
 
     static void operator delete(void* ptr, std::size_t size) {
-        bytes_alloc alloc;
-        alloc.deallocate(static_cast<std::byte*>(ptr), size);
+        Alloc alloc;
+        alloc.deallocate(
+            static_cast<Alloc::value_type*>(ptr),
+            aligned_allocation_count(size, alignof(typename Alloc::value_type))
+        );
     }
 };
 

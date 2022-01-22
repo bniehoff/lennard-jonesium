@@ -79,7 +79,7 @@ namespace engine
         state.clear_dynamical_quantities();
 
         // Now iterate over the particles
-        for (auto i : std::views::iota(0, state.particle_count()))
+        for (int i : std::views::iota(0, state.particle_count()))
         {
             auto force_contribution = background_force_(state.positions.col(i));
 

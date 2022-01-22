@@ -2,8 +2,6 @@
  * A fairly trivial test, since SystemState is just data.
  */
 
-#include <ranges>
-
 #include <catch2/catch.hpp>
 #include <Eigen/Dense>
 
@@ -35,7 +33,8 @@ SCENARIO("Representing the system state")
         int count = 7;
         SystemState s(count);
 
-        for (const auto i : std::views::iota(0, count)) {
+        for (int i = 0; i < count; ++i)
+        {
             s.positions.col(i) = Vector4d{i + 0.0, i + 1.0, i + 2.0, i + 3.0};
         }
 
