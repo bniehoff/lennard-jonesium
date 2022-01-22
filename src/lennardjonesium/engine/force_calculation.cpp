@@ -1,5 +1,5 @@
 /**
- * short_range_force_calculation.cpp
+ * force_calculation.cpp
  * 
  * Copyright (c) 2021-2022 Benjamin E. Niehoff
  * 
@@ -20,10 +20,12 @@
  * <https://www.gnu.org/licenses/>.
  */
 
+#include <ranges>
+
 #include <lennardjonesium/physics/system_state.hpp>
 #include <lennardjonesium/physics/forces.hpp>
 #include <lennardjonesium/engine/particle_pair_filter.hpp>
-#include <lennardjonesium/engine/short_range_force_calculation.hpp>
+#include <lennardjonesium/engine/force_calculation.hpp>
 
 namespace engine
 {
@@ -60,5 +62,32 @@ namespace engine
 
         return state;
     }
-} // namespace engine
 
+    BackgroundForceCalculation::BackgroundForceCalculation
+        (const physics::BackgroundForce& background_force)
+        : background_force_{background_force}
+    {}
+
+    physics::SystemState&
+    BackgroundForceCalculation::operator() (physics::SystemState& state) const
+    {
+        /**
+         * We need to get the ForceContribution from each particle and add it to the system state.
+         */
+
+        // First clear the dynamical quantities
+        state.clear_dynamical_quantities();
+
+        // Now iterate over the particles
+        for (int i : std::views::iota(0, state.particle_count()))
+        {
+            auto force_contribution = background_force_(state.positions.col(i));
+
+            state.forces.col(i) += force_contribution.force;
+            state.potential_energy += force_contribution.potential;
+            state.virial += force_contribution.virial;
+        }
+
+        return state;
+    }
+} // namespace engine

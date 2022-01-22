@@ -27,7 +27,7 @@
 
 #include <Eigen/Dense>
 
-#include <lennardjonesium/draft_cpp23/generator.hpp>
+#include <lennardjonesium/tools/aligned_generator.hpp>
 #include <lennardjonesium/tools/bounding_box.hpp>
 
 namespace tools
@@ -41,57 +41,43 @@ namespace tools
          */
 
         public:
-            struct UnitCell
-            {
-                /**
-                 * The UnitCell will determine what sort of cubic lattice we are talking about.
-                 * It is determined by an Eigen matrix whose columns are the lattice sites, scaled
-                 * to fit within a standard 1x1x1 cube.
-                 */
-
-                const Eigen::Matrix4Xd lattice_sites;
-
-                /**
-                 * The "density" is just the number of lattice sites in the cell.  We use it as
-                 * either int or double, depending on context.
-                 */
-                template <typename T> requires std::is_arithmetic_v<T>
-                auto density() {return static_cast<T>(lattice_sites.cols());}
-            };
+            /**
+             * The UnitCell will determine what sort of cubic lattice we are talking about.
+             * It is determined by an Eigen matrix whose columns are the lattice sites, scaled
+             * to fit within a standard 1x1x1 cube.
+             */
+            using UnitCell = const Eigen::Matrix4Xd;
 
             // The following static methods create the three basic cubic lattices
-            inline static UnitCell Simple() {return UnitCell{
-                Eigen::MatrixX4d{{0.0, 0.0, 0.0, 0.0}}.transpose()
-            };}
+            inline static UnitCell Simple()
+                {return Eigen::MatrixX4d{{0.0, 0.0, 0.0, 0.0}}.transpose();}
 
-            inline static UnitCell BodyCentered() {return UnitCell{
-                Eigen::MatrixX4d{{0.0, 0.0, 0.0, 0.0}, {0.5, 0.5, 0.5, 0.0}}.transpose()
-            };}
+            inline static UnitCell BodyCentered()
+                {return Eigen::MatrixX4d{{0.0, 0.0, 0.0, 0.0}, {0.5, 0.5, 0.5, 0.0}}.transpose();}
 
-            inline static UnitCell FaceCentered() {return UnitCell{
-                Eigen::MatrixX4d{
+            inline static UnitCell FaceCentered()
+                {return Eigen::MatrixX4d{
                     {0.0, 0.0, 0.0, 0.0},
                     {0.5, 0.5, 0.0, 0.0},
                     {0.5, 0.0, 0.5, 0.0},
                     {0.0, 0.5, 0.5, 0.0}
-                }.transpose()
-            };}
+                }.transpose();}
 
-            // The constructor takes a unit cell type to fully specify the cubie lattice
+            // The constructor takes a unit cell type to fully specify the cubic lattice
             CubicLattice(int particle_count, double density, UnitCell unit_cell = FaceCentered());
 
             /**
              * The unit cells will be enumerated at coordinates that fit inside the smallest
              * possible cube.
              */
-            std::generator<Eigen::Vector4d> operator() ();
+            tools::aligned_generator<Eigen::Vector4d> operator() ();
 
             BoundingBox bounding_box()
-                {return BoundingBox(static_cast<double>(cells_per_side_) * scale_);}
+                {return BoundingBox(static_cast<double>(cells_per_side_) * scale_factor_);}
         
         private:
             UnitCell unit_cell_;
-            double scale_;
+            double scale_factor_;
             int particle_count_;
             int cells_per_side_;
             

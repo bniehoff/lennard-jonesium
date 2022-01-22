@@ -22,6 +22,11 @@ SCENARIO("Constructing a BoundingBox")
         {
             REQUIRE(Eigen::Array4d{x, y, z, 1.0}.isApprox(box.array()));
         }
+
+        THEN("I get the expected volume")
+        {
+            REQUIRE(Approx(x * y * z) == box.volume());
+        }
     }
 
     WHEN("I create a BoundingBox from a single side length")
@@ -31,6 +36,11 @@ SCENARIO("Constructing a BoundingBox")
         THEN("I get the expected array output")
         {
             REQUIRE(Eigen::Array4d{s, s, s, 1.0}.isApprox(box.array()));
+        }
+
+        THEN("I get the expected volume")
+        {
+            REQUIRE(Approx(s * s * s) == box.volume());
         }
     }
 }

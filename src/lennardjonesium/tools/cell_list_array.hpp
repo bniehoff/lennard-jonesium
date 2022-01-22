@@ -28,7 +28,7 @@
 #include <boost/multi_array.hpp>
 #include <Eigen/Dense>
 
-#include <lennardjonesium/draft_cpp23/generator.hpp>
+#include <lennardjonesium/tools/aligned_generator.hpp>
 #include <lennardjonesium/tools/bounding_box.hpp>
 
 namespace tools
@@ -86,10 +86,10 @@ namespace tools
             void clear();
 
             // Generator to traverse the individual cells
-            std::generator<const CellList&> cells() const;
+            tools::generator<const CellList&> cells() const;
 
             // Generator to traverse adjacent pairs of cells (including periodic wrap around)
-            std::generator<CellListPair> adjacent_pairs() const;
+            tools::aligned_generator<CellListPair> adjacent_pairs() const;
         
         private:
             using array_type = boost::multi_array<CellList, 3>;
