@@ -71,6 +71,7 @@ add_library(draft_cpp23 STATIC
 set_target_properties(draft_cpp23 PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library(tools STATIC
+    src/lennardjonesium/tools/aligned_generator.hpp
     src/lennardjonesium/tools/bounding_box.hpp
     src/lennardjonesium/tools/bounding_box.cpp
     src/lennardjonesium/tools/cell_list_array.hpp
@@ -113,13 +114,11 @@ target_link_libraries(tools
 
 target_link_libraries(physics
     PRIVATE Eigen3::Eigen
-    PRIVATE draft_cpp23
     PRIVATE tools
 )
 
 target_link_libraries(engine
     PRIVATE Eigen3::Eigen
-    PRIVATE draft_cpp23
     PRIVATE tools
     PRIVATE physics
 )
@@ -166,7 +165,6 @@ else()
         # PRIVATE Microsoft.GSL::GSL
         # PRIVATE ktl::ktl
         PRIVATE greeter
-        PRIVATE draft_cpp23
         PRIVATE tools
         PRIVATE physics
         PRIVATE engine

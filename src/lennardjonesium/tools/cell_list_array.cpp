@@ -25,7 +25,7 @@
 #include <boost/multi_array.hpp>
 #include <Eigen/Dense>
 
-#include <lennardjonesium/draft_cpp23/generator.hpp>
+#include <lennardjonesium/tools/aligned_generator.hpp>
 #include <lennardjonesium/tools/bounding_box.hpp>
 #include <lennardjonesium/tools/cell_list_array.hpp>
 
@@ -60,7 +60,7 @@ namespace tools
         return const_cast<CellList&>(static_cast<const CellListArray&>(*this)(x, y, z));
     }
 
-    std::generator<CellListArray::index_type> CellListArray::cell_indices_() const
+    tools::generator<CellListArray::index_type> CellListArray::cell_indices_() const
     {
         for (auto i : std::views::iota(0, shape_[0]))
             for (auto j : std::views::iota(0, shape_[1]))
@@ -74,13 +74,13 @@ namespace tools
             cell_array_(index).clear();
     }
 
-    std::generator<const CellList&> CellListArray::cells() const
+    tools::generator<const CellList&> CellListArray::cells() const
     {
         for (auto index : cell_indices_())
             co_yield cell_array_(index);
     }
 
-    std::generator<CellListPair> CellListArray::adjacent_pairs() const
+    tools::aligned_generator<CellListPair> CellListArray::adjacent_pairs() const
     {
         /**
          * Each cell (i, j, k) has 26 neighbors, given by

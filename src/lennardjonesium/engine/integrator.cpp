@@ -52,10 +52,10 @@ namespace engine
     {
         using S = physics::SystemState;
         return [this, steps](S& s) -> S&
-            {
-                for ([[maybe_unused]] int i : std::views::iota(0, steps)) {s | *this;}
-                return s;
-            };
+        {
+            for ([[maybe_unused]] int i : std::views::iota(0, steps)) {s | *this;}
+            return s;
+        };
     }
 
     // Evolves time by one step

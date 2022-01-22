@@ -25,8 +25,7 @@
 
 #include <Eigen/Dense>
 
-#include <lennardjonesium/draft_cpp23/generator.hpp>
-
+#include <lennardjonesium/tools/aligned_generator.hpp>
 #include <lennardjonesium/tools/bounding_box.hpp>
 #include <lennardjonesium/tools/cell_list_array.hpp>
 #include <lennardjonesium/physics/system_state.hpp>
@@ -68,7 +67,8 @@ namespace engine
             ParticlePairFilter(const tools::BoundingBox& bounding_box, double cutoff_distance);
 
             // Generate the ParticlePairs filtered by separation distance
-            virtual std::generator<ParticlePair> operator() (const physics::SystemState&) = 0;
+            virtual tools::aligned_generator<ParticlePair>
+            operator() (const physics::SystemState&) = 0;
         
         protected:
             const tools::BoundingBox& bounding_box_;
@@ -83,7 +83,8 @@ namespace engine
             using ParticlePairFilter::ParticlePairFilter;
 
             // Generate the ParticlePairs filtered by separation distance
-            virtual std::generator<ParticlePair> operator() (const physics::SystemState&) override;
+            virtual tools::aligned_generator<ParticlePair>
+            operator() (const physics::SystemState&) override;
     };
 
     class CellListParticlePairFilter : public ParticlePairFilter
@@ -93,7 +94,8 @@ namespace engine
                 (const tools::BoundingBox& bounding_box, double cutoff_distance);
             
             // Generate the ParticlePairs filtered by separation distance
-            virtual std::generator<ParticlePair> operator() (const physics::SystemState&) override;
+            virtual tools::aligned_generator<ParticlePair>
+            operator() (const physics::SystemState&) override;
         
         protected:
             tools::CellListArray cell_list_array_;

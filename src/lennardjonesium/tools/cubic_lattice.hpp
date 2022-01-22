@@ -27,7 +27,7 @@
 
 #include <Eigen/Dense>
 
-#include <lennardjonesium/draft_cpp23/generator.hpp>
+#include <lennardjonesium/tools/aligned_generator.hpp>
 #include <lennardjonesium/tools/bounding_box.hpp>
 
 namespace tools
@@ -70,7 +70,7 @@ namespace tools
              * The unit cells will be enumerated at coordinates that fit inside the smallest
              * possible cube.
              */
-            // std::generator<Eigen::Vector4d> operator() ();
+            tools::aligned_generator<Eigen::Vector4d> operator() ();
 
             BoundingBox bounding_box()
                 {return BoundingBox(static_cast<double>(cells_per_side_) * scale_factor_);}
