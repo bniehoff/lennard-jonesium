@@ -28,6 +28,7 @@
 #include <lennardjonesium/tools/bounding_box.hpp>
 #include <lennardjonesium/tools/cubic_lattice.hpp>
 #include <lennardjonesium/physics/system_state.hpp>
+#include <lennardjonesium/physics/transformations.hpp>
 #include <lennardjonesium/engine/initial_condition.hpp>
 
 namespace engine
@@ -88,11 +89,18 @@ namespace engine
         }
 
         /**
-         * TODO: We still need to zero the linear and angular momentum, which will in turn affect
-         * the temperature (since kinetic energy is not invariant under changes of frame).
-         * We can also include a final temperature rescaling step, but temperature rescaling needs
-         * to be defined outside this class, since it will also be used elsewhere.
+         * We still need to zero the linear and angular momentum, which will in turn affect
+         * the temperature (since kinetic energy is not invariant under changes of frame).  It is
+         * important to do these corrections in the order given, since otherwise they may interfere
+         * with each other.
          */
+
+        system_state_
+            | physics::zero_angular_momentum
+            | physics::zero_momentum
+            | physics::set_temperature(temperature_);
+        
+        // Now the initial state is set up.
     }
 } // namespace engine
 
