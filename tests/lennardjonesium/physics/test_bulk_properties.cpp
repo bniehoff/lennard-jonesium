@@ -239,7 +239,21 @@ SCENARIO("Transformations of bulk properties of a small system")
             }
         }
 
-        WHEN("I set the angular momentum to a new value")
+        WHEN("I set the angular momentum about the center of mass to a new value")
+        {
+            Eigen::Vector4d new_angular_momentum{1.618, 2.718, 3.142, 0};
+
+            state | physics::set_angular_momentum(new_angular_momentum, center_of_mass);
+
+            THEN("I get the correct result")
+            {
+                REQUIRE(new_angular_momentum.isApprox(
+                    physics::total_angular_momentum(state, center_of_mass)
+                ));
+            }
+        }
+
+        WHEN("I set the angular momentum about the origin to a new value")
         {
             Eigen::Vector4d new_angular_momentum{1.618, 2.718, 3.142, 0};
 
@@ -309,7 +323,21 @@ SCENARIO("Transformations of bulk properties of a small system")
             }
         }
 
-        WHEN("I set the angular momentum to a new value")
+        WHEN("I set the angular momentum about the center of mass to a new value")
+        {
+            Eigen::Vector4d new_angular_momentum{1.618, 2.718, 3.142, 0};
+
+            state | physics::set_angular_momentum(new_angular_momentum, center_of_mass);
+
+            THEN("I get the correct result")
+            {
+                REQUIRE(new_angular_momentum.isApprox(
+                    physics::total_angular_momentum(state, center_of_mass)
+                ));
+            }
+        }
+
+        WHEN("I set the angular momentum about the origin to a new value")
         {
             Eigen::Vector4d new_angular_momentum{1.618, 2.718, 3.142, 0};
 
@@ -350,7 +378,21 @@ SCENARIO("Transformations of bulk properties of a small system")
             }
         }
 
-        WHEN("I set the angular momentum to a new value")
+        WHEN("I set the angular momentum about the center of mass to a new value")
+        {
+            Eigen::Vector4d new_angular_momentum{1.618, 2.718, 3.142, 0};
+
+            state | physics::set_angular_momentum(new_angular_momentum, center_of_mass);
+
+            THEN("I get the correct result")
+            {
+                REQUIRE(new_angular_momentum.isApprox(
+                    physics::total_angular_momentum(state, center_of_mass)
+                ));
+            }
+        }
+
+        WHEN("I set the angular momentum about the origin to a new value")
         {
             Eigen::Vector4d new_angular_momentum{1.618, 2.718, 3.142, 0};
 
@@ -379,6 +421,8 @@ SCENARIO("Transformations of bulk properties on a larger random state")
         ++i;
     }
 
+    Eigen::Vector4d center_of_mass = physics::center_of_mass(state);
+
     GIVEN("Some random velocities on the particles")
     {
         state.velocities.setRandom();
@@ -407,7 +451,21 @@ SCENARIO("Transformations of bulk properties on a larger random state")
             }
         }
 
-        WHEN("I set the angular momentum to a new value")
+        WHEN("I set the angular momentum about the center of mass to a new value")
+        {
+            Eigen::Vector4d new_angular_momentum{1.618, 2.718, 3.142, 0};
+
+            state | physics::set_angular_momentum(new_angular_momentum, center_of_mass);
+
+            THEN("I get the correct result")
+            {
+                REQUIRE(new_angular_momentum.isApprox(
+                    physics::total_angular_momentum(state, center_of_mass)
+                ));
+            }
+        }
+
+        WHEN("I set the angular momentum about the origin to a new value")
         {
             Eigen::Vector4d new_angular_momentum{1.618, 2.718, 3.142, 0};
 
