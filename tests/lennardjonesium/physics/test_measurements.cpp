@@ -5,8 +5,8 @@
 #include <catch2/catch.hpp>
 #include <Eigen/Dense>
 
-#include <lennardjonesium/physics/system_state.hpp>
-#include <lennardjonesium/physics/measurements.hpp>
+#include <src/lennardjonesium/physics/system_state.hpp>
+#include <src/lennardjonesium/physics/measurements.hpp>
 
 SCENARIO("Measuring bulk properties of the state")
 {
