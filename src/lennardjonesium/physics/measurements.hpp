@@ -60,6 +60,16 @@ namespace physics
         {return total_energy(state, kinetic_energy(state));}
     
     /**
+     * Similarly, the temperature is just proportional to the kinetic energy, so we provide simple
+     * overloads.
+     */
+    inline double temperature(double kinetic_energy)
+        {return (2./3.) * kinetic_energy;}
+
+    inline double temperature(const SystemState& state)
+        {return temperature(kinetic_energy(state));}
+    
+    /**
      * The inertia tensor is given as a 4x4 matrix for alignement reasons.  The upper 3x3 block
      * is the 3-dimensional inertia tensor.  The (i, 4) and (4, j) elements are zero.  The (4, 4)
      * element is equal to 1/2 times the trace of the 3-dimensional inertia tensor, although its
