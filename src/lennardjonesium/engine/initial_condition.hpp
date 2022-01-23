@@ -24,7 +24,6 @@
 #define LJ_INITIAL_CONDITION_HPP
 
 #include <random>
-#include <concepts>
 
 #include <lennardjonesium/tools/bounding_box.hpp>
 #include <lennardjonesium/tools/cubic_lattice.hpp>

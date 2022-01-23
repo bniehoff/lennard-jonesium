@@ -46,11 +46,12 @@ namespace physics
 
     SystemState::Operator set_temperature(double temperature);
 
-    inline SystemState& zero_momentum(SystemState& s)
-        {return s | set_momentum(Eigen::Vector4d::Zero());}
-
-    inline SystemState& zero_angular_momentum(SystemState& s)
-        {return s | set_angular_momentum(Eigen::Vector4d::Zero());}
+    inline SystemState::Operator zero_momentum() {return set_momentum(Eigen::Vector4d::Zero());}
+    
+    inline SystemState::Operator zero_angular_momentum(
+        const Eigen::Ref<const Eigen::Vector4d>& center = Eigen::Vector4d::Zero()
+    )
+        {return set_angular_momentum(Eigen::Vector4d::Zero(), center);}
 } // namespace physics
 
 

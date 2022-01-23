@@ -264,6 +264,28 @@ SCENARIO("Transformations of bulk properties of a small system")
                 REQUIRE(new_angular_momentum.isApprox(physics::total_angular_momentum(state)));
             }
         }
+
+        WHEN("I zero the momentum")
+        {
+            state | physics::zero_momentum();
+
+            THEN("I get the correct result")
+            {
+                // NOTE: Approx(0) cannot be used, approximation is proportional to the value!
+                REQUIRE(Approx(1.0) == 1.0 + physics::total_momentum(state).squaredNorm());
+            }
+        }
+
+        WHEN("I zero the angular momentum")
+        {
+            state | physics::zero_angular_momentum();
+
+            THEN("I get the correct result")
+            {
+                // NOTE: Approx(0) cannot be used, approximation is proportional to the value!
+                REQUIRE(Approx(1.0) == 1.0 + physics::total_angular_momentum(state).squaredNorm());
+            }
+        }
     }
 
     GIVEN("Some velocities on the particles rotating around the x axis")
@@ -348,6 +370,28 @@ SCENARIO("Transformations of bulk properties of a small system")
                 REQUIRE(new_angular_momentum.isApprox(physics::total_angular_momentum(state)));
             }
         }
+
+        WHEN("I zero the momentum")
+        {
+            state | physics::zero_momentum();
+
+            THEN("I get the correct result")
+            {
+                // NOTE: Approx(0) cannot be used, approximation is proportional to the value!
+                REQUIRE(Approx(1.0) == 1.0 + physics::total_momentum(state).squaredNorm());
+            }
+        }
+
+        WHEN("I zero the angular momentum")
+        {
+            state | physics::zero_angular_momentum();
+
+            THEN("I get the correct result")
+            {
+                // NOTE: Approx(0) cannot be used, approximation is proportional to the value!
+                REQUIRE(Approx(1.0) == 1.0 + physics::total_angular_momentum(state).squaredNorm());
+            }
+        }
     }
 
     GIVEN("Some random velocities on the particles")
@@ -401,6 +445,28 @@ SCENARIO("Transformations of bulk properties of a small system")
             THEN("I get the correct result")
             {
                 REQUIRE(new_angular_momentum.isApprox(physics::total_angular_momentum(state)));
+            }
+        }
+
+        WHEN("I zero the momentum")
+        {
+            state | physics::zero_momentum();
+
+            THEN("I get the correct result")
+            {
+                // NOTE: Approx(0) cannot be used, approximation is proportional to the value!
+                REQUIRE(Approx(1.0) == 1.0 + physics::total_momentum(state).squaredNorm());
+            }
+        }
+
+        WHEN("I zero the angular momentum")
+        {
+            state | physics::zero_angular_momentum();
+
+            THEN("I get the correct result")
+            {
+                // NOTE: Approx(0) cannot be used, approximation is proportional to the value!
+                REQUIRE(Approx(1.0) == 1.0 + physics::total_angular_momentum(state).squaredNorm());
             }
         }
     }
@@ -474,6 +540,28 @@ SCENARIO("Transformations of bulk properties on a larger random state")
             THEN("I get the correct result")
             {
                 REQUIRE(new_angular_momentum.isApprox(physics::total_angular_momentum(state)));
+            }
+        }
+
+        WHEN("I zero the momentum")
+        {
+            state | physics::zero_momentum();
+
+            THEN("I get the correct result")
+            {
+                // NOTE: Approx(0) cannot be used, approximation is proportional to the value!
+                REQUIRE(Approx(1.0) == 1.0 + physics::total_momentum(state).squaredNorm());
+            }
+        }
+
+        WHEN("I zero the angular momentum")
+        {
+            state | physics::zero_angular_momentum();
+
+            THEN("I get the correct result")
+            {
+                // NOTE: Approx(0) cannot be used, approximation is proportional to the value!
+                REQUIRE(Approx(1.0) == 1.0 + physics::total_angular_momentum(state).squaredNorm());
             }
         }
     }

@@ -90,14 +90,17 @@ namespace engine
 
         /**
          * We still need to zero the linear and angular momentum, which will in turn affect
-         * the temperature (since kinetic energy is not invariant under changes of frame).  It is
-         * important to do these corrections in the order given, since otherwise they may interfere
-         * with each other.
+         * the temperature (since kinetic energy is not invariant under changes of frame).
+         * 
+         * It is important to specifically use the angular momentum about the center of mass,
+         * otherwise the two operations of zeroing linear and angular momentum do not commute.
          */
 
+        auto center_of_mass = physics::center_of_mass(system_state_);
+
         system_state_
-            | physics::zero_angular_momentum
-            | physics::zero_momentum
+            | physics::zero_momentum()
+            | physics::zero_angular_momentum(center_of_mass)
             | physics::set_temperature(temperature_);
         
         // Now the initial state is set up.
