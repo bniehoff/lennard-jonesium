@@ -79,8 +79,8 @@ namespace engine
          * Next, we choose the initial velocities from a Maxwell-Boltzmann distribution.  This is
          * just a normal distribution with mean 0 and variance equal to the temperature.
          */
-        random_number_engine_type gen{seed_};
-        std::normal_distribution<> maxwell_boltzmann_distribution{0, std::sqrt(temperature_)};
+        random_number_engine_type gen{seed};
+        std::normal_distribution<> maxwell_boltzmann_distribution{0, std::sqrt(temperature)};
 
         // The individual velocity components are all independent, so we treat them as a 1d array
         for (auto& velocity_component : system_state_.velocities.reshaped())
