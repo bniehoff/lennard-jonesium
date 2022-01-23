@@ -20,6 +20,7 @@
  * <https://www.gnu.org/licenses/>.
  */
 
+#include <cassert>
 #include <cmath>
 #include <ranges>
 
@@ -31,10 +32,12 @@
 
 namespace physics
 {
-    SystemState::Operator set_momentum(Eigen::Vector4d momentum)
+    SystemState::Operator set_momentum(const Eigen::Ref<const Eigen::Vector4d>& momentum)
     {
         return [momentum](SystemState& state) -> SystemState&
         {
+            assert(state.particle_count() > 0 && "Cannot set momentum of empty state");
+
             /**
              * Take the difference in momenta divided by the total mass to get the velocity delta
              * which should be added to every velocity in the system
@@ -48,23 +51,26 @@ namespace physics
         };
     }
 
-    SystemState::Operator set_angular_momentum
-        (Eigen::Vector4d angular_momentum, const Eigen::Ref<const Eigen::Vector4d>& center)
+    SystemState::Operator set_angular_momentum(
+        const Eigen::Ref<const Eigen::Vector4d>& angular_momentum,
+        const Eigen::Ref<const Eigen::Vector4d>& center
+    )
     {
         return [angular_momentum, center](SystemState& state) -> SystemState&
         {
+            assert(state.particle_count() > 0 && "Cannot set angular momentum of empty state");
+
             /**
              * To change the angular momentum, we must compute the necessary change in angular
              * velocity.  This means solving
              * 
              *      (L' - L) = (inertia_tensor) * (omega' - omega)
              * 
-             * for (omega - omega').  We use a full-pivot Householder linear solver from Eigen.
+             * for (omega' - omega).  We use a full-pivot Householder linear solver from Eigen.
              */
 
-            auto delta_omega = inertia_tensor(state, center).fullPivHouseholderQr().solve(
-                angular_momentum - total_angular_momentum(state, center)
-            );
+            Eigen::Vector4d delta_omega = inertia_tensor(state, center).fullPivHouseholderQr()
+                .solve(angular_momentum - total_angular_momentum(state, center));
 
             /**
              * Given the change in angular velocity, we must then apply it to the system velocities
@@ -98,6 +104,11 @@ namespace physics
              * so we can correct the temperature by scaling the velocities by the square root of
              * the ratio of temperatures.
              */
+
+            assert(
+                physics::temperature(state) > 0
+                && "Cannot scale temperature of zero-temperature state"
+            );
 
             state.velocities *= std::sqrt(temperature / physics::temperature(state));
 
