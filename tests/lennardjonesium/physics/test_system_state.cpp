@@ -43,6 +43,36 @@ SCENARIO("Representing the system state")
             REQUIRE(Vector4d{3, 4, 5, 6} == s.positions.col(3));
         }
     }
+
+    WHEN("I copy a system state")
+    {
+        SystemState s1{1};
+
+        s1.positions.col(0) = Vector4d{0, 0, 1, 0};
+
+        SystemState s2 = s1;
+
+        THEN("The two positions matrices are equal")
+        {
+            REQUIRE(s1.positions.isApprox(s2.positions));
+        }
+    }
+
+    WHEN("I copy a system state and change a value")
+    {
+        SystemState s1{1};
+
+        s1.positions.col(0) = Vector4d{0, 0, 1, 0};
+
+        SystemState s2 = s1;
+
+        s2.positions.col(0) = Vector4d{0, 0, 2, 0};
+
+        THEN("The two positions matrices are not equal")
+        {
+            REQUIRE_FALSE(s1.positions.isApprox(s2.positions));
+        }
+    }
 }
 
 SystemState& increase_velocity(SystemState& s)
