@@ -38,8 +38,6 @@ namespace tools
         (int particle_count, double density, CubicLattice::UnitCell unit_cell)
         : unit_cell_{unit_cell}, particle_count_{particle_count}
     {
-        // Still need to compute scale_factor_ and cells_per_side_.
-
         // First find the total number of nonempty cells
         int nonempty_cells = std::ceil(
             static_cast<double>(particle_count) / static_cast<double>(unit_cell.cols())

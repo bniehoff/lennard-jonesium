@@ -39,12 +39,6 @@ namespace engine
          * This includes putting the particles in their initial positions, and giving them a
          * velocity distribution that corresponds to the desired temperature.
          * 
-         * We treat the particle_count as approximate, with the rule that we will create a state
-         * with AT LEAST this particle count.  In practice, we choose the lowest perfect cube which
-         * is at least as big as particle_count, so that we can create a perfect cubical lattice
-         * of particles.  This simplifies some computations regarding the angular momentum of the
-         * system.
-         * 
          * We do not enforce any particular method of choosing the initial seed.  If not provided,
          * we use the default one.  The caller is responsible for determining their own method of
          * choosing a seed, either via the system time or std::random_device, etc.
