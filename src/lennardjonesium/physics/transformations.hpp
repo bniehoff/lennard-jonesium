@@ -36,11 +36,11 @@ namespace physics
      * simulation, to ensure that the randomly-generated velocities have some desired properties.
      */
 
-    SystemState::Operator set_momentum(Eigen::Vector4d momentum);
+    SystemState::Operator set_momentum(const Eigen::Ref<const Eigen::Vector4d>& momentum);
 
     // NOTE: When setting the angular momentum, it is possible that the linear momentum can change!
     SystemState::Operator set_angular_momentum(
-        Eigen::Vector4d angular_momentum,
+        const Eigen::Ref<const Eigen::Vector4d>& angular_momentum,
         const Eigen::Ref<const Eigen::Vector4d>& center = Eigen::Vector4d::Zero()
     );
 
