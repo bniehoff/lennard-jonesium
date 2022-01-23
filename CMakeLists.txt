@@ -152,7 +152,7 @@ else()
         tests/lennardjonesium/test_utils/constant_short_range_force.cpp
 
         tests/lennardjonesium/physics/test_system_state.cpp
-        tests/lennardjonesium/physics/test_measurements.cpp
+        tests/lennardjonesium/physics/test_bulk_properties.cpp
         tests/lennardjonesium/physics/test_constant_short_range_force.cpp
 
         tests/lennardjonesium/engine/test_periodic_boundary_condition.cpp
