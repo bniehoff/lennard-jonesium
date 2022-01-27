@@ -99,7 +99,7 @@ namespace physics
              * To change the temperature of the state, we note that temperature scales quadratically
              * with velocity
              * 
-             *      T = (1/3) sum(velocity * velocity)
+             *      T = (1/3N) sum(velocity * velocity)
              * 
              * so we can correct the temperature by scaling the velocities by the square root of
              * the ratio of temperatures.

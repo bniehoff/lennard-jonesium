@@ -23,6 +23,8 @@
 #ifndef LJ_MEASUREMENTS_HPP
 #define LJ_MEASUREMENTS_HPP
 
+#include <cassert>
+
 #include <Eigen/Dense>
 
 #include <lennardjonesium/physics/system_state.hpp>
@@ -60,14 +62,18 @@ namespace physics
         {return total_energy(state, kinetic_energy(state));}
     
     /**
-     * Similarly, the temperature is just proportional to the kinetic energy, so we provide simple
-     * overloads.
+     * Similarly, the temperature is proportional to average the kinetic energy, so we provide
+     * simple overloads.
      */
-    inline double temperature(double kinetic_energy)
-        {return (2./3.) * kinetic_energy;}
+    inline double temperature(const SystemState& state, double kinetic_energy)
+    {
+        assert(state.particle_count() > 0 && "Cannot compute temperature of empty state.");
+        
+        return (2./3.) * kinetic_energy / static_cast<double>(state.particle_count());
+    }
 
     inline double temperature(const SystemState& state)
-        {return temperature(kinetic_energy(state));}
+        {return temperature(state, kinetic_energy(state));}
     
     /**
      * The inertia tensor is given as a 4x4 matrix for alignement reasons.  The upper 3x3 block
