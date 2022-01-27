@@ -157,6 +157,24 @@ namespace tools
 
             BoundingBox bounding_box();
     };
+
+    template<class T, class Alloc = std::allocator<T>>
+    class MovingAverage {
+        /**
+         * MovingAverage keeps track of the moving average of some quantity over time.  It puts
+         * values into a FIFO queue of some fixed depth, and computes their average when requested.
+         * It also informs the caller whether the queue has been filled or not, and provides a
+         * method to empty it and restart averaging.
+         */
+
+        public:
+            void push_back(T);
+            void clear();
+            bool full();
+            T sum();
+            T avg();
+
+    }
 } // namespace tools
 
 namespace physics
@@ -412,7 +430,7 @@ namespace engine
          * Equilibrator will handle the first phase of the simulation, which attempts to reach
          * equilibrium at the correct temperature.  Since temperature is a dependent variable in
          * the microcanonical ensemble, we cannot actually set a temperature directly; it must be
-         * measured instead.  The InitialStateFactory attempts to build a state which is close to
+         * measured instead.  The InitialCondition attempts to build a state which is close to
          * the desired temperature by using a Maxwell distribution of velocities.  However, this
          * process is not perfect.  So, the Equilibrator evolves the system for some time, taking
          * temperature readings, and occasionally rescaling the velocities until the desired

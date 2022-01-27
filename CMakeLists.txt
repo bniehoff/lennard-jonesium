@@ -51,12 +51,6 @@ add_compile_definitions(
 
 # Define libraries out of which the main library will be built
 
-add_library(abstract STATIC
-    src/lennardjonesium/abstract/overview.hpp
-)
-
-set_target_properties(abstract PROPERTIES LINKER_LANGUAGE CXX)
-
 add_library(greeter STATIC
     src/lennardjonesium/greeter/greeter.hpp
     src/lennardjonesium/greeter/greeter.cpp
@@ -70,6 +64,12 @@ add_library(draft_cpp23 STATIC
 # This is needed because library has no .cpp files
 set_target_properties(draft_cpp23 PROPERTIES LINKER_LANGUAGE CXX)
 
+add_library(abstract STATIC
+    src/lennardjonesium/abstract/overview.hpp
+)
+
+set_target_properties(abstract PROPERTIES LINKER_LANGUAGE CXX)
+
 add_library(tools STATIC
     src/lennardjonesium/tools/aligned_generator.hpp
     src/lennardjonesium/tools/bounding_box.hpp
@@ -78,6 +78,7 @@ add_library(tools STATIC
     src/lennardjonesium/tools/cell_list_array.cpp
     src/lennardjonesium/tools/cubic_lattice.hpp
     src/lennardjonesium/tools/cubic_lattice.cpp
+    src/lennardjonesium/tools/moving_average.hpp
 )
 
 add_library(physics STATIC
@@ -147,6 +148,7 @@ else()
         tests/lennardjonesium/tools/test_bounding_box.cpp
         tests/lennardjonesium/tools/test_cell_list_array.cpp
         tests/lennardjonesium/tools/test_cubic_lattice.cpp
+        tests/lennardjonesium/tools/test_moving_average.cpp
 
         tests/lennardjonesium/test_utils/constant_short_range_force.hpp
         tests/lennardjonesium/test_utils/constant_short_range_force.cpp
