@@ -13,7 +13,9 @@
 SCENARIO("Measurements of bulk properties of the system")
 {
     // We set up a state with four particles at the following points
-    physics::SystemState state{4};
+    int particle_count{4};
+
+    physics::SystemState state{particle_count};
 
     state.positions = Eigen::MatrixX4d{
         {0, 0, 0, 0}, {0, 0, 2, 0}, {2, 2, 0, 0}, {2, 2, 2, 0}
@@ -81,7 +83,7 @@ SCENARIO("Measurements of bulk properties of the system")
         }.transpose();
 
         double kinetic_energy{4};
-        double temperature{8./3.};
+        double temperature{8./3. / particle_count};
 
         Eigen::Vector4d total_momentum{0, 0, 0, 0};
 
@@ -123,7 +125,7 @@ SCENARIO("Measurements of bulk properties of the system")
         }.transpose();
 
         double kinetic_energy{4};
-        double temperature{8./3.};
+        double temperature{8./3. / particle_count};
 
         Eigen::Vector4d total_momentum{0, 0, 0, 0};
 
@@ -174,7 +176,9 @@ SCENARIO("Measurements of bulk properties of the system")
 SCENARIO("Transformations of bulk properties of a small system")
 {
     // We set up a state with four particles at the following points
-    physics::SystemState state{4};
+    int particle_count{4};
+
+    physics::SystemState state{particle_count};
 
     state.positions = Eigen::MatrixX4d{
         {0, 0, 0, 0}, {0, 0, 2, 0}, {2, 2, 0, 0}, {2, 2, 2, 0}
