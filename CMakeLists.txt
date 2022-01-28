@@ -72,6 +72,7 @@ set_target_properties(abstract PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library(tools STATIC
     src/lennardjonesium/tools/aligned_generator.hpp
+    src/lennardjonesium/tools/math.hpp
     src/lennardjonesium/tools/bounding_box.hpp
     src/lennardjonesium/tools/bounding_box.cpp
     src/lennardjonesium/tools/cell_list_array.hpp
@@ -102,6 +103,8 @@ add_library(engine STATIC
     src/lennardjonesium/engine/integrator.cpp
     src/lennardjonesium/engine/initial_condition.hpp
     src/lennardjonesium/engine/initial_condition.cpp
+    src/lennardjonesium/engine/equilibrator.hpp
+    src/lennardjonesium/engine/equilibrator.cpp
 )
 
 # Link the various dependencies
