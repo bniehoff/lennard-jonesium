@@ -57,17 +57,17 @@ namespace engine
              * are organized in the Parameters struct.  Their meaning is as follows:
              * 
              * The equilibration process happens over some number of time steps, using the
-             * Integrator to advance time.  Every `sample_period` steps, we measure the temperature,
+             * Integrator to advance time.  Every `sample_interval` steps, we measure the temperature,
              * keeping a moving average of the last `sample_size` measurements.
              * 
-             * Every `measurement_period` steps, we will check to see if the current measured
+             * Every `adjustment_interval` steps, we will check to see if the current measured
              * temperature is within `tolerance` of the target temperature.
              * 
              * If this check fails, then we rescale the temperature of the system.  If it succeeds,
              * then we begin a "steady state test" to check whether the value is stable.  This
-             * means for an entire `steady_state_period`, the temperature should remain within
-             * the given tolerance; i.e. *every* `measurement_period`, the temperature check must
-             * succeed, until `steady_state_period` time steps have passed.  If any temperature
+             * means for an entire `steady_state_time`, the temperature should remain within
+             * the given tolerance; i.e. *every* `adjustment_interval`, the temperature check must
+             * succeed, until `steady_state_time` time steps have passed.  If any temperature
              * check fails, then we rescale the temperature and restart the "steady state test".
              * 
              * If the steady state test passes, then we consider the system to be equilibrated at
@@ -80,9 +80,9 @@ namespace engine
             {
                 double tolerance = 0.05;
                 int sample_size = 20;
-                int sample_period = 5;
-                int measurement_period = 200;
-                int steady_state_period = 1000;
+                int sample_interval = 5;
+                int adjustment_interval = 200;
+                int steady_state_time = 1000;
                 int timeout = 5000;
 
                 // We explicitly define a default constructor as demonstrated in this bug report:
@@ -90,7 +90,7 @@ namespace engine
                 Parameters() {}
             };
 
-            Equilibrator(const Integrator& integrator, const Parameters& parameters = {});
+            Equilibrator(const Integrator& integrator, Parameters parameters = {});
 
             /**
              * Equilibrator is a parametrized SystemState operator, using the syntax
@@ -105,12 +105,14 @@ namespace engine
                 return [this, temperature](S& s) -> S&
                     {return this->equilibrate_(s, temperature);};
             }
+
+            Parameters parameters() {return parameters_;}
         
         private:
             physics::SystemState& equilibrate_(physics::SystemState& state, double temperature);
 
             const Integrator& integrator_;
-            const Parameters& parameters_;
+            Parameters parameters_;
     };
 } // namespace engine
 

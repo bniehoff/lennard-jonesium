@@ -20,6 +20,8 @@
  * <https://www.gnu.org/licenses/>.
  */
 
+#include <ranges>
+
 #include <lennardjonesium/tools/math.hpp>
 #include <lennardjonesium/tools/moving_average.hpp>
 #include <lennardjonesium/physics/system_state.hpp>
@@ -32,7 +34,7 @@ namespace engine
 {
     Equilibrator::Equilibrator(
         const Integrator& integrator,
-        const Equilibrator::Parameters& parameters
+        Equilibrator::Parameters parameters
     )
         : integrator_{integrator}, parameters_{parameters}
     {}
@@ -40,41 +42,42 @@ namespace engine
     physics::SystemState&
     Equilibrator::equilibrate_(physics::SystemState& state, double temperature)
     {
+        /**
+         * TODO: It would be useful to have logging in this function.
+         * 
+         * TODO: Also, we need to move the time loop elsewhere, there should be a single time loop
+         * that the equilibration functions somehow "register" into.  This would be the cleanest
+         * way to keep a global time_step counter.
+         */
+
         tools::MovingAverage<double> temperature_samples(parameters_.sample_size);
 
-        int last_measurement = 0;
-        int last_adjustment = 0;
-
-        for (int time_step = last_measurement;
-            time_step < parameters_.timeout;
-            time_step += parameters_.sample_period)
+        for (int last_adjustment = 0; int time_step : std::views::iota(0, parameters_.timeout))
         {
-            // Advance by sample_period time steps and take temperature sample
-            state | integrator_(parameters_.sample_period);
-            temperature_samples.push_back(physics::temperature(state));
+            // Advance by one time step
+            state | integrator_;
 
-            /**
-             * Every measurement period, check if we are within tolerance of the desired
-             * temperature.  If not, then readjust the temperature and restart the steady state
-             * test.
-             */
-            if (time_step - last_measurement >= parameters_.measurement_period)
+            // Collect temperature samples
+            if (time_step % parameters_.sample_interval == 0)
             {
-                last_measurement = time_step;
+                temperature_samples.push_back(physics::temperature(state));
+            }
+            
+            // Check whether an adjustment is needed
+            if (time_step % parameters_.adjustment_interval == 0)
+            {
+                double measured_temperature = temperature_samples.average();
 
-                if (!tools::within_tolerance(
-                        temperature_samples.average(), temperature, parameters_.tolerance))
+                if (tools::relative_error(measured_temperature, temperature)
+                    >= parameters_.tolerance)
                 {
                     state | physics::set_temperature(temperature);
                     last_adjustment = time_step;
                 }
             }
 
-            /**
-             * If we have reached the steady state period without any adjustments, then
-             * equilibration is successful and we should return the state.
-             */
-            if (time_step - last_adjustment >= parameters_.steady_state_period)
+            // Check whether we are in steady state
+            if (time_step - last_adjustment >= parameters_.steady_state_time)
             {
                 return state;
             }

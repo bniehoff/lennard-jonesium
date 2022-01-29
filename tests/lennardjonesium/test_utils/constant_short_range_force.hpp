@@ -29,6 +29,9 @@
 class ConstantShortRangeForce : public physics::ShortRangeForce
 {
     public:
+        /**
+         * A negative force value is an attractive force, and a positive value is repulsive.
+         */
         ConstantShortRangeForce(double force, double cutoff_length);
 
         virtual physics::ForceContribution

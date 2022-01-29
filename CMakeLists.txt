@@ -155,16 +155,17 @@ else()
 
         tests/lennardjonesium/test_utils/constant_short_range_force.hpp
         tests/lennardjonesium/test_utils/constant_short_range_force.cpp
+        tests/lennardjonesium/test_utils/test_constant_short_range_force.cpp
 
         tests/lennardjonesium/physics/test_system_state.cpp
         tests/lennardjonesium/physics/test_bulk_properties.cpp
-        tests/lennardjonesium/physics/test_constant_short_range_force.cpp
 
         tests/lennardjonesium/engine/test_periodic_boundary_condition.cpp
         tests/lennardjonesium/engine/test_particle_pair_filter.cpp
         tests/lennardjonesium/engine/test_short_range_force_calculation.cpp
         tests/lennardjonesium/engine/test_velocity_verlet_integrator.cpp
         tests/lennardjonesium/engine/test_initial_condition.cpp
+        tests/lennardjonesium/engine/test_equilibrator.cpp
     )
 
     target_link_libraries(tests
