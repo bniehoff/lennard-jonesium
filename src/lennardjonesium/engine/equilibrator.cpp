@@ -34,7 +34,7 @@ namespace engine
 {
     Equilibrator::Equilibrator(
         const Integrator& integrator,
-        const Equilibrator::Parameters& parameters
+        Equilibrator::Parameters parameters
     )
         : integrator_{integrator}, parameters_{parameters}
     {}
@@ -42,6 +42,14 @@ namespace engine
     physics::SystemState&
     Equilibrator::equilibrate_(physics::SystemState& state, double temperature)
     {
+        /**
+         * TODO: It would be useful to have logging in this function.
+         * 
+         * TODO: Also, we need to move the time loop elsewhere, there should be a single time loop
+         * that the equilibration functions somehow "register" into.  This would be the cleanest
+         * way to keep a global time_step counter.
+         */
+
         tools::MovingAverage<double> temperature_samples(parameters_.sample_size);
 
         for (int last_adjustment = 0; int time_step : std::views::iota(0, parameters_.timeout))
@@ -51,19 +59,28 @@ namespace engine
 
             // Collect temperature samples
             if (time_step % parameters_.sample_interval == 0)
-                {temperature_samples.push_back(physics::temperature(state));}
+            {
+                temperature_samples.push_back(physics::temperature(state));
+            }
             
             // Check whether an adjustment is needed
-            if ((time_step % parameters_.adjustment_interval == 0) && !tools::within_tolerance(
-                temperature_samples.average(), temperature, parameters_.tolerance))
+            if (time_step % parameters_.adjustment_interval == 0)
             {
-                state | physics::set_temperature(temperature);
-                last_adjustment = time_step;
+                double measured_temperature = temperature_samples.average();
+
+                if (tools::relative_error(measured_temperature, temperature)
+                    >= parameters_.tolerance)
+                {
+                    state | physics::set_temperature(temperature);
+                    last_adjustment = time_step;
+                }
             }
 
             // Check whether we are in steady state
             if (time_step - last_adjustment >= parameters_.steady_state_time)
-                {return state;}
+            {
+                return state;
+            }
         }
 
         // If we reach here, then we failed to equilibrate and should throw an error.

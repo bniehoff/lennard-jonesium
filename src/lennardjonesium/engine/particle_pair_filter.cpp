@@ -147,7 +147,7 @@ namespace engine
         ).floor().cast<int>();
 
         // Then assign each particle to its corresponding cell
-        for (int i = 0; i < cell_indices.cols(); ++i)
+        for (int i : std::views::iota(0, cell_indices.cols()))
         {
             auto cell_index = cell_indices.col(i);
             cell_list_array_(cell_index[0], cell_index[1], cell_index[2]).push_back(i);
