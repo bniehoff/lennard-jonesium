@@ -23,7 +23,7 @@ SCENARIO("Computing forces between particles")
         // Set up the ShortRangeForceCalculation
         double box_size{3.0};
         double cutoff_distance{1.0};
-        double force_strength{10.0};
+        double force_strength{-10.0};
 
         tools::BoundingBox bounding_box{box_size};
         ConstantShortRangeForce short_range_force{force_strength, cutoff_distance};
@@ -112,7 +112,7 @@ SCENARIO("Computing forces between particles")
         // Set up the ShortRangeForceCalculation
         double box_size{3.0};
         double cutoff_distance{1.0};
-        double force_strength{10.0};
+        double force_strength{-10.0};
 
         tools::BoundingBox bounding_box{box_size};
         ConstantShortRangeForce short_range_force{force_strength, cutoff_distance};

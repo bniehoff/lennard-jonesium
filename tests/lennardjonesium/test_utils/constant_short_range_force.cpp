@@ -41,11 +41,14 @@ physics::ForceContribution ConstantShortRangeForce::operator()
     // The result depends on whether we are inside the cutoff distance or not
     if (norm < cutoff_distance_)
     {
-        // The potential grows linearly with distance:
-        force_contribution.potential = force_ * (norm - cutoff_distance_);
+        /**
+         * The potential changes linearly with distance.  The potential well shape is \/ for an
+         * attractive (negative) force, or /\ for a repulsive (positive) force.
+         */
+        force_contribution.potential = force_ * (cutoff_distance_ - norm);
 
         // The virial is -r times the derivative of the potential with respect to r:
-        force_contribution.virial = -force_ * norm;
+        force_contribution.virial = force_ * norm;
 
         // The force is the virial times (/vec r)/r^2, which should be constant magnitude:
         force_contribution.force = force_contribution.virial * separation / (norm * norm);
