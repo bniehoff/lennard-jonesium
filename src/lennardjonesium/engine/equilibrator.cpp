@@ -50,11 +50,11 @@ namespace engine
             state | integrator_;
 
             // Collect temperature samples
-            if (time_step % parameters_.sample_period == 0)
+            if (time_step % parameters_.sample_interval == 0)
                 {temperature_samples.push_back(physics::temperature(state));}
             
             // Check whether an adjustment is needed
-            if ((time_step % parameters_.measurement_period == 0) && !tools::within_tolerance(
+            if ((time_step % parameters_.adjustment_interval == 0) && !tools::within_tolerance(
                 temperature_samples.average(), temperature, parameters_.tolerance))
             {
                 state | physics::set_temperature(temperature);
@@ -62,7 +62,7 @@ namespace engine
             }
 
             // Check whether we are in steady state
-            if (time_step - last_adjustment >= parameters_.steady_state_period)
+            if (time_step - last_adjustment >= parameters_.steady_state_time)
                 {return state;}
         }
 
