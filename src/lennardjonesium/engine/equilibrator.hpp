@@ -90,7 +90,7 @@ namespace engine
                 Parameters() {}
             };
 
-            Equilibrator(const Integrator& integrator, const Parameters& parameters = {});
+            Equilibrator(const Integrator& integrator, Parameters parameters = {});
 
             /**
              * Equilibrator is a parametrized SystemState operator, using the syntax
@@ -105,12 +105,14 @@ namespace engine
                 return [this, temperature](S& s) -> S&
                     {return this->equilibrate_(s, temperature);};
             }
+
+            Parameters parameters() {return parameters_;}
         
         private:
             physics::SystemState& equilibrate_(physics::SystemState& state, double temperature);
 
             const Integrator& integrator_;
-            const Parameters& parameters_;
+            Parameters parameters_;
     };
 } // namespace engine
 

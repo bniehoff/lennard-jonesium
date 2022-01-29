@@ -31,8 +31,8 @@ namespace tools
      * Here we provide some basic math functions that are universally useful.
      */
 
-    bool within_tolerance(double measured, double desired, double tolerance)
-    {return std::abs(measured / desired - 1.0) < tolerance;}
+    inline double relative_error(double measured, double desired)
+    {return std::abs(measured / desired - 1.0);}
     
 } // namespace tools
 
