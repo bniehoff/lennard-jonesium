@@ -59,15 +59,20 @@ SCENARIO("Moving averages")
 
         tools::MovingAverage<vec> vectors(3);
 
+        double precision = 0.00001;
+
         WHEN("I enter 2 values")
         {
             vectors.push_back({1, 0, 0, 0});
             vectors.push_back({0, 1, 0, 0});
 
+            vec sum{1, 1, 0, 0};
+            vec average{0.5, 0.5, 0, 0};
+
             THEN("I get the correct sum and average")
             {
-                REQUIRE(vectors.sum().isApprox(vec{1, 1, 0, 0}));
-                REQUIRE(vectors.average().isApprox(vec{0.5, 0.5, 0, 0}));
+                REQUIRE((vectors.sum() - sum).norm() < precision);
+                REQUIRE((vectors.average() - average).norm() < precision);
             }
         }
 
@@ -77,10 +82,13 @@ SCENARIO("Moving averages")
             vectors.push_back({0, 3, 2, 0});
             vectors.push_back({1, 0, 0, 0});
 
+            vec sum{3, 3, 3, 0};
+            vec average{1, 1, 1, 0};
+
             THEN("I get the correct sum and average")
             {
-                REQUIRE(vectors.sum().isApprox(vec{3, 3, 3, 0}));
-                REQUIRE(vectors.average().isApprox(vec{1, 1, 1, 0}));
+                REQUIRE((vectors.sum() - sum).norm() < precision);
+                REQUIRE((vectors.average() - average).norm() < precision);
             }
         }
 
@@ -91,10 +99,13 @@ SCENARIO("Moving averages")
             vectors.push_back({1, 0, 0, 0});
             vectors.push_back({5, 6, 1, 0});
 
+            vec sum{6, 9, 3, 0};
+            vec average{2, 3, 1, 0};
+
             THEN("I get the correct sum and average")
             {
-                REQUIRE(vectors.sum().isApprox(vec{6, 9, 3, 0}));
-                REQUIRE(vectors.average().isApprox(vec{2, 3, 1, 0}));
+                REQUIRE((vectors.sum() - sum).norm() < precision);
+                REQUIRE((vectors.average() - average).norm() < precision);
             }
         }
     }
