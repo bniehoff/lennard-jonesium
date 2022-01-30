@@ -159,21 +159,28 @@ namespace tools
     };
 
     template<class T, class Alloc = std::allocator<T>>
-    class MovingAverage {
+    class MovingSample {
         /**
-         * MovingAverage keeps track of the moving average of some quantity over time.  It puts
-         * values into a FIFO queue of some fixed depth, and computes their average when requested.
-         * It also informs the caller whether the queue has been filled or not, and provides a
-         * method to empty it and restart averaging.
+         * MovingSample keeps a fixed-sized sample of a quantity over time, used for computing
+         * estimates of its statistics.  It does this by pushing values into a FIFO queue of fixed
+         * length.  When requested, it computes statistics on these values (mean, variance).  These
+         * statistics are sample estimates.
+         * 
+         * We also provide a means for clearing and restarting the queue, as well as for testing
+         * whether it is completely full.
          */
 
         public:
+            struct Statistics
+            {
+                T mean;
+                T variance;
+            };
+
             void push_back(T);
             void clear();
             bool full();
-            T sum();
-            T avg();
-
+            Statistics statistics();
     }
 } // namespace tools
 
