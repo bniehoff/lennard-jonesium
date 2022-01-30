@@ -23,7 +23,7 @@
 #include <ranges>
 
 #include <lennardjonesium/tools/math.hpp>
-#include <lennardjonesium/tools/moving_average.hpp>
+#include <lennardjonesium/tools/moving_sample.hpp>
 #include <lennardjonesium/physics/system_state.hpp>
 #include <lennardjonesium/physics/measurements.hpp>
 #include <lennardjonesium/physics/transformations.hpp>
@@ -50,7 +50,7 @@ namespace engine
          * way to keep a global time_step counter.
          */
 
-        tools::MovingAverage<double> temperature_samples(parameters_.sample_size);
+        tools::MovingSample<double> temperature_samples(parameters_.sample_size);
 
         for (int last_adjustment = 0; int time_step : std::views::iota(0, parameters_.timeout))
         {
@@ -66,7 +66,7 @@ namespace engine
             // Check whether an adjustment is needed
             if (time_step % parameters_.adjustment_interval == 0)
             {
-                double measured_temperature = temperature_samples.average();
+                double measured_temperature = temperature_samples.statistics().mean;
 
                 if (tools::relative_error(measured_temperature, temperature)
                     >= parameters_.tolerance)
