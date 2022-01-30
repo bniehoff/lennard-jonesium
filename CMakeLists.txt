@@ -79,6 +79,7 @@ add_library(tools STATIC
     src/lennardjonesium/tools/cell_list_array.cpp
     src/lennardjonesium/tools/cubic_lattice.hpp
     src/lennardjonesium/tools/cubic_lattice.cpp
+    src/lennardjonesium/tools/moving_sample.hpp
     src/lennardjonesium/tools/moving_average.hpp
 )
 
@@ -151,7 +152,8 @@ else()
         tests/lennardjonesium/tools/test_bounding_box.cpp
         tests/lennardjonesium/tools/test_cell_list_array.cpp
         tests/lennardjonesium/tools/test_cubic_lattice.cpp
-        tests/lennardjonesium/tools/test_moving_average.cpp
+        tests/lennardjonesium/tools/test_moving_sample.cpp
+        # tests/lennardjonesium/tools/test_moving_average.cpp
 
         tests/lennardjonesium/test_utils/constant_short_range_force.hpp
         tests/lennardjonesium/test_utils/constant_short_range_force.cpp
@@ -165,7 +167,7 @@ else()
         tests/lennardjonesium/engine/test_short_range_force_calculation.cpp
         tests/lennardjonesium/engine/test_velocity_verlet_integrator.cpp
         tests/lennardjonesium/engine/test_initial_condition.cpp
-        tests/lennardjonesium/engine/test_equilibrator.cpp
+        # tests/lennardjonesium/engine/test_equilibrator.cpp
     )
 
     target_link_libraries(tests
