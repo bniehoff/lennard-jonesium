@@ -1,5 +1,5 @@
 /**
- * moving_average.hpp
+ * moving_sample.hpp
  * 
  * Copyright (c) 2021-2022 Benjamin E. Niehoff
  * 
@@ -20,8 +20,8 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LJ_MOVING_AVERAGE_HPP
-#define LJ_MOVING_AVERAGE_HPP
+#ifndef LJ_MOVING_SAMPLE_HPP
+#define LJ_MOVING_SAMPLE_HPP
 
 #include <cassert>
 #include <memory>
