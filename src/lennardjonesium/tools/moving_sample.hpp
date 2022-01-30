@@ -79,13 +79,17 @@ namespace tools
     {
         /**
          * This unspecialized version of MovingSample will work as long as T is an ordinary
-         * numeric type.
+         * numeric type.  Note that it may produce odd results if T is an integral type as a result
+         * of integer division!
          */
 
-        public:
-            using mean_type = T;
-            using variance_type = T;
+        using mean_type = T;
+        using variance_type = T;
 
+        // The sample size is cast into this type in the denominator of mean/variance expressions.
+        using denominator_type = T;
+        
+        public:
             using MovingSampleBase<T, Alloc>::MovingSampleBase;
 
             struct Statistics
@@ -104,7 +108,7 @@ namespace tools
                 // Compute the mean
                 mean_type mean = (
                     std::reduce(this->buffer_.begin(), this->buffer_.end(), initial_mean)
-                    / static_cast<double>(this->size())
+                    / static_cast<denominator_type>(this->size())
                 );
 
                 // Compute the variance (using Bessel's correction for sample variance)
@@ -115,31 +119,32 @@ namespace tools
                         [mean](mean_type value) -> variance_type {
                             return (value - mean) * (value - mean);
                         })
-                    / static_cast<double>(this->size() - 1)
+                    / static_cast<denominator_type>(this->size() - 1)
                 );
 
                 return Statistics{mean, variance};
             }
     };
 
-    template<int Size, class Alloc>
-    class MovingSample<Eigen::Vector<double, Size>, Alloc>
-        : public MovingSampleBase<Eigen::Vector<double, Size>, Alloc>
+    template<class Scalar, int Size, class Alloc>
+    class MovingSample<Eigen::Vector<Scalar, Size>, Alloc>
+        : public MovingSampleBase<Eigen::Vector<Scalar, Size>, Alloc>
     {
         /**
-         * This specialization should work for Eigen::Vector types.
+         * This specialization should work for Eigen::Vector types.  In place of a variance value
+         * for a single sampled quantity, the Statistics structure has a covariance matrix for the
+         * sampled Eigen::Vector quantity.
          */
 
+        using mean_type = Eigen::Vector<Scalar, Size>;
+        using covariance_type = Eigen::Matrix<Scalar, Size, Size>;
+
+        // The sample size is cast into this type in the denominator of mean/variance expressions.
+        using denominator_type = Scalar;
+
         public:
-            using mean_type = Eigen::Vector<double, Size>;
-            using covariance_type = Eigen::Matrix<double, Size, Size>;
+            using MovingSampleBase<Eigen::Vector<Scalar, Size>, Alloc>::MovingSampleBase;
 
-            using MovingSampleBase<Eigen::Vector<double, Size>, Alloc>::MovingSampleBase;
-
-            /**
-             * For the Eigen::Vector specialization, we compute a covariance matrix instead of a
-             * single variance.
-             */
             struct Statistics
             {
                 const mean_type mean;
@@ -156,18 +161,19 @@ namespace tools
                 // Compute the mean
                 mean_type mean = (
                     std::reduce(this->buffer_.begin(), this->buffer_.end(), initial_mean)
-                    / static_cast<double>(this->size())
+                    / static_cast<denominator_type>(this->size())
                 );
 
                 // Compute the covariance matrix (using Bessel's correction for sample variance)
+                using function_argument_type = const Eigen::Ref<const mean_type>&;
                 covariance_type covariance = (
                     std::transform_reduce(
                         this->buffer_.begin(), this->buffer_.end(), initial_covariance,
                         std::plus<covariance_type>(),
-                        [mean](mean_type value) -> covariance_type {
+                        [&mean](function_argument_type value) -> covariance_type {
                             return (value - mean) * (value - mean).transpose();
                         })
-                    / static_cast<double>(this->size() - 1)
+                    / static_cast<denominator_type>(this->size() - 1)
                 );
 
                 return Statistics{mean, covariance};
