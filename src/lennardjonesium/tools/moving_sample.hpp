@@ -31,6 +31,32 @@
 
 #include <Eigen/Dense>
 
+namespace detail
+{
+    template<class T, class Alloc = std::allocator<T>>
+    class MovingSampleBase
+    {
+        public:
+            void push_back(T value) {buffer_.push_back(value);}
+
+            size_t size() {return buffer_.size();}
+
+            size_t capacity() {return buffer_.capacity();}
+
+            void clear() {buffer_.clear();}
+
+            bool empty() {return buffer_.empty();}
+
+            bool full() {return buffer_.full();}
+        
+        protected:
+            explicit MovingSampleBase(int size) : buffer_(size) {}
+
+            boost::circular_buffer<T, Alloc> buffer_;
+    };
+} // namespace detail
+
+
 namespace tools
 {
     /**
@@ -53,29 +79,7 @@ namespace tools
      */
 
     template<class T, class Alloc = std::allocator<T>>
-    class MovingSampleBase
-    {
-        public:
-            explicit MovingSampleBase(int size) : buffer_(size) {}
-
-            void push_back(T value) {buffer_.push_back(value);}
-
-            size_t size() {return buffer_.size();}
-
-            size_t capacity() {return buffer_.capacity();}
-
-            void clear() {buffer_.clear();}
-
-            bool empty() {return buffer_.empty();}
-
-            bool full() {return buffer_.full();}
-        
-        protected:
-            boost::circular_buffer<T, Alloc> buffer_;
-    };
-
-    template<class T, class Alloc = std::allocator<T>>
-    class MovingSample : public MovingSampleBase<T, Alloc>
+    class MovingSample : public detail::MovingSampleBase<T, Alloc>
     {
         /**
          * This unspecialized version of MovingSample will work as long as T is an ordinary
@@ -90,7 +94,9 @@ namespace tools
         using denominator_type = T;
         
         public:
-            using MovingSampleBase<T, Alloc>::MovingSampleBase;
+            explicit MovingSample(int size)
+                : detail::MovingSampleBase<T, Alloc>::MovingSampleBase(size)
+            {}
 
             struct Statistics
             {
@@ -128,7 +134,7 @@ namespace tools
 
     template<class Scalar, int Size, class Alloc>
     class MovingSample<Eigen::Vector<Scalar, Size>, Alloc>
-        : public MovingSampleBase<Eigen::Vector<Scalar, Size>, Alloc>
+        : public detail::MovingSampleBase<Eigen::Vector<Scalar, Size>, Alloc>
     {
         /**
          * This specialization should work for Eigen::Vector types.  In place of a variance value
@@ -143,7 +149,9 @@ namespace tools
         using denominator_type = Scalar;
 
         public:
-            using MovingSampleBase<Eigen::Vector<Scalar, Size>, Alloc>::MovingSampleBase;
+            explicit MovingSample(int size)
+                : detail::MovingSampleBase<mean_type, Alloc>::MovingSampleBase(size)
+            {}
 
             struct Statistics
             {
