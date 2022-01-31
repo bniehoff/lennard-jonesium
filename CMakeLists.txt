@@ -80,7 +80,6 @@ add_library(tools STATIC
     src/lennardjonesium/tools/cubic_lattice.hpp
     src/lennardjonesium/tools/cubic_lattice.cpp
     src/lennardjonesium/tools/moving_sample.hpp
-    src/lennardjonesium/tools/moving_average.hpp
 )
 
 add_library(physics STATIC
@@ -153,7 +152,6 @@ else()
         tests/lennardjonesium/tools/test_cell_list_array.cpp
         tests/lennardjonesium/tools/test_cubic_lattice.cpp
         tests/lennardjonesium/tools/test_moving_sample.cpp
-        # tests/lennardjonesium/tools/test_moving_average.cpp
 
         tests/lennardjonesium/test_utils/constant_short_range_force.hpp
         tests/lennardjonesium/test_utils/constant_short_range_force.cpp
