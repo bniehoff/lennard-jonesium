@@ -20,6 +20,8 @@
  * <https://www.gnu.org/licenses/>.
  */
 
+#include <cassert>
+
 #include <lennardjonesium/physics/system_state.hpp>
 
 namespace physics
@@ -34,10 +36,21 @@ namespace physics
         forces.setZero(4, particle_count);
     }
 
-    void SystemState::clear_dynamical_quantities()
+    // Clears the force, potential energy, and virial, so that they can be recomputed
+    SystemState& clear_dynamics(SystemState& state)
     {
-        forces.setZero(4, particle_count());
-        potential_energy = 0;
-        virial = 0;
+        state.forces.setZero(4, state.particle_count());
+        state.potential_energy = 0;
+        state.virial = 0;
+
+        return state;
+    }
+
+    // Clears the displacements so that the main experiment can start from the current positions
+    SystemState& clear_displacements(SystemState& state)
+    {
+        state.displacements.setZero(4, state.particle_count());
+
+        return state;
     }
 } // namespace physics
