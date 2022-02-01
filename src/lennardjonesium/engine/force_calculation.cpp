@@ -46,7 +46,7 @@ namespace engine
          */
 
         // First clear the dynamical quantities
-        state.clear_dynamical_quantities();
+        state | physics::clear_dynamics;
 
         // Now iterate over the pairs of particles
         for (const auto& pair : particle_pair_filter_(state))
@@ -76,7 +76,7 @@ namespace engine
          */
 
         // First clear the dynamical quantities
-        state.clear_dynamical_quantities();
+        state | physics::clear_dynamics;
 
         // Now iterate over the particles
         for (int i : std::views::iota(0, state.particle_count()))
