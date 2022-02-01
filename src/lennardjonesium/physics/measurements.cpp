@@ -39,6 +39,17 @@ namespace physics
         return (1./2.) * state.velocities.colwise().squaredNorm().sum();
     }
 
+    double mean_square_displacement(const SystemState& state)
+    {
+        assert(state.particle_count() > 0
+            && "Cannot compute mean square displacement of empty state.");
+
+        return (
+            state.displacements.colwise().squaredNorm().sum()
+            / static_cast<double>(state.particle_count())
+        );
+    }
+
     Eigen::Vector4d total_momentum(const SystemState& state)
     {
         return state.velocities.rowwise().sum();

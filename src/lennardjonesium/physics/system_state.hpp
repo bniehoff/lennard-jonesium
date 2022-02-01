@@ -41,19 +41,26 @@ namespace physics
          *  velocities
          *  forces/accelerations
          *  total displacements (disregarding boundary conditions)
+         *  *mean square displacement
+         *  *kinetic energy
          *  potential energy
          *  virial
+         *  (*kinetic energy tensor)
          *  (virial tensor)
          * 
-         * The last one is not necessary for the most basic simulator, but may be interesting in
+         * The last two are not necessary for the most basic simulator, but may be interesting in
          * the future for measuring things like shear stress and pressure.
          * 
-         * SystemState only contains this information, and doesn't do anything with it.  It is
-         * acted upon by Operators.
+         * Note also that kinetic energy and mean square displacement are derived quantities, and
+         * will be considered measurements rather than state variables (especially considering we
+         * might not want to compute them every time step).
          * 
-         * NOTE: We do not include the kinetic energy or kinetic energy tensor.  These are derived
-         * quantities which can be computed from the velocities, and we don't want to compute them
-         * every time step, necessarily.
+         * SystemState is merely a container for this data, and does not have any methods to
+         * modify it.  Instead, the SystemState is acted on by Operators which modify the state.
+         * 
+         * (Mostly the reason for this is to learn how to use Concepts to define some generic
+         * operator overloading; however, the unusual syntax for dealing with the SystemState also
+         * helps make those lines stand out elsewhere in the code.)
          */
 
         // An Operator is a function that acts on the SystemState
@@ -80,17 +87,24 @@ namespace physics
         // Construct a SystemState with a given particle count
         explicit SystemState(int particle_count = 0);
 
-        // Get the particle count if needed
+        // Get the particle count
         int particle_count() const {return positions.cols();};
-
-        // Clear the dynamical quantities (forces, potential, virial)
-        void clear_dynamical_quantities();
     };
 
     /**
-     * Operator that simply returns the state without change
+     * Operator that simply returns the state without change.
      */
     inline auto identity_operator = [](SystemState& s) -> SystemState& {return s;};
+
+    /**
+     * Some additional useful Operators which modify the SystemState.
+     */
+
+    // Clears the force, potential energy, and virial, so that they can be recomputed
+    SystemState& clear_dynamics(SystemState&);
+
+    // Clears the displacements so that the main experiment can start from the current positions
+    SystemState& clear_displacements(SystemState&);
 
     /**
      * The Operator concept allows us to define some syntax for functions that act on the

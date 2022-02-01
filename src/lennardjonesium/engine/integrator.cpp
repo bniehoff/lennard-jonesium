@@ -78,7 +78,7 @@ namespace engine
         // Next impose boundary conditions and calculate forces
         state | boundary_condition_ | force_calculation_;
 
-        // Finally, update the velocities using the first half increment and a second half
+        // Update the velocities using the first half increment and a second half
         // increment based on the new forces:
         state.velocities = velocity_half_step + (1./2.) * state.forces * timestep_;
 

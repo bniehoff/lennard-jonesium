@@ -39,6 +39,8 @@ namespace physics
 
     double kinetic_energy(const SystemState&);
 
+    double mean_square_displacement(const SystemState&);
+
     Eigen::Vector4d total_momentum(const SystemState&);
 
     Eigen::Vector4d total_force(const SystemState&);
