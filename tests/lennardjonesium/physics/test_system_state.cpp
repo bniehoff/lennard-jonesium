@@ -81,33 +81,54 @@ SystemState& increase_velocity(SystemState& s)
     return s;
 }
 
-SCENARIO("Piping Operators")
+SCENARIO("Piping Operators and Measurements")
 {
     SystemState s(1);
     Vector4d gravity{0, 0, -10, 0};
+    Vector4d velocity{0, 0, 0, 0};
+    double speed{};
 
     auto apply_gravity = [gravity](SystemState& s) -> SystemState& {
         s.velocities.colwise() += gravity;
         return s;
     };
 
+    auto measure_speed = [&speed] (const SystemState& s) -> const SystemState& {
+        speed = s.velocities.col(0).norm();
+        return s;
+    };
+
+    auto measure_velocity = [&velocity] (const SystemState& s) -> const SystemState& {
+        velocity = s.velocities.col(0);
+        return s;
+    };
+
     WHEN("I apply a chain of functions to the state")
     {
-        s | increase_velocity | increase_velocity | apply_gravity;
+        s | increase_velocity | increase_velocity | apply_gravity
+          | measure_velocity | measure_speed;
 
         THEN("I get the expected result")
         {
-            REQUIRE(Vector4d{0, 0, -8, 0} == s.velocities.col(0));
+            REQUIRE(Vector4d{0, 0, -8, 0} == velocity);
+            REQUIRE(Approx(8) == speed);
         }
     }
 
     WHEN("I act with the identity operator")
     {
-        s | physics::identity_operator;
+        s | physics::identity_operator | measure_velocity;
 
         THEN("I get back the state I started with")
         {
-            REQUIRE(Vector4d{0, 0, 0, 0} == s.velocities.col(0));
+            REQUIRE(Vector4d{0, 0, 0, 0} == velocity);
         }
+    }
+
+    WHEN("I attempt to put Operators after Measurements")
+    {
+        // This should fail to compile
+        // s | measure_velocity | apply_gravity;
+        // Success!
     }
 }
