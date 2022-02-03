@@ -41,6 +41,8 @@
 #include <memory>
 #include <utility>
 #include <vector>
+#include <string>
+#include <variant>
 
 #include <Eigen/Dense>
 
@@ -431,29 +433,49 @@ namespace engine
             physics::SystemState system_state();
     };
 
-    class Equilibrator
+    struct Command
     {
         /**
-         * Equilibrator will handle the first phase of the simulation, which attempts to reach
-         * equilibrium at the correct temperature.  Since temperature is a dependent variable in
-         * the microcanonical ensemble, we cannot actually set a temperature directly; it must be
-         * measured instead.  The InitialCondition attempts to build a state which is close to
-         * the desired temperature by using a Maxwell distribution of velocities.  However, this
-         * process is not perfect.  So, the Equilibrator evolves the system for some time, taking
-         * temperature readings, and occasionally rescaling the velocities until the desired
-         * temperature is reached and remains sufficiently stable for some amount of time.
+         * A Command will be issued by a SimulationPhase to inform the Simulation what should
+         * happen next.  The Command records the time step when it was issued, and a message giving
+         * a description which can be logged or printed to the screen.
          */
+
+        // Message that will be entered in the log
+        std::string message;
     };
 
-    class Simulator
+    // The following commands are all separate derived classes.
+    struct RecordResult : Command;      // Log an observation result computed from statistical data
+    struct ModifyState : Command;       // Modify the SystemState in some way
+    struct PhaseComplete : Command;     // On success, end this phase and move on to next
+    struct AbortSimulation : Command;   // On failure, end simulation
+
+    // Commands will be issued wrapped in a variant, which can distinguish the type of command.
+    // It is then up to the Simulation to interpret them.
+    using CommandVariant = std::variant<RecordResult, ModifyState, PhaseComplete, AbortSimulation>;
+
+    class SimulationPhase
     {
         /**
-         * Simulator runs the main part of the simulation after equilibrium has been reached.  At
-         * this point, we assume that the time evolution of the system is physically correct, and
-         * we take relevant measurements which can be used to compute quantities of physical
-         * interest.
+         * A SimulationPhase drives a particular phase of the simulation (e.g. equilibration or
+         * observation, etc.).  The Simulator provides the SimulationPhase with the data measured
+         * from the SystemState at every time step, and the SimulationPhase makes decisions about
+         * whatever actions to take next (by issuing Commands).  The SimulationPhase can have
+         * internal state (such as further statistical computations).
          */
+        public:
+            std::unique_ptr<CommandVariant> operator() (int time_step, double temperature);
+
+            std::string name();
     };
+
+    class EquilibrationPhase : public SimulationPhase;
+
+    class ObservationPhase : public SimulationPhase;
+
+    // Runs the main loop, interprets commands, and creates log entries
+    class Simulation;
 } // namespace engine
 
 #endif

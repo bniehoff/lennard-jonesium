@@ -100,4 +100,26 @@ namespace physics
 
         return inertia_tensor;
     }
+
+    const SystemState& Thermodynamics::operator() (const SystemState& state)
+    {
+        kinetic_energy_ = physics::kinetic_energy(state);
+        potential_energy_ = state.potential_energy;
+        total_energy_ = physics::total_energy(state, kinetic_energy_);
+        virial_ = state.virial;
+        temperature_ = physics::temperature(state, kinetic_energy_);
+        mean_square_displacement_ = physics::mean_square_displacement(state);
+
+        return state;
+    }
+
+    const SystemState& Diagnostics::operator() (const SystemState& state)
+    {
+        total_momentum_ = physics::total_momentum(state);
+        total_force_ = physics::total_force(state);
+        center_of_mass_ = physics::center_of_mass(state);
+        total_angular_momentum_ = physics::total_angular_momentum(state, center_of_mass_);
+
+        return state;
+    }
 } // namespace physics
