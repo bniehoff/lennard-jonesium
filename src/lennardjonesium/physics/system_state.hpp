@@ -66,6 +66,9 @@ namespace physics
         // An Operator is a function that acts on the SystemState
         using Operator = std::function<SystemState& (SystemState&)>;
 
+        // A Measurement observes the SystemState without modifying it
+        using Measurement = std::function<const SystemState& (const SystemState&)>;
+
         /**
          * We use 4xN matrices so that each of the columns will be aligned for vectorization.
          * 
@@ -110,8 +113,13 @@ namespace physics
      * The Operator concept allows us to define some syntax for functions that act on the
      * SystemState.
      */
-    template <typename Op, typename S = SystemState>
-    concept Operator = std::invocable<Op, S&> and std::is_invocable_r_v<S&, Op, S&>;
+    template <class Op>
+    concept Operator = std::invocable<Op, SystemState&>
+        and std::is_invocable_r_v<SystemState&, Op, SystemState&>;
+
+    template <class Mes>
+    concept Measurement = std::invocable<Mes, const SystemState&>
+        and std::is_invocable_r_v<const SystemState&, Mes, const SystemState&>;
 
     /**
      * Operators can act on SystemStates via the pipe syntax
@@ -119,6 +127,13 @@ namespace physics
      *      state | op1 | op2 | ...;
      */
     SystemState& operator| (SystemState& s, const Operator auto& op) {return op(s);}
+
+    /**
+     * Similarly for Measurements
+     * 
+     *      state | me1 | me2 | ...;
+     */
+    const SystemState& operator| (const SystemState& s, const Measurement auto& me) {return me(s);}
 
     /**
      * Operators together in a pipeline can also be combined into a single operator
@@ -129,6 +144,30 @@ namespace physics
     {
         using S = SystemState;
         return [op1=std::move(op1), op2=std::move(op2)](S& s) -> S& {return op2(op1(s));};
+    }
+
+    /**
+     * Measurements can also be combined
+     * 
+     *      combined_me = me1 | me2 | me3 | ...;
+     */
+    Measurement auto operator| (const Measurement auto& me1, const Measurement auto& me2)
+    {
+        using S = SystemState;
+        return [me1=std::move(me1), me2=std::move(me2)](const S& s) -> const S&
+            {return me2(me1(s));};
+    }
+
+    /**
+     * An Operator followed by a Measurement is an Operator
+     * 
+     *      combined_op = op1 | me2 | me3 | ...;
+     */
+    Operator auto operator| (const Operator auto& op1, const Measurement auto& me2)
+    {
+        using S = SystemState;
+        return [op1=std::move(op1), me2=std::move(me2)](S& s) -> S&
+            {return const_cast<S&>(me2(op1(s)));};
     }
 } // namespace physics
 
