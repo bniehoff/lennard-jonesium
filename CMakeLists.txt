@@ -13,6 +13,7 @@ include_directories(
 set(CMAKE_CXX_STANDARD 20)
 
 find_package(Eigen3 3.4 REQUIRED NO_MODULE)
+find_package(fmt REQUIRED)
 # find_package(Microsoft.GSL REQUIRED)
 
 # TODO: Make these more portable for different compilers
@@ -110,21 +111,25 @@ add_library(engine STATIC
 # Link the various dependencies
 target_link_libraries(abstract
     PRIVATE Eigen3::Eigen
+    PRIVATE fmt::fmt
     PRIVATE draft_cpp23
 )
 
 target_link_libraries(tools
     PRIVATE Eigen3::Eigen
+    PRIVATE fmt::fmt
     PRIVATE draft_cpp23
 )
 
 target_link_libraries(physics
     PRIVATE Eigen3::Eigen
+    PRIVATE fmt::fmt
     PRIVATE tools
 )
 
 target_link_libraries(engine
     PRIVATE Eigen3::Eigen
+    PRIVATE fmt::fmt
     PRIVATE tools
     PRIVATE physics
 )
@@ -171,6 +176,7 @@ else()
     target_link_libraries(tests
         PRIVATE Eigen3::Eigen
         PRIVATE Catch2::Catch2WithMain
+        PRIVATE fmt::fmt
         # PRIVATE Microsoft.GSL::GSL
         # PRIVATE ktl::ktl
         PRIVATE greeter
