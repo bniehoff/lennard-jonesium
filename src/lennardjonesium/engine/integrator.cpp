@@ -82,6 +82,9 @@ namespace engine
         // increment based on the new forces:
         state.velocities = velocity_half_step + (1./2.) * state.forces * timestep_;
 
+        // Update the elapsed time
+        state.time += timestep_;
+
         return state;
     }
 } // namespace engine

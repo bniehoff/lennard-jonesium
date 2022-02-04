@@ -91,6 +91,9 @@ namespace physics
         double potential_energy{0.0};      // Potential energy from particle interactions
         double virial{0.0};                // Virial from pairwise forces
 
+        // It is also useful to keep track of the total time elapsed from the beginning
+        double time{0.0};
+
         // Construct a SystemState with a given particle count
         explicit SystemState(int particle_count = 0);
 
@@ -120,6 +123,7 @@ namespace physics
 
     inline double potential_energy(const SystemState& state) {return state.potential_energy;}
     inline double virial(const SystemState& state) {return state.virial;}
+    inline double time(const SystemState& state) {return state.time;}
     inline int particle_count(const SystemState& state) {return state.particle_count();}
 
     /**
