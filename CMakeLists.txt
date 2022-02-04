@@ -87,8 +87,8 @@ add_library(physics STATIC
     src/lennardjonesium/physics/system_state.hpp
     src/lennardjonesium/physics/system_state.cpp
     src/lennardjonesium/physics/forces.hpp
-    src/lennardjonesium/physics/measurements.hpp
-    src/lennardjonesium/physics/measurements.cpp
+    src/lennardjonesium/physics/derived_properties.hpp
+    src/lennardjonesium/physics/derived_properties.cpp
     src/lennardjonesium/physics/transformations.hpp
     src/lennardjonesium/physics/transformations.cpp
 )

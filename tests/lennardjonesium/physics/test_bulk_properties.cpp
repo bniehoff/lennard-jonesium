@@ -7,7 +7,7 @@
 
 #include <src/lennardjonesium/tools/cubic_lattice.hpp>
 #include <src/lennardjonesium/physics/system_state.hpp>
-#include <src/lennardjonesium/physics/measurements.hpp>
+#include <src/lennardjonesium/physics/derived_properties.hpp>
 #include <src/lennardjonesium/physics/transformations.hpp>
 
 SCENARIO("Measurements of bulk properties of the system")
