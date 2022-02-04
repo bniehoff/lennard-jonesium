@@ -10,7 +10,7 @@
 #include <src/lennardjonesium/tools/bounding_box.hpp>
 #include <src/lennardjonesium/tools/cubic_lattice.hpp>
 #include <src/lennardjonesium/physics/system_state.hpp>
-#include <src/lennardjonesium/physics/measurements.hpp>
+#include <src/lennardjonesium/physics/derived_properties.hpp>
 #include <src/lennardjonesium/engine/initial_condition.hpp>
 
 SCENARIO("Creating initial conditions with specified properties")

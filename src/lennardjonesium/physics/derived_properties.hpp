@@ -1,5 +1,5 @@
 /**
- * measurements.hpp
+ * derived_properties.hpp
  * 
  * Copyright (c) 2021-2022 Benjamin E. Niehoff
  * 
@@ -20,8 +20,8 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LJ_MEASUREMENTS_HPP
-#define LJ_MEASUREMENTS_HPP
+#ifndef LJ_DERIVED_PROPERTIES_HPP
+#define LJ_DERIVED_PROPERTIES_HPP
 
 #include <cassert>
 
@@ -32,10 +32,8 @@
 namespace physics
 {
     /**
-     * First we define several useful measurement _functions_ which look at the SystemState and
-     * compute some value.  These are not the same as the Measurement _concept_, which is supposed
-     * to return a const reference to the SystemState so that multiple Measurements can be chained
-     * together.  However, these functions are important building blocks for making Measurements.
+     * We define several useful derived Properties, which gather important information about the
+     * SystemState, but which may require some calculation.
      */
 
     double kinetic_energy(const SystemState&);
@@ -53,6 +51,9 @@ namespace physics
         
     inline Eigen::Vector4d total_angular_momentum(const SystemState& state)
         {return total_angular_momentum(state, Eigen::Vector4d::Zero());}
+    
+    inline Property auto total_angular_momentum(const Eigen::Ref<const Eigen::Vector4d>& center)
+        {return [&center] (const SystemState& s) {return total_angular_momentum(s, center);};}
 
     /**
      * Since the total energy requires the kinetic energy to be computed, we provide an overload
@@ -63,6 +64,9 @@ namespace physics
     
     inline double total_energy(const SystemState& state)
         {return total_energy(state, kinetic_energy(state));}
+    
+    inline Property auto total_energy(double kinetic_energy)
+        {return [kinetic_energy] (const SystemState& s) {return total_energy(s, kinetic_energy);};}
     
     /**
      * Similarly, the temperature is proportional to average the kinetic energy, so we provide
@@ -77,6 +81,9 @@ namespace physics
 
     inline double temperature(const SystemState& state)
         {return temperature(state, kinetic_energy(state));}
+    
+    inline Property auto temperature(double kinetic_energy)
+        {return [kinetic_energy] (const SystemState& s) {return temperature(s, kinetic_energy);};}
     
     /**
      * The inertia tensor is given as a 4x4 matrix for alignement reasons.  The upper 3x3 block
@@ -97,50 +104,8 @@ namespace physics
     inline Eigen::Matrix4d inertia_tensor(const SystemState& state)
         {return inertia_tensor(state, Eigen::Vector4d::Zero());}
     
-    /**
-     * Now we define some Measurement objects which bundle certain useful combination of measurement
-     * functions together.
-     */
-
-    class Thermodynamics
-    {
-        // A Measurement which gathers thermodynamic information about the state
-        public:
-            const SystemState& operator() (const SystemState&);
-
-            double kinetic_energy() const {return kinetic_energy_;}
-            double potential_energy() const {return potential_energy_;}
-            double total_energy() const {return total_energy_;}
-            double virial() const {return virial_;}
-            double temperature() const {return temperature_;}
-            double mean_square_displacement() const {return mean_square_displacement_;}
-
-        private:
-            double kinetic_energy_;
-            double potential_energy_;
-            double total_energy_;
-            double virial_;
-            double temperature_;
-            double mean_square_displacement_;
-    };
-
-    class Diagnostics
-    {
-        // A Measurement which gathers information about conservation laws which may be useful
-        public:
-            const SystemState& operator() (const SystemState&);
-
-            Eigen::Vector4d total_momentum() {return total_momentum_;}
-            Eigen::Vector4d total_force() {return total_force_;}
-            Eigen::Vector4d center_of_mass() {return center_of_mass_;}
-            Eigen::Vector4d total_angular_momentum() {return total_angular_momentum_;}
-        
-        private:
-            Eigen::Vector4d total_momentum_;
-            Eigen::Vector4d total_force_;
-            Eigen::Vector4d center_of_mass_;
-            Eigen::Vector4d total_angular_momentum_;
-    };
+    inline Property auto inertia_tensor(const Eigen::Ref<const Eigen::Vector4d>& center)
+        {return [&center] (const SystemState& s) {return inertia_tensor(s, center);};}
 } // namespace physics
 
 #endif

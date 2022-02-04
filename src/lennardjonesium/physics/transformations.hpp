@@ -26,7 +26,7 @@
 #include <Eigen/Dense>
 
 #include <lennardjonesium/physics/system_state.hpp>
-#include <lennardjonesium/physics/measurements.hpp>
+#include <lennardjonesium/physics/derived_properties.hpp>
 
 namespace physics
 {
