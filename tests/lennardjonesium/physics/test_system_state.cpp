@@ -12,6 +12,14 @@ using Eigen::Vector4d;
 
 using physics::SystemState;
 using physics::Operator;
+using physics::Measurement;
+using physics::Property;
+
+template<typename First, typename Second>
+constexpr bool pipe_compiles = requires (SystemState s, First p1, Second p2)
+{
+    s | p1 | p2;
+};
 
 SCENARIO("Representing the system state")
 {
@@ -105,13 +113,14 @@ SCENARIO("Piping Operators and Measurements")
 
     WHEN("I apply a chain of functions to the state")
     {
-        s | increase_velocity | increase_velocity | apply_gravity
-          | measure_velocity | measure_speed;
+        auto particle_count = s | increase_velocity | increase_velocity | apply_gravity
+                                | measure_velocity | measure_speed | physics::particle_count;
 
         THEN("I get the expected result")
         {
             REQUIRE(Vector4d{0, 0, -8, 0} == velocity);
             REQUIRE(Approx(8) == speed);
+            REQUIRE(1 == particle_count);
         }
     }
 
@@ -125,10 +134,14 @@ SCENARIO("Piping Operators and Measurements")
         }
     }
 
-    WHEN("I attempt to put Operators after Measurements")
+    WHEN("I try different combinations of piping orders")
     {
-        // This should fail to compile
-        // s | measure_velocity | apply_gravity;
-        // Success!
+        REQUIRE(pipe_compiles<decltype(apply_gravity), decltype(measure_velocity)>);
+        REQUIRE(pipe_compiles<decltype(apply_gravity), decltype(physics::particle_count)>);
+        REQUIRE(pipe_compiles<decltype(measure_velocity), decltype(physics::particle_count)>);
+        
+        REQUIRE_FALSE(pipe_compiles<decltype(measure_velocity), decltype(apply_gravity)>);
+        REQUIRE_FALSE(pipe_compiles<decltype(physics::particle_count), decltype(apply_gravity)>);
+        REQUIRE_FALSE(pipe_compiles<decltype(physics::particle_count), decltype(measure_velocity)>);
     }
 }
