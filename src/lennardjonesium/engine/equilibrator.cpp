@@ -25,7 +25,7 @@
 #include <lennardjonesium/tools/math.hpp>
 #include <lennardjonesium/tools/moving_sample.hpp>
 #include <lennardjonesium/physics/system_state.hpp>
-#include <lennardjonesium/physics/measurements.hpp>
+#include <lennardjonesium/physics/derived_properties.hpp>
 #include <lennardjonesium/physics/transformations.hpp>
 #include <lennardjonesium/engine/integrator.hpp>
 #include <lennardjonesium/engine/equilibrator.hpp>

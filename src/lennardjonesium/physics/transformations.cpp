@@ -27,14 +27,14 @@
 #include <Eigen/Dense>
 
 #include <lennardjonesium/physics/system_state.hpp>
-#include <lennardjonesium/physics/measurements.hpp>
+#include <lennardjonesium/physics/derived_properties.hpp>
 #include <lennardjonesium/physics/transformations.hpp>
 
 namespace physics
 {
     SystemState::Operator set_momentum(const Eigen::Ref<const Eigen::Vector4d>& momentum)
     {
-        return [momentum](SystemState& state) -> SystemState&
+        return [&momentum](SystemState& state) -> SystemState&
         {
             assert(state.particle_count() > 0 && "Cannot set momentum of empty state");
 
@@ -56,7 +56,7 @@ namespace physics
         const Eigen::Ref<const Eigen::Vector4d>& center
     )
     {
-        return [angular_momentum, center](SystemState& state) -> SystemState&
+        return [&angular_momentum, &center](SystemState& state) -> SystemState&
         {
             assert(state.particle_count() > 0 && "Cannot set angular momentum of empty state");
 
