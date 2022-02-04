@@ -69,6 +69,10 @@ namespace physics
         // A Measurement observes the SystemState without modifying it
         using Measurement = std::function<const SystemState& (const SystemState&)>;
 
+        // A Property gets a value from the SystemState
+        template<typename T> requires (!std::convertible_to<std::remove_cvref<T>, SystemState>)
+        using Property = std::function<T (const SystemState&)>;
+
         /**
          * We use 4xN matrices so that each of the columns will be aligned for vectorization.
          * 
@@ -110,8 +114,16 @@ namespace physics
     SystemState& clear_displacements(SystemState&);
 
     /**
-     * The Operator concept allows us to define some syntax for functions that act on the
-     * SystemState.
+     * We define a few basic Properties.  These just give a uniform syntax for accessing information
+     * about the SystemState.
+     */
+
+    inline double potential_energy(const SystemState& state) {return state.potential_energy;}
+    inline double virial(const SystemState& state) {return state.virial;}
+    inline int particle_count(const SystemState& state) {return state.particle_count();}
+
+    /**
+     * It is useful to define concepts that refer to Operators, Measurements, and Properties.
      */
     template <class Op>
     concept Operator = std::invocable<Op, SystemState&>
@@ -120,6 +132,11 @@ namespace physics
     template <class Mes>
     concept Measurement = std::invocable<Mes, const SystemState&>
         and std::is_invocable_r_v<const SystemState&, Mes, const SystemState&>;
+    
+    template <class Pr>
+    concept Property = std::invocable<Pr, const SystemState&>
+        and std::is_invocable_v<Pr, const SystemState&>
+        and !Measurement<Pr> and !Operator<Pr>;
 
     /**
      * Operators can act on SystemStates via the pipe syntax
@@ -134,6 +151,13 @@ namespace physics
      *      state | me1 | me2 | ...;
      */
     const SystemState& operator| (const SystemState& s, const Measurement auto& me) {return me(s);}
+
+    /**
+     * Properties can only appear at the end of a chain
+     * 
+     *      state | ... | pr;
+     */
+    auto operator| (const SystemState& s, const Property auto& pr) {return pr(s);}
 
     /**
      * Operators together in a pipeline can also be combined into a single operator
@@ -169,6 +193,24 @@ namespace physics
         return [op1=std::move(op1), me2=std::move(me2)](S& s) -> S&
             {return const_cast<S&>(me2(op1(s)));};
     }
+
+    /**
+     * An Operator followed by a Property cannot be reduced, because the resulting object would not
+     * be a function accepting a const reference.
+     */
+
+    /**
+     * A Measurement followed by a Property is a Property
+     * 
+     *      combined_pr = me1 | pr2;
+     */
+    Property auto operator| (const Measurement auto& me1, const Property auto& pr2)
+    {
+        using S = SystemState;
+        return [me1=std::move(me1), pr2=std::move(pr2)](const S& s) -> const S&
+            {return pr2(me1(s));};
+    }
+
 } // namespace physics
 
 #endif
