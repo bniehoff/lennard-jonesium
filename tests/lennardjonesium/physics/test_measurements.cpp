@@ -9,6 +9,7 @@
 #include <src/lennardjonesium/physics/system_state.hpp>
 #include <src/lennardjonesium/physics/derived_properties.hpp>
 #include <src/lennardjonesium/physics/transformations.hpp>
+#include <src/lennardjonesium/physics/measurements.hpp>
 
 SCENARIO("Measurements of bulk properties of the system")
 {
@@ -20,6 +21,9 @@ SCENARIO("Measurements of bulk properties of the system")
     state.positions = Eigen::MatrixX4d{
         {0, 0, 0, 0}, {0, 0, 2, 0}, {2, 2, 0, 0}, {2, 2, 2, 0}
     }.transpose();
+
+    // Also create a Thermodynamics object to read the state
+    physics::Thermodynamics thermodynamics;
 
     // The center of mass of this system is
     Eigen::Vector4d center_of_mass {1, 1, 1, 0};
@@ -82,6 +86,8 @@ SCENARIO("Measurements of bulk properties of the system")
             { 1, -1,  0,  0}, { 1, -1,  0,  0}, {-1,  1,  0,  0}, {-1,  1,  0,  0}
         }.transpose();
 
+        state | thermodynamics;
+
         double kinetic_energy{4};
         double temperature{8./3. / particle_count};
 
@@ -94,6 +100,9 @@ SCENARIO("Measurements of bulk properties of the system")
         {
             REQUIRE(Approx(kinetic_energy) == physics::kinetic_energy(state));
             REQUIRE(Approx(temperature) == physics::temperature(state));
+
+            REQUIRE(Approx(kinetic_energy) == thermodynamics.kinetic_energy());
+            REQUIRE(Approx(temperature) == thermodynamics.temperature());
         }
 
         THEN("The measured total momentum is correct")
@@ -124,6 +133,8 @@ SCENARIO("Measurements of bulk properties of the system")
             { 0, -1,  1,  0}, { 0,  1,  1,  0}, { 0, -1, -1,  0}, { 0,  1, -1,  0}
         }.transpose();
 
+        state | thermodynamics;
+
         double kinetic_energy{4};
         double temperature{8./3. / particle_count};
 
@@ -153,6 +164,9 @@ SCENARIO("Measurements of bulk properties of the system")
         {
             REQUIRE(Approx(kinetic_energy) == physics::kinetic_energy(state));
             REQUIRE(Approx(temperature) == physics::temperature(state));
+
+            REQUIRE(Approx(kinetic_energy) == thermodynamics.kinetic_energy());
+            REQUIRE(Approx(temperature) == thermodynamics.temperature());
         }
 
         THEN("The measured total momentum is correct")
@@ -484,6 +498,7 @@ SCENARIO("Transformations of bulk properties on a larger random state")
 
     tools::CubicLattice cubic_lattice{particle_count, density, tools::CubicLattice::BodyCentered()};
     physics::SystemState state{particle_count};
+    physics::Thermodynamics thermodynamics;
 
     for (int i = 0; auto position : cubic_lattice())
     {
@@ -513,11 +528,13 @@ SCENARIO("Transformations of bulk properties on a larger random state")
         {
             double new_temperature{0.5};
 
-            state | physics::set_temperature(new_temperature);
+            state | physics::set_temperature(new_temperature) | thermodynamics;
 
             THEN("I get the correct result")
             {
                 REQUIRE(Approx(new_temperature) == physics::temperature(state));
+
+                REQUIRE(Approx(new_temperature) == thermodynamics.temperature());
             }
         }
 

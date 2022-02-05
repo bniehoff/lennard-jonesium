@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.18)
 
 project(lennardjonesium
     VERSION 0.0.1
@@ -91,6 +91,7 @@ add_library(physics STATIC
     src/lennardjonesium/physics/derived_properties.cpp
     src/lennardjonesium/physics/transformations.hpp
     src/lennardjonesium/physics/transformations.cpp
+    src/lennardjonesium/physics/measurements.hpp
 )
 
 add_library(engine STATIC
@@ -163,7 +164,7 @@ else()
         tests/lennardjonesium/test_utils/test_constant_short_range_force.cpp
 
         tests/lennardjonesium/physics/test_system_state.cpp
-        tests/lennardjonesium/physics/test_bulk_properties.cpp
+        tests/lennardjonesium/physics/test_measurements.cpp
 
         tests/lennardjonesium/engine/test_periodic_boundary_condition.cpp
         tests/lennardjonesium/engine/test_particle_pair_filter.cpp
