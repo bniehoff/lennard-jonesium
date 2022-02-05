@@ -91,6 +91,9 @@ namespace physics
         double potential_energy{0.0};      // Potential energy from particle interactions
         double virial{0.0};                // Virial from pairwise forces
 
+        // It is also useful to keep track of the total time elapsed from the beginning
+        double time{0.0};
+
         // Construct a SystemState with a given particle count
         explicit SystemState(int particle_count = 0);
 
@@ -120,6 +123,7 @@ namespace physics
 
     inline double potential_energy(const SystemState& state) {return state.potential_energy;}
     inline double virial(const SystemState& state) {return state.virial;}
+    inline double time(const SystemState& state) {return state.time;}
     inline int particle_count(const SystemState& state) {return state.particle_count();}
 
     /**
@@ -146,11 +150,12 @@ namespace physics
     SystemState& operator| (SystemState& s, const Operator auto& op) {return op(s);}
 
     /**
-     * Similarly for Measurements
+     * Similarly for Measurements (note that the Measurement itself is not const, as it may have
+     * side effects).
      * 
      *      state | me1 | me2 | ...;
      */
-    const SystemState& operator| (const SystemState& s, const Measurement auto& me) {return me(s);}
+    const SystemState& operator| (const SystemState& s, Measurement auto& me) {return me(s);}
 
     /**
      * Properties can only appear at the end of a chain
@@ -175,7 +180,7 @@ namespace physics
      * 
      *      combined_me = me1 | me2 | me3 | ...;
      */
-    Measurement auto operator| (const Measurement auto& me1, const Measurement auto& me2)
+    Measurement auto operator| (Measurement auto& me1, Measurement auto& me2)
     {
         using S = SystemState;
         return [me1=std::move(me1), me2=std::move(me2)](const S& s) -> const S&
@@ -183,33 +188,17 @@ namespace physics
     }
 
     /**
-     * An Operator followed by a Measurement is an Operator
+     * In a chain of several different types of state functions, Operators, Measurements, and
+     * Properties cannot be mixed, because their various const requirements do not agree (for
+     * example, an Operator combined with a Measurement would have to be non-const, and we have
+     * not accounted for non-const objects which also act on a non-const SystemState).
      * 
-     *      combined_op = op1 | me2 | me3 | ...;
-     */
-    Operator auto operator| (const Operator auto& op1, const Measurement auto& me2)
-    {
-        using S = SystemState;
-        return [op1=std::move(op1), me2=std::move(me2)](S& s) -> S&
-            {return const_cast<S&>(me2(op1(s)));};
-    }
-
-    /**
-     * An Operator followed by a Property cannot be reduced, because the resulting object would not
-     * be a function accepting a const reference.
-     */
-
-    /**
-     * A Measurement followed by a Property is a Property
+     *      op | me | pr = op1 | op2 | op3 | me1 | me2 | pr;
      * 
-     *      combined_pr = me1 | pr2;
+     * So, the entire chain cannot be combined into a single object.  However, practically this is
+     * not very important since we nearly always have a SystemState at the beginning of the chain,
+     * so it can always evaluate everything from left to right.
      */
-    Property auto operator| (const Measurement auto& me1, const Property auto& pr2)
-    {
-        using S = SystemState;
-        return [me1=std::move(me1), pr2=std::move(pr2)](const S& s) -> const S&
-            {return pr2(me1(s));};
-    }
 
 } // namespace physics
 

@@ -28,7 +28,8 @@ SCENARIO("Inertial motion without forces")
     state.velocities.col(1) = Vector4d{0, 1.0, 0, 0};
 
     // Configure integrator with time step 1
-    VelocityVerletIntegrator verlet_integrator{1.0};
+    double time_step{1.0};
+    VelocityVerletIntegrator verlet_integrator{time_step};
 
     // For the tests, it is useful to have a generic Integrator with polymorphism
     Integrator& integrator{verlet_integrator};
@@ -54,6 +55,11 @@ SCENARIO("Inertial motion without forces")
             REQUIRE(Vector4d{1.0, 0, 0, 0} == state.velocities.col(0));
             REQUIRE(Vector4d{0, 1.0, 0, 0} == state.velocities.col(1));
         }
+
+        THEN("The total time elapsed is 4 time steps")
+        {
+            REQUIRE(Approx(4 * time_step) == state.time);
+        }
     }
 
     WHEN("I evolve the state by 4 time steps using abbreviated notation")
@@ -77,6 +83,11 @@ SCENARIO("Inertial motion without forces")
             REQUIRE(Vector4d{1.0, 0, 0, 0} == state.velocities.col(0));
             REQUIRE(Vector4d{0, 1.0, 0, 0} == state.velocities.col(1));
         }
+
+        THEN("The total time elapsed is 4 time steps")
+        {
+            REQUIRE(Approx(4 * time_step) == state.time);
+        }
     }
 }
 
@@ -92,7 +103,8 @@ SCENARIO("Motion under a gravitational force")
     state.forces.col(0) = state.forces.col(1) = Vector4d{0, 0, -1.0, 0};
 
     // Configure integrator with time step 1
-    auto integrator = VelocityVerletIntegrator(1.0);
+    double time_step{1.0};
+    auto integrator = VelocityVerletIntegrator(time_step);
 
     WHEN("I evolve the state by 4 time steps")
     {
@@ -118,6 +130,11 @@ SCENARIO("Motion under a gravitational force")
             REQUIRE(Vector4d{1.0, 0, -4.0, 0} == state.velocities.col(0));
             REQUIRE(Vector4d{0, 1.0, -4.0, 0} == state.velocities.col(1));
         }
+
+        THEN("The total time elapsed is 4 time steps")
+        {
+            REQUIRE(Approx(4 * time_step) == state.time);
+        }
     }
 }
 
@@ -134,8 +151,9 @@ SCENARIO("Inertial motion with boundary conditions")
     auto boundary_condition = PeriodicBoundaryCondition{bounding_box};
 
     // Configure integrator with time step 1
+    double time_step{1.0};
     auto integrator = VelocityVerletIntegrator(
-        1.0, boundary_condition, engine::null_force_calculation
+        time_step, boundary_condition, engine::null_force_calculation
     );
 
     WHEN("I evolve the state by 4 time steps")
@@ -159,6 +177,11 @@ SCENARIO("Inertial motion with boundary conditions")
             REQUIRE(Vector4d{1.0, 0, 0, 0} == state.velocities.col(0));
             REQUIRE(Vector4d{0, 1.0, 0, 0} == state.velocities.col(1));
         }
+
+        THEN("The total time elapsed is 4 time steps")
+        {
+            REQUIRE(Approx(4 * time_step) == state.time);
+        }
     }
 }
 
@@ -178,8 +201,9 @@ SCENARIO("Motion under a gravitational force with boundary conditions")
     auto boundary_condition = PeriodicBoundaryCondition{bounding_box};
 
     // Configure integrator with time step 1
+    double time_step{1.0};
     auto integrator = VelocityVerletIntegrator(
-        1.0, boundary_condition, engine::null_force_calculation
+        time_step, boundary_condition, engine::null_force_calculation
     );
 
     WHEN("I evolve the state by 4 time steps")
@@ -206,6 +230,11 @@ SCENARIO("Motion under a gravitational force with boundary conditions")
         {
             REQUIRE(Vector4d{1.0, 0, -4.0, 0} == state.velocities.col(0));
             REQUIRE(Vector4d{0, 1.0, -4.0, 0} == state.velocities.col(1));
+        }
+
+        THEN("The total time elapsed is 4 time steps")
+        {
+            REQUIRE(Approx(4 * time_step) == state.time);
         }
     }
 }
