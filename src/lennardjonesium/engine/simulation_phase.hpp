@@ -32,40 +32,33 @@
 
 namespace engine
 {
-    struct Command
-    {
-        /**
-         * A Command will be issued by a SimulationPhase to inform the Simulation what should
-         * happen next.  The action to be taken can be deduced from the _type_ of the Command,
-         * by using std::variant.  Some commands contain additional information to be used when
-         * executing them.
-         */
-
-        virtual ~Command() = default;
-    };
-
-    // The following commands are all separate derived classes.
+    /**
+     * We use the Command pattern to implement communication between the SimulationPhase and the
+     * Simulation.  A Command is a std::variant among the following types.  When the Simulation
+     * receives a Command, it will execute the appropriate action.
+     * 
+     * We use std::variant and delegate the interpretation of these commands to the Simulation, so
+     * that SimulationPhase does not acquire a dependency on Simulation in order to effectively
+     * control it.
+     */
 
     // Record an observation result computed from statistical data
-    struct RecordObservation : Command {};
+    struct RecordObservation {};
 
     // Adjust the temperature of the system
-    struct SetTemperature : Command
+    struct SetTemperature
     {
         double temperature;
-
-        explicit SetTemperature(double temperature) : temperature{temperature} {}
     };
 
     // On success, end this phase and move on to next
-    struct PhaseComplete : Command {};
+    struct PhaseComplete {};
 
     // On failure, end simulation
-    struct AbortSimulation : Command {};
+    struct AbortSimulation {};
 
-    // Commands will be issued wrapped in a variant, which can distinguish the type of command.
-    // It is then up to the Simulation to interpret them.
-    using CommandVariant = std::variant<
+    // The Command variant itself
+    using Command = std::variant<
         std::monostate,
         RecordObservation,
         SetTemperature,
@@ -88,7 +81,7 @@ namespace engine
          */
         public:
             // Evaluate the thermodynamic properties of the state and issue commands
-            virtual CommandVariant
+            virtual Command
             evaluate(int time_step, const physics::Thermodynamics& thermodynamics) = 0;
 
             virtual ~SimulationPhase() = default;
@@ -163,7 +156,7 @@ namespace engine
                   last_adjustment_time_{start_time}
             {}
 
-            virtual CommandVariant
+            virtual Command
             evaluate(int time_step, const physics::Thermodynamics& thermodynamics) override;
         
         private:
