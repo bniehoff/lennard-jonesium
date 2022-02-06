@@ -89,9 +89,9 @@ add_library(physics STATIC
     src/lennardjonesium/physics/forces.hpp
     src/lennardjonesium/physics/derived_properties.hpp
     src/lennardjonesium/physics/derived_properties.cpp
+    src/lennardjonesium/physics/measurements.hpp
     src/lennardjonesium/physics/transformations.hpp
     src/lennardjonesium/physics/transformations.cpp
-    src/lennardjonesium/physics/measurements.hpp
 )
 
 add_library(engine STATIC
@@ -105,6 +105,8 @@ add_library(engine STATIC
     src/lennardjonesium/engine/integrator.cpp
     src/lennardjonesium/engine/initial_condition.hpp
     src/lennardjonesium/engine/initial_condition.cpp
+    src/lennardjonesium/engine/simulation_phase.hpp
+    src/lennardjonesium/engine/simulation_phase.cpp
     src/lennardjonesium/engine/equilibrator.hpp
     src/lennardjonesium/engine/equilibrator.cpp
 )
@@ -112,19 +114,16 @@ add_library(engine STATIC
 # Link the various dependencies
 target_link_libraries(abstract
     PRIVATE Eigen3::Eigen
-    PRIVATE fmt::fmt
     PRIVATE draft_cpp23
 )
 
 target_link_libraries(tools
     PRIVATE Eigen3::Eigen
-    PRIVATE fmt::fmt
     PRIVATE draft_cpp23
 )
 
 target_link_libraries(physics
     PRIVATE Eigen3::Eigen
-    PRIVATE fmt::fmt
     PRIVATE tools
 )
 
@@ -171,13 +170,14 @@ else()
         tests/lennardjonesium/engine/test_short_range_force_calculation.cpp
         tests/lennardjonesium/engine/test_velocity_verlet_integrator.cpp
         tests/lennardjonesium/engine/test_initial_condition.cpp
+        tests/lennardjonesium/engine/test_equilibration_phase.cpp
         # tests/lennardjonesium/engine/test_equilibrator.cpp
     )
 
     target_link_libraries(tests
         PRIVATE Eigen3::Eigen
         PRIVATE Catch2::Catch2WithMain
-        PRIVATE fmt::fmt
+        # PRIVATE fmt::fmt
         # PRIVATE Microsoft.GSL::GSL
         # PRIVATE ktl::ktl
         PRIVATE greeter

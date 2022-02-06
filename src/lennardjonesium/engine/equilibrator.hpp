@@ -60,13 +60,13 @@ namespace engine
              * Integrator to advance time.  Every `sample_interval` steps, we measure the temperature,
              * keeping a moving average of the last `sample_size` measurements.
              * 
-             * Every `adjustment_interval` steps, we will check to see if the current measured
+             * Every `assessment_interval` steps, we will check to see if the current measured
              * temperature is within `tolerance` of the target temperature.
              * 
              * If this check fails, then we rescale the temperature of the system.  If it succeeds,
              * then we begin a "steady state test" to check whether the value is stable.  This
              * means for an entire `steady_state_time`, the temperature should remain within
-             * the given tolerance; i.e. *every* `adjustment_interval`, the temperature check must
+             * the given tolerance; i.e. *every* `assessment_interval`, the temperature check must
              * succeed, until `steady_state_time` time steps have passed.  If any temperature
              * check fails, then we rescale the temperature and restart the "steady state test".
              * 
@@ -81,7 +81,7 @@ namespace engine
                 double tolerance = 0.05;
                 int sample_size = 20;
                 int sample_interval = 5;
-                int adjustment_interval = 200;
+                int assessment_interval = 200;
                 int steady_state_time = 1000;
                 int timeout = 5000;
 
