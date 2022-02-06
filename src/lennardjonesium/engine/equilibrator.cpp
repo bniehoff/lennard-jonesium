@@ -64,7 +64,7 @@ namespace engine
             }
             
             // Check whether an adjustment is needed
-            if (time_step % parameters_.adjustment_interval == 0)
+            if (time_step % parameters_.assessment_interval == 0)
             {
                 double measured_temperature = temperature_samples.statistics().mean;
 
