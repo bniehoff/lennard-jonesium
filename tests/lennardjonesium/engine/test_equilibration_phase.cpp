@@ -45,7 +45,7 @@ SCENARIO("Equilibration Phase decision-making")
 
     WHEN("I pass a time step that is before the first adjustment interval")
     {
-        engine::CommandVariant command;
+        engine::Command command;
         state | thermodynamics;
 
         command = equilibration_phase.evaluate(parameters.assessment_interval - 3, thermodynamics);
@@ -58,7 +58,7 @@ SCENARIO("Equilibration Phase decision-making")
 
     WHEN("I measure an average temperature that is outside the desired range")
     {
-        engine::CommandVariant command;
+        engine::Command command;
         state | physics::set_temperature(target_temperature * 2) | thermodynamics;
 
         command = equilibration_phase.evaluate(parameters.assessment_interval - 1, thermodynamics);
@@ -81,7 +81,7 @@ SCENARIO("Equilibration Phase decision-making")
 
     WHEN("I measure the correct temperature at the adjustment interval")
     {
-        engine::CommandVariant command;
+        engine::Command command;
         state | physics::set_temperature(target_temperature) | thermodynamics;
 
         command = equilibration_phase.evaluate(parameters.assessment_interval - 1, thermodynamics);
@@ -101,7 +101,7 @@ SCENARIO("Equilibration Phase decision-making")
 
     WHEN("I measure the correct temperature at the steady state time")
     {
-        engine::CommandVariant command;
+        engine::Command command;
         state | physics::set_temperature(target_temperature) | thermodynamics;
 
         // We need to run the "simulation" from the beginning, with fixed temperature
@@ -122,7 +122,7 @@ SCENARIO("Equilibration Phase decision-making")
 
     WHEN("I measure the wrong temperature at timeout")
     {
-        engine::CommandVariant command;
+        engine::Command command;
 
         state | physics::set_temperature(target_temperature * 2) | thermodynamics;
 

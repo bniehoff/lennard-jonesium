@@ -29,7 +29,7 @@
 
 namespace engine
 {   
-    CommandVariant
+    Command
     EquilibrationPhase::evaluate(int time_step, const physics::Thermodynamics& thermodynamics)
     {
         /**
