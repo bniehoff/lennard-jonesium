@@ -23,12 +23,15 @@
 #ifndef LJ_SIMULATION_PHASE_HPP
 #define LJ_SIMULATION_PHASE_HPP
 
+#include <memory>
 #include <vector>
 #include <variant>
 #include <limits>
 
+#include <lennardjonesium/tools/system_parameters.hpp>
 #include <lennardjonesium/tools/moving_sample.hpp>
 #include <lennardjonesium/physics/measurements.hpp>
+#include <lennardjonesium/physics/observation.hpp>
 
 namespace engine
 {
@@ -43,7 +46,9 @@ namespace engine
      */
 
     // Record an observation result computed from statistical data
-    struct RecordObservation {};
+    struct RecordObservation {
+        std::unique_ptr<physics::Observation> observation;
+    };
 
     // Adjust the temperature of the system
     struct SetTemperature
@@ -145,13 +150,13 @@ namespace engine
             // The parameters will use the above defaults if not given
             EquilibrationPhase(
                 int start_time,
-                double target_temperature,
-                Parameters parameters = {}
+                tools::SystemParameters system_parameters,
+                Parameters equilibration_parameters = {}
             )
                 : SimulationPhase{start_time},
-                  temperatures_(parameters.sample_size),
-                  target_temperature_{target_temperature},
-                  parameters_{parameters},
+                  temperatures_(equilibration_parameters.sample_size),
+                  system_parameters_{system_parameters},
+                  equilibration_parameters_{equilibration_parameters},
                   last_assessment_time_{start_time},
                   last_adjustment_time_{start_time}
             {}
@@ -161,15 +166,78 @@ namespace engine
         
         private:
             tools::MovingSample<double> temperatures_;
-            const double target_temperature_;
-            const Parameters parameters_;
+            tools::SystemParameters system_parameters_;
+            Parameters equilibration_parameters_;
             double last_mean_temperature_{std::numeric_limits<double>::signaling_NaN()};
             int last_assessment_time_;
             int last_adjustment_time_;
     };
 
     class ObservationPhase : public SimulationPhase
-    {};
+    {
+        /**
+         * The ObservationPhase passively observes the SystemState and makes periodic Observations
+         * of physically relevant quantities.  These include, e.g., the temperature, total energy,
+         * pressure, specific heat, and diffusion coefficient.
+         */
+
+        public:
+
+            /**
+             * The ObservationPhase accepts a Parameters struct to configure its behavior.
+             * The entries have the following meanings:
+             * 
+             * tolerance:  Since temperature is a dependent variable, even after the Equilibration
+             *      phase, we cannot guarantee that the temperature will remain stable.  This
+             *      parameter gives the allowed window in which the observed temperature will be
+             *      considered valid; if the temperature leaves this window, the simulation will be
+             *      aborted.  The value given here should probably be larger than the one used for
+             *      equilibration.  Some variance in the temperature is necessary for determining
+             *      the other observed quantities, such as specific heat.
+             * 
+             * sample_size:  The number of recent measurements to include in statistics, when making
+             *      observations.
+             * 
+             * observation_interval:  The number of time steps to wait between making observations.
+             * 
+             * observation_count:  The number of observations to make; this determines the running
+             *      time of the full experiment.  Note that if the temperature strays outside the
+             *      given tolerance, then the experiment will be ended; however, observations made
+             *      up to that point should be valid (since they were made at a temperature within
+             *      the allowed tolerance.)
+             */
+            struct Parameters
+            {
+                double tolerance = 0.10;
+                int sample_size = 50;
+                int observation_interval = 200;
+                int observation_count = 20;
+
+                // We explicitly define a default constructor as demonstrated in this bug report:
+                // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=88165
+                Parameters() {}
+            };
+
+            // The parameters will use the above defaults if not given
+            ObservationPhase(
+                int start_time,
+                tools::SystemParameters system_parameters,
+                Parameters observation_parameters = {}
+            )
+                : SimulationPhase{start_time},
+                  temperatures_{observation_parameters.sample_size},
+                  system_parameters_{system_parameters},
+                  observation_parameters_{observation_parameters}
+            {}
+
+            virtual Command
+            evaluate(int time_step, const physics::Thermodynamics& thermodynamics) override;
+        
+        private:
+            tools::MovingSample<double> temperatures_;
+            tools::SystemParameters system_parameters_;
+            Parameters observation_parameters_;
+    };
 } // namespace engine
 
 
