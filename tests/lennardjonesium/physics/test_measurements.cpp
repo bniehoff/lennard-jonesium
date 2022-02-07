@@ -5,6 +5,7 @@
 #include <catch2/catch.hpp>
 #include <Eigen/Dense>
 
+#include <src/lennardjonesium/tools/system_parameters.hpp>
 #include <src/lennardjonesium/tools/cubic_lattice.hpp>
 #include <src/lennardjonesium/physics/system_state.hpp>
 #include <src/lennardjonesium/physics/derived_properties.hpp>
@@ -493,11 +494,14 @@ SCENARIO("Transformations of bulk properties of a small system")
 SCENARIO("Transformations of bulk properties on a larger random state")
 {
     // We set up a system state with several particles in a crystal lattice structure
-    int particle_count{50};
-    double density{1.0};
+    tools::SystemParameters system_parameters{
+        .temperature{0.5},
+        .density{1.0},
+        .particle_count{50}
+    };
 
-    tools::CubicLattice cubic_lattice{particle_count, density, tools::CubicLattice::BodyCentered()};
-    physics::SystemState state{particle_count};
+    tools::CubicLattice cubic_lattice{system_parameters, tools::CubicLattice::BodyCentered()};
+    physics::SystemState state{system_parameters.particle_count};
     physics::Thermodynamics thermodynamics;
 
     for (int i = 0; auto position : cubic_lattice())

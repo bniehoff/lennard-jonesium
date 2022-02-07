@@ -29,6 +29,7 @@
 
 #include <lennardjonesium/tools/aligned_generator.hpp>
 #include <lennardjonesium/tools/bounding_box.hpp>
+#include <lennardjonesium/tools/system_parameters.hpp>
 
 namespace tools
 {
@@ -64,7 +65,7 @@ namespace tools
                 }.transpose();}
 
             // The constructor takes a unit cell type to fully specify the cubic lattice
-            CubicLattice(int particle_count, double density, UnitCell unit_cell = FaceCentered());
+            CubicLattice(SystemParameters system_parameters, UnitCell unit_cell = FaceCentered());
 
             /**
              * The unit cells will be enumerated at coordinates that fit inside the smallest
