@@ -27,6 +27,7 @@
 
 #include <lennardjonesium/tools/bounding_box.hpp>
 #include <lennardjonesium/tools/cubic_lattice.hpp>
+#include <lennardjonesium/tools/system_parameters.hpp>
 #include <lennardjonesium/physics/system_state.hpp>
 
 namespace engine
@@ -52,20 +53,15 @@ namespace engine
 
             // Constructor
             InitialCondition(
-                int particle_count,
-                double density,
-                double temperature,
+                tools::SystemParameters system_parameters,
                 tools::CubicLattice::UnitCell unit_cell = tools::CubicLattice::FaceCentered(),
                 std::random_device::result_type seed = random_number_engine_type::default_seed
             );
             
             // These return by value so that the original InitialCondition will not be modified
             tools::BoundingBox bounding_box() {return bounding_box_;}
+            tools::SystemParameters system_parameters() {return system_parameters_;}
             physics::SystemState system_state() {return system_state_;}
-
-            int particle_count() {return system_state_.particle_count();}
-            double density() {return density_;}
-            double temperature() {return temperature_;}
 
             std::random_device::result_type seed() {return seed_;}
         
@@ -75,19 +71,16 @@ namespace engine
              * for UnitCell
              */
             InitialCondition(
-                int particle_count,
-                double density,
-                double temperature,
+                tools::SystemParameters system_parameters,
                 tools::CubicLattice cubic_lattice,
                 std::random_device::result_type seed
             );
 
             // Data members
+            tools::SystemParameters system_parameters_;
             tools::BoundingBox bounding_box_;
             physics::SystemState system_state_;
-
-            double density_;
-            double temperature_;
+            
             std::random_device::result_type seed_;
     };
 } // namespace engine
