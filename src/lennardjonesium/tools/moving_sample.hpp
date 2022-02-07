@@ -39,15 +39,15 @@ namespace detail
         public:
             void push_back(T value) {buffer_.push_back(value);}
 
-            size_t size() {return buffer_.size();}
+            size_t size() const {return buffer_.size();}
 
-            size_t capacity() {return buffer_.capacity();}
+            size_t capacity() const {return buffer_.capacity();}
 
             void clear() {buffer_.clear();}
 
-            bool empty() {return buffer_.empty();}
+            bool empty() const {return buffer_.empty();}
 
-            bool full() {return buffer_.full();}
+            bool full() const {return buffer_.full();}
         
         protected:
             explicit MovingSampleBase(int size) : buffer_(size) {}
@@ -100,11 +100,11 @@ namespace tools
 
             struct Statistics
             {
-                const mean_type mean;
-                const variance_type variance;
+                mean_type mean;
+                variance_type variance;
             };
 
-            Statistics statistics()
+            Statistics statistics() const
             {
                 assert(this->size() > 1 && "Cannot compute statistics without at least 2 samples");
 
@@ -155,11 +155,11 @@ namespace tools
 
             struct Statistics
             {
-                const mean_type mean;
-                const covariance_type covariance;
+                mean_type mean;
+                covariance_type covariance;
             };
 
-            Statistics statistics()
+            Statistics statistics() const
             {
                 assert(this->size() > 1 && "Cannot compute statistics without at least 2 samples");
 
