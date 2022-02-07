@@ -8,20 +8,26 @@
 #include <Eigen/Dense>
 
 #include <src/lennardjonesium/tools/bounding_box.hpp>
+#include <src/lennardjonesium/tools/system_parameters.hpp>
 #include <src/lennardjonesium/tools/cubic_lattice.hpp>
 
 SCENARIO("Producing particle lattices with the correct density")
 {
-    int particle_count{7};
-    double desired_density{2.718};
+    tools::SystemParameters system_parameters{
+        .temperature{0.5},
+        .density{2.718},
+        .particle_count{7}
+    };
 
     WHEN("I create a simple cubic lattice")
     {
         tools::CubicLattice lattice(
-            particle_count, desired_density, tools::CubicLattice::Simple()
+            system_parameters, tools::CubicLattice::Simple()
         );
         tools::BoundingBox bounding_box = lattice.bounding_box();
-        double density = static_cast<double>(particle_count) / bounding_box.volume();
+        double density = (
+            static_cast<double>(system_parameters.particle_count) / bounding_box.volume()
+        );
 
         THEN("The bounding box is a cube")
         {
@@ -31,17 +37,19 @@ SCENARIO("Producing particle lattices with the correct density")
 
         THEN("I get a lattice of the desired density")
         {
-            REQUIRE(Approx(desired_density) == density);
+            REQUIRE(Approx(system_parameters.density) == density);
         }
     }
 
     WHEN("I create a body-centered cubic lattice")
     {
         tools::CubicLattice lattice(
-            particle_count, desired_density, tools::CubicLattice::BodyCentered()
+            system_parameters, tools::CubicLattice::BodyCentered()
         );
         tools::BoundingBox bounding_box = lattice.bounding_box();
-        double density = static_cast<double>(particle_count) / bounding_box.volume();
+        double density = (
+            static_cast<double>(system_parameters.particle_count) / bounding_box.volume()
+        );
 
         THEN("The bounding box is a cube")
         {
@@ -51,17 +59,19 @@ SCENARIO("Producing particle lattices with the correct density")
 
         THEN("I get a lattice of the desired density")
         {
-            REQUIRE(Approx(desired_density) == density);
+            REQUIRE(Approx(system_parameters.density) == density);
         }
     }
 
     WHEN("I create a face-centered cubic lattice")
     {
         tools::CubicLattice lattice(
-            particle_count, desired_density, tools::CubicLattice::FaceCentered()
+            system_parameters, tools::CubicLattice::FaceCentered()
         );
         tools::BoundingBox bounding_box = lattice.bounding_box();
-        double density = static_cast<double>(particle_count) / bounding_box.volume();
+        double density = (
+            static_cast<double>(system_parameters.particle_count) / bounding_box.volume()
+        );
 
         THEN("The bounding box is a cube")
         {
@@ -71,20 +81,23 @@ SCENARIO("Producing particle lattices with the correct density")
 
         THEN("I get a lattice of the desired density")
         {
-            REQUIRE(Approx(desired_density) == density);
+            REQUIRE(Approx(system_parameters.density) == density);
         }
     }
 }
 
 SCENARIO("Producing particle lattices with the correct lattice sites")
 {
-    int particle_count{7};
-    double desired_density{7.0 / 8.0};
+    tools::SystemParameters system_parameters{
+        .temperature{0.5},
+        .density{7.0 / 8.0},
+        .particle_count{7}
+    };
 
     WHEN("I create a simple cubic lattice")
     {
         tools::CubicLattice lattice(
-            particle_count, desired_density, tools::CubicLattice::Simple()
+            system_parameters, tools::CubicLattice::Simple()
         );
 
         std::vector<Eigen::Vector4d> expected_sites{
@@ -107,7 +120,7 @@ SCENARIO("Producing particle lattices with the correct lattice sites")
     WHEN("I create a body-centered cubic lattice")
     {
         tools::CubicLattice lattice(
-            particle_count, desired_density, tools::CubicLattice::BodyCentered()
+            system_parameters, tools::CubicLattice::BodyCentered()
         );
 
         std::vector<Eigen::Vector4d> expected_sites{
@@ -130,7 +143,7 @@ SCENARIO("Producing particle lattices with the correct lattice sites")
     WHEN("I create a face-centered cubic lattice")
     {
         tools::CubicLattice lattice(
-            particle_count, desired_density, tools::CubicLattice::FaceCentered()
+            system_parameters, tools::CubicLattice::FaceCentered()
         );
 
         std::vector<Eigen::Vector4d> expected_sites{

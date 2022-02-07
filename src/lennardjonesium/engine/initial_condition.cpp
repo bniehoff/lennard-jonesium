@@ -27,6 +27,7 @@
 
 #include <lennardjonesium/tools/bounding_box.hpp>
 #include <lennardjonesium/tools/cubic_lattice.hpp>
+#include <lennardjonesium/tools/system_parameters.hpp>
 #include <lennardjonesium/physics/system_state.hpp>
 #include <lennardjonesium/physics/transformations.hpp>
 #include <lennardjonesium/engine/initial_condition.hpp>
@@ -34,32 +35,25 @@
 namespace engine
 {
     InitialCondition::InitialCondition(
-        int particle_count,
-        double density,
-        double temperature,
+        tools::SystemParameters system_parameters,
         tools::CubicLattice::UnitCell unit_cell,
         std::random_device::result_type seed
     )
         : InitialCondition::InitialCondition(
-            particle_count,
-            density,
-            temperature,
-            tools::CubicLattice{particle_count, density, unit_cell},
+            system_parameters,
+            tools::CubicLattice{system_parameters, unit_cell},
             seed
         )
     {}
 
     InitialCondition::InitialCondition(
-        int particle_count,
-        double density,
-        double temperature,
+        tools::SystemParameters system_parameters,
         tools::CubicLattice cubic_lattice,
         std::random_device::result_type seed
     )
-        : bounding_box_{cubic_lattice.bounding_box()},
-          system_state_{particle_count},
-          density_{density},
-          temperature_{temperature},
+        : system_parameters_{system_parameters},
+          bounding_box_{cubic_lattice.bounding_box()},
+          system_state_{system_parameters.particle_count},
           seed_{seed}
     {
         /**
@@ -80,10 +74,13 @@ namespace engine
          * just a normal distribution with mean 0 and variance equal to the temperature.
          */
         random_number_engine_type gen{seed_};
-        std::normal_distribution<> maxwell_boltzmann_distribution{0, std::sqrt(temperature_)};
+        std::normal_distribution<> maxwell_boltzmann_distribution{
+            0,
+            std::sqrt(system_parameters_.temperature)
+        };
 
         // The individual velocity components are all independent, so we treat them as a 1d array
-        for (auto& velocity_component : system_state_.velocities.reshaped())
+        for (auto& velocity_component : system_state_.velocities.topRows<3>().reshaped())
         {
             velocity_component = maxwell_boltzmann_distribution(gen);
         }
@@ -101,7 +98,7 @@ namespace engine
         system_state_
             | physics::zero_momentum()
             | physics::zero_angular_momentum(center_of_mass)
-            | physics::set_temperature(temperature_);
+            | physics::set_temperature(system_parameters_.temperature);
         
         // Now the initial state is set up.
     }

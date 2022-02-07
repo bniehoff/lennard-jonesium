@@ -76,6 +76,7 @@ add_library(tools STATIC
     src/lennardjonesium/tools/math.hpp
     src/lennardjonesium/tools/bounding_box.hpp
     src/lennardjonesium/tools/bounding_box.cpp
+    src/lennardjonesium/tools/system_parameters.hpp
     src/lennardjonesium/tools/cell_list_array.hpp
     src/lennardjonesium/tools/cell_list_array.cpp
     src/lennardjonesium/tools/cubic_lattice.hpp
@@ -92,6 +93,7 @@ add_library(physics STATIC
     src/lennardjonesium/physics/measurements.hpp
     src/lennardjonesium/physics/transformations.hpp
     src/lennardjonesium/physics/transformations.cpp
+    src/lennardjonesium/physics/observation.hpp
 )
 
 add_library(engine STATIC
@@ -107,8 +109,8 @@ add_library(engine STATIC
     src/lennardjonesium/engine/initial_condition.cpp
     src/lennardjonesium/engine/simulation_phase.hpp
     src/lennardjonesium/engine/simulation_phase.cpp
-    src/lennardjonesium/engine/equilibrator.hpp
-    src/lennardjonesium/engine/equilibrator.cpp
+    # src/lennardjonesium/engine/equilibrator.hpp
+    # src/lennardjonesium/engine/equilibrator.cpp
 )
 
 # Link the various dependencies

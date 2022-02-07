@@ -30,17 +30,18 @@
 
 #include <lennardjonesium/tools/aligned_generator.hpp>
 #include <lennardjonesium/tools/bounding_box.hpp>
+#include <lennardjonesium/tools/system_parameters.hpp>
 #include <lennardjonesium/tools/cubic_lattice.hpp>
 
 namespace tools
 {
     CubicLattice::CubicLattice
-        (int particle_count, double density, CubicLattice::UnitCell unit_cell)
-        : unit_cell_{unit_cell}, particle_count_{particle_count}
+        (SystemParameters system_parameters, CubicLattice::UnitCell unit_cell)
+        : unit_cell_{unit_cell}, particle_count_{system_parameters.particle_count}
     {
         // First find the total number of nonempty cells
         int nonempty_cells = std::ceil(
-            static_cast<double>(particle_count) / static_cast<double>(unit_cell.cols())
+            static_cast<double>(particle_count_) / static_cast<double>(unit_cell.cols())
         );
 
         // cells_per_side_ is the cube root of the smallest cube that contains this number of cells
@@ -49,12 +50,12 @@ namespace tools
         // Next find the prototype density, given by the number of particles divided by volume,
         // assuming that a unit cell has unit volume
         double prototype_density = (
-            static_cast<double>(particle_count) /
+            static_cast<double>(particle_count_) /
             static_cast<double>(cells_per_side_ * cells_per_side_ * cells_per_side_)
         );
 
         // scale_factor_ is then the linear scale needed to change to the desired density
-        scale_factor_ = std::cbrt(prototype_density / density);
+        scale_factor_ = std::cbrt(prototype_density / system_parameters.density);
     }
 
     tools::aligned_generator<Eigen::Vector4d> CubicLattice::operator() ()
