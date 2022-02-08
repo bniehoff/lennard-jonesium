@@ -252,7 +252,6 @@ namespace engine
             tools::SystemParameters system_parameters_;
             ObservationParameters observation_parameters_;
     };
+
 } // namespace engine
-
-
 #endif
