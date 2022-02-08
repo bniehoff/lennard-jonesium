@@ -107,8 +107,8 @@ add_library(engine STATIC
     src/lennardjonesium/engine/integrator.cpp
     src/lennardjonesium/engine/initial_condition.hpp
     src/lennardjonesium/engine/initial_condition.cpp
-    # src/lennardjonesium/engine/simulation_phase.hpp
-    # src/lennardjonesium/engine/simulation_phase.cpp
+    src/lennardjonesium/engine/simulation_phase.hpp
+    src/lennardjonesium/engine/simulation_phase.cpp
     # src/lennardjonesium/engine/equilibrator.hpp
     # src/lennardjonesium/engine/equilibrator.cpp
 )
@@ -172,7 +172,7 @@ else()
         tests/lennardjonesium/engine/test_short_range_force_calculation.cpp
         tests/lennardjonesium/engine/test_velocity_verlet_integrator.cpp
         tests/lennardjonesium/engine/test_initial_condition.cpp
-        # tests/lennardjonesium/engine/test_equilibration_phase.cpp
+        tests/lennardjonesium/engine/test_equilibration_phase.cpp
         # tests/lennardjonesium/engine/test_equilibrator.cpp
     )
 

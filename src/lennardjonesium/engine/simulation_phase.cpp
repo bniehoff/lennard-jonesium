@@ -32,37 +32,33 @@ namespace engine
     Command
     EquilibrationPhase::evaluate(int time_step, const physics::Thermodynamics& thermodynamics)
     {
-        /**
-         * TODO: Could use logging here, in order to see how decisions relate to the measured
-         * temperature.
-         */
-
         // Collect temperature sample every time step
         temperatures_.push_back(thermodynamics.temperature());
 
         bool adjustment_needed = false;
 
         // Check whether adjustment is needed
-        if (time_step - last_assessment_time_ >= parameters_.assessment_interval) [[unlikely]]
+        if (time_step - last_assessment_time_ >= equilibration_parameters_.assessment_interval)
+            [[unlikely]]
         {
             last_assessment_time_ = time_step;
             last_mean_temperature_ = temperatures_.statistics().mean;
 
             adjustment_needed = (
-                tools::relative_error(last_mean_temperature_, target_temperature_)
-                >= parameters_.tolerance
+                tools::relative_error(last_mean_temperature_, system_parameters_.temperature)
+                >= equilibration_parameters_.tolerance
             );
         }
 
         // Check whether we are in steady state
-        if ((time_step - last_adjustment_time_ >= parameters_.steady_state_time)
+        if ((time_step - last_adjustment_time_ >= equilibration_parameters_.steady_state_time)
             && !adjustment_needed) [[unlikely]]
         {
             return PhaseComplete{};
         }
 
         // Check whether we have reached timeout
-        if (time_step - start_time_ >= parameters_.timeout) [[unlikely]]
+        if (time_step - start_time_ >= equilibration_parameters_.timeout) [[unlikely]]
         {
             return AbortSimulation{};
         }
@@ -71,11 +67,21 @@ namespace engine
         if (adjustment_needed) [[unlikely]]
         {
             last_adjustment_time_ = time_step;
-            return SetTemperature{target_temperature_};
+            return SetTemperature{system_parameters_.temperature};
         }
 
         // If none of the above conditions were met, do nothing
         return std::monostate{};
     }
+
+    // Command
+    // ObservationPhase::evaluate(int time_step, const physics::Thermodynamics& thermodynamics)
+    // {
+    //     // Collect relevant data every time step
+        
+
+    //     // If none of the above conditions were met, do nothing
+    //     return std::monostate{};
+    // }
 } // namespace engine
 
