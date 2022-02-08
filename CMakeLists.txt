@@ -93,7 +93,7 @@ add_library(physics STATIC
     src/lennardjonesium/physics/measurements.hpp
     src/lennardjonesium/physics/transformations.hpp
     src/lennardjonesium/physics/transformations.cpp
-    # src/lennardjonesium/physics/observation.hpp
+    src/lennardjonesium/physics/observation.hpp
 )
 
 add_library(engine STATIC
