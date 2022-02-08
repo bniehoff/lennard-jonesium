@@ -48,7 +48,6 @@ namespace physics
                 virial_ = state | physics::virial;
                 temperature_ = state | physics::temperature(kinetic_energy_);
                 mean_square_displacement_ = state | physics::mean_square_displacement;
-                particle_count_ = state | physics::particle_count;
 
                 return state;
             }
@@ -61,7 +60,6 @@ namespace physics
             double virial() const {return virial_;}
             double temperature() const {return temperature_;}
             double mean_square_displacement() const {return mean_square_displacement_;}
-            int particle_count() const {return particle_count_;}
 
         private:
             double time_{};
@@ -71,7 +69,6 @@ namespace physics
             double virial_{};
             double temperature_{};
             double mean_square_displacement_{};
-            int particle_count_{};
     };
     
 } // namespace physics
