@@ -97,6 +97,26 @@ namespace engine
             explicit SimulationPhase(int start_time) : start_time_{start_time} {}
     };
 
+    struct EquilibrationParameters
+    {
+        /**
+         * This really ought to be a nested struct inside EquilibrationPhase below, however there
+         * is a bug in GCC that prevents default-initializing it properly:
+         * 
+         *      https://gcc.gnu.org/bugzilla/show_bug.cgi?id=88165
+         * 
+         * An alternative is to provide a default constructor, but then it will not be recognized
+         * as an aggregate type, and thus wouldn't allow designated initialization (which is a very
+         * convenient way to define these parameters).
+         */
+
+        double tolerance = 0.05;
+        int sample_size = 50;
+        int assessment_interval = 200;
+        int steady_state_time = 1000;
+        int timeout = 5000;
+    };
+
     class EquilibrationPhase : public SimulationPhase
     {
         /**
@@ -134,24 +154,11 @@ namespace engine
              *      determine that the system cannot equilibrate and we abort the simulation.
              */
             
-            struct Parameters
-            {
-                double tolerance = 0.05;
-                int sample_size = 50;
-                int assessment_interval = 200;
-                int steady_state_time = 1000;
-                int timeout = 5000;
-
-                // We explicitly define a default constructor as demonstrated in this bug report:
-                // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=88165
-                Parameters() {}
-            };
-
             // The parameters will use the above defaults if not given
             EquilibrationPhase(
                 int start_time,
                 tools::SystemParameters system_parameters,
-                Parameters equilibration_parameters = {}
+                EquilibrationParameters equilibration_parameters = {}
             )
                 : SimulationPhase{start_time},
                   temperatures_(equilibration_parameters.sample_size),
@@ -167,10 +174,29 @@ namespace engine
         private:
             tools::MovingSample<double> temperatures_;
             tools::SystemParameters system_parameters_;
-            Parameters equilibration_parameters_;
+            EquilibrationParameters equilibration_parameters_;
             double last_mean_temperature_{std::numeric_limits<double>::signaling_NaN()};
             int last_assessment_time_;
             int last_adjustment_time_;
+    };
+
+    struct ObservationParameters
+    {
+        /**
+         * This really ought to be a nested struct inside EquilibrationPhase below, however there
+         * is a bug in GCC that prevents default-initializing it properly:
+         * 
+         *      https://gcc.gnu.org/bugzilla/show_bug.cgi?id=88165
+         * 
+         * An alternative is to provide a default constructor, but then it will not be recognized
+         * as an aggregate type, and thus wouldn't allow designated initialization (which is a very
+         * convenient way to define these parameters).
+         */
+
+        double tolerance = 0.10;
+        int sample_size = 50;
+        int observation_interval = 200;
+        int observation_count = 20;
     };
 
     class ObservationPhase : public SimulationPhase
@@ -206,23 +232,11 @@ namespace engine
              *      up to that point should be valid (since they were made at a temperature within
              *      the allowed tolerance.)
              */
-            struct Parameters
-            {
-                double tolerance = 0.10;
-                int sample_size = 50;
-                int observation_interval = 200;
-                int observation_count = 20;
-
-                // We explicitly define a default constructor as demonstrated in this bug report:
-                // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=88165
-                Parameters() {}
-            };
-
             // The parameters will use the above defaults if not given
             ObservationPhase(
                 int start_time,
                 tools::SystemParameters system_parameters,
-                Parameters observation_parameters = {}
+                ObservationParameters observation_parameters = {}
             )
                 : SimulationPhase{start_time},
                   temperatures_{observation_parameters.sample_size},
@@ -236,9 +250,8 @@ namespace engine
         private:
             tools::MovingSample<double> temperatures_;
             tools::SystemParameters system_parameters_;
-            Parameters observation_parameters_;
+            ObservationParameters observation_parameters_;
     };
+
 } // namespace engine
-
-
 #endif

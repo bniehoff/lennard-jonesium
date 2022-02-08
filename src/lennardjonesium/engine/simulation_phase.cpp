@@ -74,14 +74,14 @@ namespace engine
         return std::monostate{};
     }
 
-    Command
-    ObservationPhase::evaluate(int time_step, const physics::Thermodynamics& thermodynamics)
-    {
-        // Collect relevant data every time step
+    // Command
+    // ObservationPhase::evaluate(int time_step, const physics::Thermodynamics& thermodynamics)
+    // {
+    //     // Collect relevant data every time step
         
 
-        // If none of the above conditions were met, do nothing
-        return std::monostate{};
-    }
+    //     // If none of the above conditions were met, do nothing
+    //     return std::monostate{};
+    // }
 } // namespace engine
 

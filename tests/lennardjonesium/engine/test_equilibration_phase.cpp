@@ -34,12 +34,12 @@ SCENARIO("Equilibration Phase decision-making")
     physics::Thermodynamics thermodynamics;
 
     // Create the equilibration parameters
-    engine::EquilibrationPhase::Parameters equilibration_parameters{};
-
-    equilibration_parameters.sample_size = 2;
-    equilibration_parameters.assessment_interval = 10;
-    equilibration_parameters.steady_state_time = 100;
-    equilibration_parameters.timeout = 500;
+    engine::EquilibrationParameters equilibration_parameters{
+        .sample_size {2},
+        .assessment_interval {10},
+        .steady_state_time {100},
+        .timeout {500}
+    };
 
     int start_time{0};
 
