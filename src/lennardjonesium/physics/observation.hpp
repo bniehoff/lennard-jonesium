@@ -25,7 +25,9 @@
 
 #include <Eigen/Dense>
 
+#include <lennardjonesium/tools/system_parameters.hpp>
 #include <lennardjonesium/tools/moving_sample.hpp>
+#include <lennardjonesium/physics/measurements.hpp>
 
 namespace physics
 {
@@ -37,35 +39,39 @@ namespace physics
          */
 
         double temperature;
-        double energy;
         double pressure;
         double specific_heat;
         double diffusion_coefficient;
     };
 
-    /**
-     * We leave Observation with the trivial constructor; however, it is useful to define a
-     * factory object that actually computes these quantities from the ones measured in the
-     * simulation.
-     */
-
-    class ObservationFactory
+    class ObservationComputer
     {
+        /**
+         * Collects the data (i.e. ThermodynamicSnapshots) needed to compute an Observation, and
+         * then does the statistical computations when requested.
+         */
+
         public:
-            ObservationFactory(double volume, int particle_count)
-                : volume_{volume}, particle_count_{particle_count}
+            Observation compute();
+
+            void collect_data(const ThermodynamicSnapshot& snapshot);
+
+            int sample_size() {return sample_size_;}
+
+            ObservationComputer(tools::SystemParameters system_parameters, int sample_size)
+                : temperature_sample_{sample_size},
+                  virial_sample_{sample_size},
+                  msd_vs_time_sample_{sample_size},
+                  system_parameters_{system_parameters},
+                  sample_size_{sample_size}
             {}
 
-            Observation compute_observation(
-                const tools::MovingSample<double>& temperatures,
-                const tools::MovingSample<double>& energies,
-                const tools::MovingSample<double>& virials,
-                const tools::MovingSample<Eigen::Vector2d>& msd_vs_time
-            );
-        
         private:
-            double volume_;
-            int particle_count_;
+            tools::MovingSample<double> temperature_sample_;
+            tools::MovingSample<double> virial_sample_;
+            tools::MovingSample<Eigen::Vector2d> msd_vs_time_sample_;
+            tools::SystemParameters system_parameters_;
+            int sample_size_;
     };
 } // namespace physics
 

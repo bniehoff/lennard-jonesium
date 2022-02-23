@@ -30,11 +30,12 @@
 namespace physics
 {
     // We define some useful Measurements for extracting information from the SystemState
-    class Thermodynamics
+    class ThermodynamicSnapshot
     {
         /**
-         * The Thermodynamics Measurement captures all of the useful thermodynamic information
-         * about the state, which can be used to make decisions or further statistical observations.
+         * ThermodynamicSnapshot is a Measurement captures all of the useful instantaneous
+         * thermodynamic information about the state, which can be used to make decisions or
+         * further statistical observations.
          */
 
         public:
@@ -70,6 +71,9 @@ namespace physics
             double temperature_{};
             double mean_square_displacement_{};
     };
+
+    // Will be used to check conservation laws
+    class KinematicSnapshot;
     
 } // namespace physics
 

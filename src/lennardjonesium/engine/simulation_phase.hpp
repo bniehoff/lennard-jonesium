@@ -46,7 +46,8 @@ namespace engine
      */
 
     // Record an observation result computed from statistical data
-    struct RecordObservation {
+    struct RecordObservation
+    {
         std::unique_ptr<physics::Observation> observation;
     };
 
@@ -64,7 +65,6 @@ namespace engine
 
     // The Command variant itself
     using Command = std::variant<
-        std::monostate,
         RecordObservation,
         SetTemperature,
         PhaseComplete,
@@ -86,8 +86,8 @@ namespace engine
          */
         public:
             // Evaluate the thermodynamic properties of the state and issue commands
-            virtual Command
-            evaluate(int time_step, const physics::Thermodynamics& thermodynamics) = 0;
+            virtual std::vector<Command>
+            evaluate(int time_step, const physics::ThermodynamicSnapshot& snapshot) = 0;
 
             virtual ~SimulationPhase() = default;
         
@@ -161,18 +161,18 @@ namespace engine
                 EquilibrationParameters equilibration_parameters = {}
             )
                 : SimulationPhase{start_time},
-                  temperatures_(equilibration_parameters.sample_size),
+                  temperature_sample_(equilibration_parameters.sample_size),
                   system_parameters_{system_parameters},
                   equilibration_parameters_{equilibration_parameters},
                   last_assessment_time_{start_time},
                   last_adjustment_time_{start_time}
             {}
 
-            virtual Command
-            evaluate(int time_step, const physics::Thermodynamics& thermodynamics) override;
+            virtual std::vector<Command>
+            evaluate(int time_step, const physics::ThermodynamicSnapshot& snapshot) override;
         
         private:
-            tools::MovingSample<double> temperatures_;
+            tools::MovingSample<double> temperature_sample_;
             tools::SystemParameters system_parameters_;
             EquilibrationParameters equilibration_parameters_;
             double last_mean_temperature_{std::numeric_limits<double>::signaling_NaN()};
@@ -239,18 +239,22 @@ namespace engine
                 ObservationParameters observation_parameters = {}
             )
                 : SimulationPhase{start_time},
-                  temperatures_{observation_parameters.sample_size},
+                  observation_computer_{system_parameters, observation_parameters.sample_size},
                   system_parameters_{system_parameters},
-                  observation_parameters_{observation_parameters}
+                  observation_parameters_{observation_parameters},
+                  last_observation_time_{start_time}
             {}
 
-            virtual Command
-            evaluate(int time_step, const physics::Thermodynamics& thermodynamics) override;
+            virtual std::vector<Command>
+            evaluate(int time_step, const physics::ThermodynamicSnapshot& snapshot) override;
         
         private:
-            tools::MovingSample<double> temperatures_;
+            physics::ObservationComputer observation_computer_;
             tools::SystemParameters system_parameters_;
             ObservationParameters observation_parameters_;
+            double last_mean_temperature_{std::numeric_limits<double>::signaling_NaN()};
+            int last_observation_time_;
+            int observation_count_{0};
     };
 
 } // namespace engine
