@@ -94,6 +94,7 @@ add_library(physics STATIC
     src/lennardjonesium/physics/transformations.hpp
     src/lennardjonesium/physics/transformations.cpp
     src/lennardjonesium/physics/observation.hpp
+    src/lennardjonesium/physics/observation.cpp
 )
 
 add_library(engine STATIC
@@ -172,7 +173,7 @@ else()
         tests/lennardjonesium/engine/test_short_range_force_calculation.cpp
         tests/lennardjonesium/engine/test_velocity_verlet_integrator.cpp
         tests/lennardjonesium/engine/test_initial_condition.cpp
-        tests/lennardjonesium/engine/test_equilibration_phase.cpp
+        # tests/lennardjonesium/engine/test_equilibration_phase.cpp
         # tests/lennardjonesium/engine/test_equilibrator.cpp
     )
 

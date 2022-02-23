@@ -20,68 +20,87 @@
  * <https://www.gnu.org/licenses/>.
  */
 
+#include <memory>
 #include <variant>
 
 #include <lennardjonesium/tools/math.hpp>
 #include <lennardjonesium/tools/moving_sample.hpp>
 #include <lennardjonesium/physics/measurements.hpp>
+
 #include <lennardjonesium/engine/simulation_phase.hpp>
 
 namespace engine
 {   
-    Command
-    EquilibrationPhase::evaluate(int time_step, const physics::Thermodynamics& thermodynamics)
+    std::vector<Command>
+    EquilibrationPhase::evaluate(int time_step, const physics::ThermodynamicSnapshot& snapshot)
     {
-        // Collect temperature sample every time step
-        temperatures_.push_back(thermodynamics.temperature());
+        // Prepare the sequence of commands to be returned
+        std::vector<Command> commands;
 
-        bool adjustment_needed = false;
+        // Collect temperature sample every time step
+        temperature_sample_.push_back(snapshot.temperature());
 
         // Check whether adjustment is needed
         if (time_step - last_assessment_time_ >= equilibration_parameters_.assessment_interval)
             [[unlikely]]
         {
             last_assessment_time_ = time_step;
-            last_mean_temperature_ = temperatures_.statistics().mean;
+            last_mean_temperature_ = temperature_sample_.statistics().mean;
 
-            adjustment_needed = (
-                tools::relative_error(last_mean_temperature_, system_parameters_.temperature)
-                >= equilibration_parameters_.tolerance
-            );
+            if (tools::relative_error(last_mean_temperature_, system_parameters_.temperature)
+                >= equilibration_parameters_.tolerance) [[unlikely]]
+            {
+                last_adjustment_time_ = time_step;
+                commands.push_back(SetTemperature{system_parameters_.temperature});
+            }
         }
 
         // Check whether we are in steady state
-        if ((time_step - last_adjustment_time_ >= equilibration_parameters_.steady_state_time)
-            && !adjustment_needed) [[unlikely]]
+        if (time_step - last_adjustment_time_ >= equilibration_parameters_.steady_state_time)
+            [[unlikely]]
         {
-            return PhaseComplete{};
+            commands.push_back(PhaseComplete{});
         }
 
         // Check whether we have reached timeout
         if (time_step - start_time_ >= equilibration_parameters_.timeout) [[unlikely]]
         {
-            return AbortSimulation{};
+            commands.push_back(AbortSimulation{});
         }
 
-        // Send adjustment command if needed
-        if (adjustment_needed) [[unlikely]]
-        {
-            last_adjustment_time_ = time_step;
-            return SetTemperature{system_parameters_.temperature};
-        }
-
-        // If none of the above conditions were met, do nothing
-        return std::monostate{};
+        return commands;
     }
 
-    // Command
-    // ObservationPhase::evaluate(int time_step, const physics::Thermodynamics& thermodynamics)
-    // {
-    //     // Collect relevant data every time step
-        
+    std::vector<Command>
+    ObservationPhase::evaluate(int time_step, const physics::ThermodynamicSnapshot& snapshot)
+    {
+        // Prepare the sequence of commands to be returned
+        std::vector<Command> commands;
 
-    //     // If none of the above conditions were met, do nothing
-    //     return std::monostate{};
-    // }
+        // Collect relevant data every time step
+        observation_computer_.collect_data(snapshot);
+
+        // Check whether we should compute an Observation
+        if (time_step - last_observation_time_ >= observation_parameters_.observation_interval)
+            [[unlikely]]
+        {
+            last_observation_time_ = time_step;
+
+            auto observation = std::make_unique<physics::Observation>(
+                observation_computer_.compute()
+            );
+            ++observation_count_;
+
+            commands.push_back(RecordObservation{std::move(observation)});
+        }
+
+        // Check whether we have collected enough Observations
+        if (observation_count_ >= observation_parameters_.observation_count)
+        {
+            commands.push_back(PhaseComplete{});
+        }
+        
+        return commands;
+    }
 } // namespace engine
 
