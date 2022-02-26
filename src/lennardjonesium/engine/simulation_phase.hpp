@@ -31,7 +31,7 @@
 #include <lennardjonesium/tools/system_parameters.hpp>
 #include <lennardjonesium/tools/moving_sample.hpp>
 #include <lennardjonesium/physics/measurements.hpp>
-#include <lennardjonesium/physics/observation.hpp>
+#include <lennardjonesium/physics/analyzers.hpp>
 
 namespace engine
 {
@@ -48,11 +48,11 @@ namespace engine
     // Record an observation result computed from statistical data
     struct RecordObservation
     {
-        std::unique_ptr<physics::Observation> observation;
+        physics::Observation observation;
     };
 
     // Adjust the temperature of the system
-    struct SetTemperature
+    struct AdjustTemperature
     {
         double temperature;
     };
@@ -66,7 +66,7 @@ namespace engine
     // The Command variant itself
     using Command = std::variant<
         RecordObservation,
-        SetTemperature,
+        AdjustTemperature,
         PhaseComplete,
         AbortSimulation
     >;
@@ -87,7 +87,7 @@ namespace engine
         public:
             // Evaluate the thermodynamic properties of the state and issue commands
             virtual std::vector<Command>
-            evaluate(int time_step, const physics::ThermalMeasurement& snapshot) = 0;
+            evaluate(int time_step, const physics::ThermodynamicMeasurement& measurement) = 0;
 
             virtual ~SimulationPhase() = default;
         
@@ -108,6 +108,27 @@ namespace engine
          * An alternative is to provide a default constructor, but then it will not be recognized
          * as an aggregate type, and thus wouldn't allow designated initialization (which is a very
          * convenient way to define these parameters).
+         * 
+         * EquilibrationPhase has a lot of parameters that govern the equilibration process.
+         * Their meaning is as follows:
+         * 
+         * tolerance:  The allowed relative error between the system temperature and the
+         *      target temperature.
+         * 
+         * sample_size:  The number of recent temperature measurements to use when estimating
+         *      the system temperature.
+         * 
+         * assessment_interval:  The number of time steps after which to estimate the system
+         *      temperature and make a decision.  If the temperature falls outside the
+         *      tolerance range from the target temperature, then we issue a Command to rescale
+         *      the system temperature.
+         * 
+         * steady_state_time:  If we pass this number of time steps without having to adjust
+         *      the system temperature, then we consider the system to be in equilibrium at the
+         *      target temperature, and we can exit the equilibration phase.
+         * 
+         * timeout:  If we pass this number of time steps without reaching equilibrium, then we
+         *      determine that the system cannot equilibrate and we abort the simulation.
          */
 
         double tolerance = 0.05;
@@ -131,29 +152,6 @@ namespace engine
          */
 
         public:
-            /**
-             * EquilibrationPhase has a lot of parameters that govern the equilibration process.
-             * These are organized in the Parameters struct.  Their meaning is as follows:
-             * 
-             * tolerance:  The allowed relative error between the system temperature and the
-             *      target temperature.
-             * 
-             * sample_size:  The number of recent temperature measurements to use when estimating
-             *      the system temperature.
-             * 
-             * assessment_interval:  The number of time steps after which to estimate the system
-             *      temperature and make a decision.  If the temperature falls outside the
-             *      tolerance range from the target temperature, then we issue a Command to rescale
-             *      the system temperature.
-             * 
-             * steady_state_time:  If we pass this number of time steps without having to adjust
-             *      the system temperature, then we consider the system to be in equilibrium at the
-             *      target temperature, and we can exit the equilibration phase.
-             * 
-             * timeout:  If we pass this number of time steps without reaching equilibrium, then we
-             *      determine that the system cannot equilibrate and we abort the simulation.
-             */
-            
             // The parameters will use the above defaults if not given
             EquilibrationPhase(
                 int start_time,
@@ -161,7 +159,7 @@ namespace engine
                 EquilibrationParameters equilibration_parameters = {}
             )
                 : SimulationPhase{start_time},
-                  temperature_sample_(equilibration_parameters.sample_size),
+                  temperature_analyzer_(system_parameters, equilibration_parameters.sample_size),
                   system_parameters_{system_parameters},
                   equilibration_parameters_{equilibration_parameters},
                   last_assessment_time_{start_time},
@@ -169,13 +167,13 @@ namespace engine
             {}
 
             virtual std::vector<Command>
-            evaluate(int time_step, const physics::ThermalMeasurement& snapshot) override;
+            evaluate(int time_step, const physics::ThermodynamicMeasurement& measurement) override;
         
         private:
-            tools::MovingSample<double> temperature_sample_;
+            physics::TemperatureAnalyzer temperature_analyzer_;
             tools::SystemParameters system_parameters_;
             EquilibrationParameters equilibration_parameters_;
-            double last_mean_temperature_{std::numeric_limits<double>::signaling_NaN()};
+            double last_temperature_{std::numeric_limits<double>::signaling_NaN()};
             int last_assessment_time_;
             int last_adjustment_time_;
     };
@@ -191,6 +189,27 @@ namespace engine
          * An alternative is to provide a default constructor, but then it will not be recognized
          * as an aggregate type, and thus wouldn't allow designated initialization (which is a very
          * convenient way to define these parameters).
+         * 
+         * The entries have the following meanings:
+         * 
+         * tolerance:  Since temperature is a dependent variable, even after the Equilibration
+         *      phase, we cannot guarantee that the temperature will remain stable.  This
+         *      parameter gives the allowed window in which the observed temperature will be
+         *      considered valid; if the temperature leaves this window, the simulation will be
+         *      aborted.  The value given here should probably be larger than the one used for
+         *      equilibration.  Some variance in the temperature is necessary for determining
+         *      the other observed quantities, such as specific heat.
+         * 
+         * sample_size:  The number of recent measurements to include in statistics, when making
+         *      observations.
+         * 
+         * observation_interval:  The number of time steps to wait between making observations.
+         * 
+         * observation_count:  The number of observations to make; this determines the running
+         *      time of the full experiment.  Note that if the temperature strays outside the
+         *      given tolerance, then the experiment will be ended; however, observations made
+         *      up to that point should be valid (since they were made at a temperature within
+         *      the allowed tolerance.)
          */
 
         double tolerance = 0.10;
@@ -208,30 +227,6 @@ namespace engine
          */
 
         public:
-
-            /**
-             * The ObservationPhase accepts a Parameters struct to configure its behavior.
-             * The entries have the following meanings:
-             * 
-             * tolerance:  Since temperature is a dependent variable, even after the Equilibration
-             *      phase, we cannot guarantee that the temperature will remain stable.  This
-             *      parameter gives the allowed window in which the observed temperature will be
-             *      considered valid; if the temperature leaves this window, the simulation will be
-             *      aborted.  The value given here should probably be larger than the one used for
-             *      equilibration.  Some variance in the temperature is necessary for determining
-             *      the other observed quantities, such as specific heat.
-             * 
-             * sample_size:  The number of recent measurements to include in statistics, when making
-             *      observations.
-             * 
-             * observation_interval:  The number of time steps to wait between making observations.
-             * 
-             * observation_count:  The number of observations to make; this determines the running
-             *      time of the full experiment.  Note that if the temperature strays outside the
-             *      given tolerance, then the experiment will be ended; however, observations made
-             *      up to that point should be valid (since they were made at a temperature within
-             *      the allowed tolerance.)
-             */
             // The parameters will use the above defaults if not given
             ObservationPhase(
                 int start_time,
@@ -239,20 +234,20 @@ namespace engine
                 ObservationParameters observation_parameters = {}
             )
                 : SimulationPhase{start_time},
-                  observation_computer_{system_parameters, observation_parameters.sample_size},
+                  thermodynamic_analyzer_{system_parameters, observation_parameters.sample_size},
                   system_parameters_{system_parameters},
                   observation_parameters_{observation_parameters},
                   last_observation_time_{start_time}
             {}
 
             virtual std::vector<Command>
-            evaluate(int time_step, const physics::ThermalMeasurement& snapshot) override;
+            evaluate(int time_step, const physics::ThermodynamicMeasurement& snapshot) override;
         
         private:
-            physics::ObservationComputer observation_computer_;
+            physics::ThermodynamicAnalyzer thermodynamic_analyzer_;
             tools::SystemParameters system_parameters_;
             ObservationParameters observation_parameters_;
-            double last_mean_temperature_{std::numeric_limits<double>::signaling_NaN()};
+            double last_temperature_{std::numeric_limits<double>::signaling_NaN()};
             int last_observation_time_;
             int observation_count_{0};
     };

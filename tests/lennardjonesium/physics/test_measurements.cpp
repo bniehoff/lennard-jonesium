@@ -23,8 +23,8 @@ SCENARIO("Measurements of bulk properties of the system")
         {0, 0, 0, 0}, {0, 0, 2, 0}, {2, 2, 0, 0}, {2, 2, 2, 0}
     }.transpose();
 
-    // Also create a ThermalMeasurement object to read the state
-    physics::ThermalMeasurement thermodynamics;
+    // Also create a ThermodynamicMeasurement object to read the state
+    physics::ThermodynamicMeasurement thermodynamics;
 
     // The center of mass of this system is
     Eigen::Vector4d center_of_mass {1, 1, 1, 0};
@@ -502,7 +502,7 @@ SCENARIO("Transformations of bulk properties on a larger random state")
 
     tools::CubicLattice cubic_lattice{system_parameters, tools::CubicLattice::BodyCentered()};
     physics::SystemState state{system_parameters.particle_count};
-    physics::ThermalMeasurement thermodynamics;
+    physics::ThermodynamicMeasurement thermodynamics;
 
     for (int i = 0; auto position : cubic_lattice())
     {

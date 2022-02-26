@@ -30,10 +30,10 @@
 namespace physics
 {
     // We define some useful Measurements for extracting information from the SystemState
-    class ThermalMeasurement
+    class ThermodynamicMeasurement
     {
         /**
-         * ThermalMeasurement is a Measurement captures all of the useful instantaneous
+         * ThermodynamicMeasurement is a Measurement captures all of the useful instantaneous
          * thermodynamic information about the state, which can be used to make decisions or
          * further statistical observations.
          */
