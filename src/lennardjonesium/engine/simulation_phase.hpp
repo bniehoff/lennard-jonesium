@@ -247,7 +247,6 @@ namespace engine
             physics::ThermodynamicAnalyzer thermodynamic_analyzer_;
             tools::SystemParameters system_parameters_;
             ObservationParameters observation_parameters_;
-            double last_temperature_{std::numeric_limits<double>::signaling_NaN()};
             int last_observation_time_;
             int observation_count_{0};
     };
