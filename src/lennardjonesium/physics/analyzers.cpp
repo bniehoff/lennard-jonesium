@@ -1,5 +1,5 @@
 /**
- * observation.hpp
+ * analyzers.cpp
  * 
  * Copyright (c) 2021-2022 Benjamin E. Niehoff
  * 
@@ -25,20 +25,20 @@
 #include <lennardjonesium/tools/system_parameters.hpp>
 #include <lennardjonesium/tools/moving_sample.hpp>
 #include <lennardjonesium/physics/measurements.hpp>
-#include <lennardjonesium/physics/observation.hpp>
+#include <lennardjonesium/physics/analyzers.hpp>
 
 namespace physics
 {
-    void ObservationComputer::collect_data(const ThermodynamicSnapshot& snapshot)
+    void ThermodynamicAnalyzer::collect(const ThermodynamicMeasurement& measurement)
     {
-        temperature_sample_.push_back(snapshot.temperature());
-        virial_sample_.push_back(snapshot.virial());
+        temperature_sample_.push_back(measurement.temperature());
+        virial_sample_.push_back(measurement.virial());
 
         // The mean square displacement as a function of time will be used for linear regression
-        msd_vs_time_sample_.push_back({snapshot.time(), snapshot.mean_square_displacement()});
+        msd_vs_time_sample_.push_back({measurement.time(), measurement.mean_square_displacement()});
     }
 
-    Observation ObservationComputer::compute()
+    ThermodynamicAnalyzer::result_type ThermodynamicAnalyzer::result()
     {
         /**
          * Compute physical quantities to package into an Observation.
@@ -137,7 +137,7 @@ namespace physics
         );
 
         // Now assemble the return value
-        return Observation{
+        return {
             temperature,
             pressure,
             specific_heat,
