@@ -87,9 +87,20 @@ namespace engine
             [[unlikely]]
         {
             last_observation_time_ = time_step;
-            ++observation_count_;
 
-            commands.push_back(RecordObservation{thermodynamic_analyzer_.result()});
+            auto observation = thermodynamic_analyzer_.result();
+
+            // Check whether the temperature has drifted too far from the nominal value
+            if (tools::relative_error(observation.temperature, system_parameters_.temperature)
+                >= observation_parameters_.tolerance) [[unlikely]]
+            {
+                commands.push_back(AbortSimulation{});
+            }
+            else
+            {
+                ++observation_count_;
+                commands.push_back(RecordObservation{observation});
+            }
         }
 
         // Check whether we have collected enough Observations
