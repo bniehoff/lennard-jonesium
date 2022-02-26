@@ -30,10 +30,10 @@
 namespace physics
 {
     // We define some useful Measurements for extracting information from the SystemState
-    class ThermodynamicSnapshot
+    class ThermalMeasurement
     {
         /**
-         * ThermodynamicSnapshot is a Measurement captures all of the useful instantaneous
+         * ThermalMeasurement is a Measurement captures all of the useful instantaneous
          * thermodynamic information about the state, which can be used to make decisions or
          * further statistical observations.
          */
@@ -72,8 +72,15 @@ namespace physics
             double mean_square_displacement_{};
     };
 
-    // Will be used to check conservation laws
-    class KinematicSnapshot;
+    class KinematicMeasurement
+    {
+        /**
+         * KinematicMeasurement is used to collect data about the state in order to verify
+         * conservation laws.  This includes total momentum, total force, energies, etc.
+         */
+
+        // TODO: Fill this in
+    };
     
 } // namespace physics
 

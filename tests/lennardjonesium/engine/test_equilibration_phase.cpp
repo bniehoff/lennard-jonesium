@@ -31,7 +31,7 @@ SCENARIO("Equilibration Phase decision-making")
     state.velocities.setRandom();
 
     // Create thermodynamics object
-    physics::ThermodynamicSnapshot thermodynamics;
+    physics::ThermalMeasurement thermodynamics;
 
     // Create the equilibration parameters
     engine::EquilibrationParameters equilibration_parameters{

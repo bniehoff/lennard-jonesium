@@ -87,7 +87,7 @@ namespace engine
         public:
             // Evaluate the thermodynamic properties of the state and issue commands
             virtual std::vector<Command>
-            evaluate(int time_step, const physics::ThermodynamicSnapshot& snapshot) = 0;
+            evaluate(int time_step, const physics::ThermalMeasurement& snapshot) = 0;
 
             virtual ~SimulationPhase() = default;
         
@@ -169,7 +169,7 @@ namespace engine
             {}
 
             virtual std::vector<Command>
-            evaluate(int time_step, const physics::ThermodynamicSnapshot& snapshot) override;
+            evaluate(int time_step, const physics::ThermalMeasurement& snapshot) override;
         
         private:
             tools::MovingSample<double> temperature_sample_;
@@ -246,7 +246,7 @@ namespace engine
             {}
 
             virtual std::vector<Command>
-            evaluate(int time_step, const physics::ThermodynamicSnapshot& snapshot) override;
+            evaluate(int time_step, const physics::ThermalMeasurement& snapshot) override;
         
         private:
             physics::ObservationComputer observation_computer_;
