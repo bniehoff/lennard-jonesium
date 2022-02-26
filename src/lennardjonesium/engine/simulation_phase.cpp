@@ -32,26 +32,27 @@
 namespace engine
 {   
     std::vector<Command>
-    EquilibrationPhase::evaluate(int time_step, const physics::ThermalMeasurement& thermal_data)
+    EquilibrationPhase::evaluate
+        (int time_step, const physics::ThermodynamicMeasurement& measurement)
     {
         // Prepare the sequence of commands to be returned
         std::vector<Command> commands;
 
         // Collect temperature sample every time step
-        temperature_sample_.push_back(thermal_data.temperature());
+        temperature_analyzer_.collect(measurement);
 
         // Check whether adjustment is needed
         if (time_step - last_assessment_time_ >= equilibration_parameters_.assessment_interval)
             [[unlikely]]
         {
             last_assessment_time_ = time_step;
-            last_mean_temperature_ = temperature_sample_.statistics().mean;
+            last_temperature_ = temperature_analyzer_.result();
 
-            if (tools::relative_error(last_mean_temperature_, system_parameters_.temperature)
+            if (tools::relative_error(last_temperature_, system_parameters_.temperature)
                 >= equilibration_parameters_.tolerance) [[unlikely]]
             {
                 last_adjustment_time_ = time_step;
-                commands.push_back(SetTemperature{system_parameters_.temperature});
+                commands.push_back(AdjustTemperature{system_parameters_.temperature});
             }
         }
 
@@ -72,26 +73,23 @@ namespace engine
     }
 
     std::vector<Command>
-    ObservationPhase::evaluate(int time_step, const physics::ThermalMeasurement& thermal_data)
+    ObservationPhase::evaluate
+        (int time_step, const physics::ThermodynamicMeasurement& measurement)
     {
         // Prepare the sequence of commands to be returned
         std::vector<Command> commands;
 
         // Collect relevant data every time step
-        observation_computer_.collect_data(thermal_data);
+        thermodynamic_analyzer_.collect(measurement);
 
         // Check whether we should compute an Observation
         if (time_step - last_observation_time_ >= observation_parameters_.observation_interval)
             [[unlikely]]
         {
             last_observation_time_ = time_step;
-
-            auto observation = std::make_unique<physics::Observation>(
-                observation_computer_.compute()
-            );
             ++observation_count_;
 
-            commands.push_back(RecordObservation{std::move(observation)});
+            commands.push_back(RecordObservation{thermodynamic_analyzer_.result()});
         }
 
         // Check whether we have collected enough Observations
