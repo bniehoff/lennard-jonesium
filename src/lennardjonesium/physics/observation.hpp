@@ -54,7 +54,7 @@ namespace physics
         public:
             Observation compute();
 
-            void collect_data(const ThermodynamicSnapshot& snapshot);
+            void collect_data(const ThermalMeasurement& snapshot);
 
             int sample_size() {return sample_size_;}
 

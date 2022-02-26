@@ -29,7 +29,7 @@
 
 namespace physics
 {
-    void ObservationComputer::collect_data(const ThermodynamicSnapshot& snapshot)
+    void ObservationComputer::collect_data(const ThermalMeasurement& snapshot)
     {
         temperature_sample_.push_back(snapshot.temperature());
         virial_sample_.push_back(snapshot.virial());

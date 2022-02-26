@@ -32,13 +32,13 @@
 namespace engine
 {   
     std::vector<Command>
-    EquilibrationPhase::evaluate(int time_step, const physics::ThermodynamicSnapshot& snapshot)
+    EquilibrationPhase::evaluate(int time_step, const physics::ThermalMeasurement& thermal_data)
     {
         // Prepare the sequence of commands to be returned
         std::vector<Command> commands;
 
         // Collect temperature sample every time step
-        temperature_sample_.push_back(snapshot.temperature());
+        temperature_sample_.push_back(thermal_data.temperature());
 
         // Check whether adjustment is needed
         if (time_step - last_assessment_time_ >= equilibration_parameters_.assessment_interval)
@@ -72,13 +72,13 @@ namespace engine
     }
 
     std::vector<Command>
-    ObservationPhase::evaluate(int time_step, const physics::ThermodynamicSnapshot& snapshot)
+    ObservationPhase::evaluate(int time_step, const physics::ThermalMeasurement& thermal_data)
     {
         // Prepare the sequence of commands to be returned
         std::vector<Command> commands;
 
         // Collect relevant data every time step
-        observation_computer_.collect_data(snapshot);
+        observation_computer_.collect_data(thermal_data);
 
         // Check whether we should compute an Observation
         if (time_step - last_observation_time_ >= observation_parameters_.observation_interval)
