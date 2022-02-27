@@ -174,6 +174,7 @@ else()
         tests/lennardjonesium/engine/test_velocity_verlet_integrator.cpp
         tests/lennardjonesium/engine/test_initial_condition.cpp
         tests/lennardjonesium/engine/test_equilibration_phase.cpp
+        tests/lennardjonesium/engine/test_observation_phase.cpp
         # tests/lennardjonesium/engine/test_equilibrator.cpp
     )
 
