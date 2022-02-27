@@ -173,7 +173,7 @@ else()
         tests/lennardjonesium/engine/test_short_range_force_calculation.cpp
         tests/lennardjonesium/engine/test_velocity_verlet_integrator.cpp
         tests/lennardjonesium/engine/test_initial_condition.cpp
-        # tests/lennardjonesium/engine/test_equilibration_phase.cpp
+        tests/lennardjonesium/engine/test_equilibration_phase.cpp
         # tests/lennardjonesium/engine/test_equilibrator.cpp
     )
 
