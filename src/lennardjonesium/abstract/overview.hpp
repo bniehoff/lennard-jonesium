@@ -282,8 +282,8 @@ namespace physics
     };
 
     /**
-     * We also define some various types of measurements that can be made on the SystemState.
-     * These are simply functions, which return a value of the appropriate type
+     * We also define some various Properties, which are functions that read the SystemState and
+     * compute various values of physical interest.
      */
     double kinetic_energy(const SystemState&);
     Eigen::Vector4d total_momentum(const SystemState&);
@@ -291,6 +291,30 @@ namespace physics
     Eigen::Vector4d center_of_mass(const SystemState&);
     Eigen::Vector4d total_angular_momentum(const SystemState&);
     Eigen::Matrix4d inertia_tensor(const SystemState&);
+
+    /**
+     * We also define some Measurement classes for computing (instanenous) quantities of physical
+     * interest.  These quantities require combining the results of several Properties
+     */
+
+    class ThermodynamicMeasurement
+    {
+        public:
+            // Takes the measurements and populates the internal fields
+            const SystemState& operator() (const SystemState& state);
+
+            // Get the properties measured
+            double time() const;
+            double kinetic_energy() const;
+            double potential_energy() const;
+            double total_energy() const;
+            double virial() const;
+            double temperature() const;
+            double mean_square_displacement() const;
+    };
+
+    // This one will be related to bulk conservation laws
+    class KinematicMeasurement;
 } // namespace physics
 
 namespace engine
@@ -433,27 +457,41 @@ namespace engine
             physics::SystemState system_state();
     };
 
-    struct Command
-    {
-        /**
-         * A Command will be issued by a SimulationPhase to inform the Simulation what should
-         * happen next.  The Command records the time step when it was issued, and a message giving
-         * a description which can be logged or printed to the screen.
-         */
+    /**
+     * We use the Command pattern to implement communication between the SimulationPhase and the
+     * Simulation.  A Command is a std::variant among the following types.  When the Simulation
+     * receives a Command, it will execute the appropriate action.
+     * 
+     * We use std::variant and delegate the interpretation of these commands to the Simulation, so
+     * that SimulationPhase does not acquire a dependency on Simulation in order to effectively
+     * control it.
+     */
 
-        // Message that will be entered in the log
-        std::string message;
+    // Record an observation result computed from statistical data
+    struct RecordObservation
+    {
+        physics::Observation observation;
     };
 
-    // The following commands are all separate derived classes.
-    struct RecordResult : Command;      // Log an observation result computed from statistical data
-    struct ModifyState : Command;       // Modify the SystemState in some way
-    struct PhaseComplete : Command;     // On success, end this phase and move on to next
-    struct AbortSimulation : Command;   // On failure, end simulation
+    // Adjust the temperature of the system
+    struct AdjustTemperature
+    {
+        double temperature;
+    };
 
-    // Commands will be issued wrapped in a variant, which can distinguish the type of command.
-    // It is then up to the Simulation to interpret them.
-    using CommandVariant = std::variant<RecordResult, ModifyState, PhaseComplete, AbortSimulation>;
+    // On success, end this phase and move on to next
+    struct PhaseComplete {};
+
+    // On failure, end simulation
+    struct AbortSimulation {};
+
+    // The Command variant itself
+    using Command = std::variant<
+        RecordObservation,
+        AdjustTemperature,
+        PhaseComplete,
+        AbortSimulation
+    >;
 
     class SimulationPhase
     {
@@ -465,9 +503,9 @@ namespace engine
          * internal state (such as further statistical computations).
          */
         public:
-            std::unique_ptr<CommandVariant> operator() (int time_step, double temperature);
-
-            std::string name();
+            // Evaluate the thermodynamic properties of the state and issue commands
+            virtual std::vector<Command>
+            evaluate(int time_step, const physics::ThermodynamicMeasurement& measurement) = 0;
     };
 
     class EquilibrationPhase : public SimulationPhase;
