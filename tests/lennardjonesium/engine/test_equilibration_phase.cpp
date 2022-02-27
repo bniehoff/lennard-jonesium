@@ -30,8 +30,8 @@ SCENARIO("Equilibration Phase decision-making")
     state.positions.setRandom();
     state.velocities.setRandom();
 
-    // Create thermodynamics object
-    physics::ThermodynamicMeasurement thermodynamics;
+    // Create measurement object
+    physics::ThermodynamicMeasurement measurement;
 
     // Create the equilibration parameters
     engine::EquilibrationParameters equilibration_parameters{
@@ -52,126 +52,134 @@ SCENARIO("Equilibration Phase decision-making")
 
     WHEN("I pass a time step that is before the first adjustment interval")
     {
-        engine::Command command;
-        state | thermodynamics;
+        state | measurement;
 
-        command = equilibration_phase.evaluate(
+        auto commands = equilibration_phase.evaluate(
             equilibration_parameters.assessment_interval - 3,
-            thermodynamics
+            measurement
         );
 
         THEN("I get no response")
         {
-            REQUIRE(std::holds_alternative<std::monostate>(command));
+            REQUIRE(commands.empty());
         }
     }
 
     WHEN("I measure an average temperature that is outside the desired range")
     {
-        engine::Command command;
-        state | physics::set_temperature(system_parameters.temperature * 2) | thermodynamics;
+        state | physics::set_temperature(system_parameters.temperature * 2) | measurement;
 
-        command = equilibration_phase.evaluate(
+        auto commands = equilibration_phase.evaluate(
             equilibration_parameters.assessment_interval - 1,
-            thermodynamics
+            measurement
         );
 
         THEN("The command at assessment_interval - 1 should be empty")
         {
-            REQUIRE(std::holds_alternative<std::monostate>(command));
+            REQUIRE(commands.empty());
         }
 
-        command = equilibration_phase.evaluate(
+        commands = equilibration_phase.evaluate(
             equilibration_parameters.assessment_interval,
-            thermodynamics
+            measurement
         );
 
         THEN("The command at assessment_interval should be to set the temperature")
         {
-            REQUIRE(std::holds_alternative<engine::SetTemperature>(command));
+            REQUIRE(1 == commands.size());
+            REQUIRE(std::holds_alternative<engine::AdjustTemperature>(commands.front()));
             REQUIRE(
                 Approx(system_parameters.temperature)
-                    == std::get<engine::SetTemperature>(command).temperature
+                    == std::get<engine::AdjustTemperature>(commands.front()).temperature
             );
         }
     }
 
     WHEN("I measure the correct temperature at the adjustment interval")
     {
-        engine::Command command;
-        state | physics::set_temperature(system_parameters.temperature) | thermodynamics;
+        state | physics::set_temperature(system_parameters.temperature) | measurement;
 
-        command = equilibration_phase.evaluate(
+        auto commands = equilibration_phase.evaluate(
             equilibration_parameters.assessment_interval - 1,
-            thermodynamics
+            measurement
         );
 
         THEN("The command at assessment_interval - 1 should be empty")
         {
-            REQUIRE(std::holds_alternative<std::monostate>(command));
+            REQUIRE(commands.empty());
         }
 
-        command = equilibration_phase.evaluate(
+        commands = equilibration_phase.evaluate(
             equilibration_parameters.assessment_interval,
-            thermodynamics
+            measurement
         );
 
         THEN("The command at assessment_interval should also be empty")
         {
-            REQUIRE(std::holds_alternative<std::monostate>(command));
+            REQUIRE(commands.empty());
         }
     }
 
     WHEN("I measure the correct temperature at the steady state time")
     {
-        engine::Command command;
-        state | physics::set_temperature(system_parameters.temperature) | thermodynamics;
+        std::vector<engine::Command> commands;
+
+        state | physics::set_temperature(system_parameters.temperature) | measurement;
 
         // We need to run the "simulation" from the beginning, with fixed temperature
         for (int time_step : std::views::iota(0, equilibration_parameters.steady_state_time))
         {
-            command = equilibration_phase.evaluate(time_step, thermodynamics);
-            REQUIRE(std::holds_alternative<std::monostate>(command));
+            commands = equilibration_phase.evaluate(time_step, measurement);
+            REQUIRE(commands.empty());
         }
 
         // Now execute the final step
-        command = equilibration_phase.evaluate(
+        commands = equilibration_phase.evaluate(
             equilibration_parameters.steady_state_time,
-            thermodynamics
+            measurement
         );
 
         THEN("The command at steady_state_time should indicate success")
         {
-            REQUIRE(std::holds_alternative<engine::PhaseComplete>(command));
+            REQUIRE(1 == commands.size());
+            REQUIRE(std::holds_alternative<engine::PhaseComplete>(commands.front()));
         }
     }
 
     WHEN("I measure the wrong temperature at timeout")
     {
-        engine::Command command;
+        std::vector<engine::Command> commands;
 
-        state | physics::set_temperature(system_parameters.temperature * 2) | thermodynamics;
+        state | physics::set_temperature(system_parameters.temperature * 2) | measurement;
 
         // We need to force adjustments to happen over the entire time evolution up until timeout
         for (int time_step : std::views::iota(0, equilibration_parameters.timeout))
         {
-            command = equilibration_phase.evaluate(time_step, thermodynamics);
+            commands = equilibration_phase.evaluate(time_step, measurement);
 
             if ((time_step > 0)
-                    && (time_step % equilibration_parameters.assessment_interval == 0)) {
-                REQUIRE(std::holds_alternative<engine::SetTemperature>(command));
-            } else {
-                REQUIRE(std::holds_alternative<std::monostate>(command));
+                    && (time_step % equilibration_parameters.assessment_interval == 0))
+            {
+                REQUIRE(1 == commands.size());
+                REQUIRE(std::holds_alternative<engine::AdjustTemperature>(commands.front()));
+            }
+            else
+            {
+                REQUIRE(commands.empty());
             }
         }
 
         // Now execute the final step
 
-        command = equilibration_phase.evaluate(equilibration_parameters.timeout, thermodynamics);
+        commands = equilibration_phase.evaluate(equilibration_parameters.timeout, measurement);
 
         THEN("The command at timeout should indicate failure")
         {
-            REQUIRE(std::holds_alternative<engine::AbortSimulation>(command));
+            // Note that a temperature adjustment command will also be issued, since the
+            // temperature is outside the desired range
+            REQUIRE(2 == commands.size());
+            REQUIRE(std::holds_alternative<engine::AdjustTemperature>(commands[0]));
+            REQUIRE(std::holds_alternative<engine::AbortSimulation>(commands[1]));
         }
     }
 }

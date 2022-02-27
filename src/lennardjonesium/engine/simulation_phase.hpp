@@ -241,7 +241,7 @@ namespace engine
             {}
 
             virtual std::vector<Command>
-            evaluate(int time_step, const physics::ThermodynamicMeasurement& snapshot) override;
+            evaluate(int time_step, const physics::ThermodynamicMeasurement& measurement) override;
         
         private:
             physics::ThermodynamicAnalyzer thermodynamic_analyzer_;
