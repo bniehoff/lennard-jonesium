@@ -104,7 +104,7 @@ namespace engine
         }
 
         // Check whether we have collected enough Observations
-        if (observation_count_ >= observation_parameters_.observation_count)
+        if (observation_count_ >= observation_parameters_.observation_count) [[unlikely]]
         {
             commands.push_back(PhaseComplete{});
         }
