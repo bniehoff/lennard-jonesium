@@ -518,6 +518,25 @@ namespace control
 
     class ObservationPhase : public SimulationPhase;
 
+    class SimulationSchedule
+    {
+        /**
+         * SimulationSchedule manages the creation of SimulationPhase objects at the appropriate
+         * time in the simulation.  These objects need to be constructed with their start_time,
+         * rather than using some separate init() method to configure them on first use.  My thought
+         * was that an init() method might be confusing, because then it would be possible for
+         * a SimulationPhase class to be constructed and yet not be in a usable state.  This would
+         * violate RAII (although the "resource" in this case is simply the knowledge of the time
+         * step on which the SimulationPhase is actually started).
+         * 
+         * So, to get around this, the SimulationSchedule maintains a list of which SimulationPhase
+         * classes have been requested and which Parameters structs should be used to construct
+         * them.  Then, at the appropriate time step, a factory method is provided which will
+         * dynamically construct the appropriate SimulationPhase and provide it with the initial
+         * time step that it needs in order to be ready to function.
+         */
+    };
+
     // Runs the main loop, interprets commands, and creates log entries
     class Simulation;
 } // namespace control
