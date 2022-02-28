@@ -13,7 +13,7 @@
 #include <src/lennardjonesium/physics/system_state.hpp>
 #include <src/lennardjonesium/physics/transformations.hpp>
 #include <src/lennardjonesium/physics/measurements.hpp>
-#include <src/lennardjonesium/engine/simulation_phase.hpp>
+#include <src/lennardjonesium/control/simulation_phase.hpp>
 
 SCENARIO("Equilibration Phase decision-making")
 {
@@ -36,7 +36,7 @@ SCENARIO("Equilibration Phase decision-making")
     // Create the equilibration parameters
     engine::EquilibrationParameters equilibration_parameters{
         .sample_size {2},
-        .assessment_interval {10},
+        .adjustment_interval {10},
         .steady_state_time {100},
         .timeout {500}
     };
@@ -55,7 +55,7 @@ SCENARIO("Equilibration Phase decision-making")
         state | measurement;
 
         auto commands = equilibration_phase.evaluate(
-            equilibration_parameters.assessment_interval - 3,
+            equilibration_parameters.adjustment_interval - 3,
             measurement
         );
 
@@ -70,21 +70,21 @@ SCENARIO("Equilibration Phase decision-making")
         state | physics::set_temperature(system_parameters.temperature * 2) | measurement;
 
         auto commands = equilibration_phase.evaluate(
-            equilibration_parameters.assessment_interval - 1,
+            equilibration_parameters.adjustment_interval - 1,
             measurement
         );
 
-        THEN("The command at assessment_interval - 1 should be empty")
+        THEN("The command at adjustment_interval - 1 should be empty")
         {
             REQUIRE(commands.empty());
         }
 
         commands = equilibration_phase.evaluate(
-            equilibration_parameters.assessment_interval,
+            equilibration_parameters.adjustment_interval,
             measurement
         );
 
-        THEN("The command at assessment_interval should be to set the temperature")
+        THEN("The command at adjustment_interval should be to set the temperature")
         {
             REQUIRE(1 == commands.size());
             REQUIRE(std::holds_alternative<engine::AdjustTemperature>(commands.front()));
@@ -100,21 +100,21 @@ SCENARIO("Equilibration Phase decision-making")
         state | physics::set_temperature(system_parameters.temperature) | measurement;
 
         auto commands = equilibration_phase.evaluate(
-            equilibration_parameters.assessment_interval - 1,
+            equilibration_parameters.adjustment_interval - 1,
             measurement
         );
 
-        THEN("The command at assessment_interval - 1 should be empty")
+        THEN("The command at adjustment_interval - 1 should be empty")
         {
             REQUIRE(commands.empty());
         }
 
         commands = equilibration_phase.evaluate(
-            equilibration_parameters.assessment_interval,
+            equilibration_parameters.adjustment_interval,
             measurement
         );
 
-        THEN("The command at assessment_interval should also be empty")
+        THEN("The command at adjustment_interval should also be empty")
         {
             REQUIRE(commands.empty());
         }
@@ -158,7 +158,7 @@ SCENARIO("Equilibration Phase decision-making")
             commands = equilibration_phase.evaluate(time_step, measurement);
 
             if ((time_step > 0)
-                    && (time_step % equilibration_parameters.assessment_interval == 0))
+                    && (time_step % equilibration_parameters.adjustment_interval == 0))
             {
                 REQUIRE(1 == commands.size());
                 REQUIRE(std::holds_alternative<engine::AdjustTemperature>(commands.front()));
