@@ -42,10 +42,10 @@ namespace engine
         temperature_analyzer_.collect(measurement);
 
         // Check whether adjustment is needed
-        if (time_step - last_assessment_time_ >= equilibration_parameters_.assessment_interval)
-            [[unlikely]]
+        if (time_step - last_adjustment_check_time_
+            >= equilibration_parameters_.adjustment_interval) [[unlikely]]
         {
-            last_assessment_time_ = time_step;
+            last_adjustment_check_time_ = time_step;
             last_temperature_ = temperature_analyzer_.result();
 
             if (tools::relative_error(last_temperature_, system_parameters_.temperature)
