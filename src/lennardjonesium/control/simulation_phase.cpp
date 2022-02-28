@@ -27,7 +27,7 @@
 #include <lennardjonesium/tools/moving_sample.hpp>
 #include <lennardjonesium/physics/measurements.hpp>
 
-#include <lennardjonesium/engine/simulation_phase.hpp>
+#include <lennardjonesium/control/simulation_phase.hpp>
 
 namespace engine
 {   

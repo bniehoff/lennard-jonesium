@@ -18,7 +18,7 @@
 #include <src/lennardjonesium/engine/boundary_condition.hpp>
 #include <src/lennardjonesium/engine/initial_condition.hpp>
 #include <src/lennardjonesium/engine/integrator.hpp>
-#include <src/lennardjonesium/engine/equilibrator.hpp>
+#include <src/lennardjonesium/control/equilibrator.hpp>
 
 #include <tests/lennardjonesium/test_utils/constant_short_range_force.hpp>
 

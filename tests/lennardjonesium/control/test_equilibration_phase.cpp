@@ -13,7 +13,7 @@
 #include <src/lennardjonesium/physics/system_state.hpp>
 #include <src/lennardjonesium/physics/transformations.hpp>
 #include <src/lennardjonesium/physics/measurements.hpp>
-#include <src/lennardjonesium/engine/simulation_phase.hpp>
+#include <src/lennardjonesium/control/simulation_phase.hpp>
 
 SCENARIO("Equilibration Phase decision-making")
 {

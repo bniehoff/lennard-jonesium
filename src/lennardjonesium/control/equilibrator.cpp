@@ -28,7 +28,7 @@
 #include <lennardjonesium/physics/derived_properties.hpp>
 #include <lennardjonesium/physics/transformations.hpp>
 #include <lennardjonesium/engine/integrator.hpp>
-#include <lennardjonesium/engine/equilibrator.hpp>
+#include <lennardjonesium/control/equilibrator.hpp>
 
 namespace engine
 {

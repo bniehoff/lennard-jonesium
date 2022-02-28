@@ -64,6 +64,9 @@
  * engine:  Classes/functions related to simulating the physics; i.e., all the "hard work" involved
  *          in practically calculating the forces, integrating the equations of motion to update
  *          the system state, etc.
+ * 
+ * control: Structures related to simulation on a higher level: The main simulation loop, the
+ *          equilibration and observation phases, etc.
  */
 
 namespace tools
@@ -456,7 +459,10 @@ namespace engine
             tools::BoundingBox bounding_box();
             physics::SystemState system_state();
     };
+} // namespace engine
 
+namespace control
+{
     /**
      * We use the Command pattern to implement communication between the SimulationPhase and the
      * Simulation.  A Command is a std::variant among the following types.  When the Simulation
@@ -514,6 +520,7 @@ namespace engine
 
     // Runs the main loop, interprets commands, and creates log entries
     class Simulation;
-} // namespace engine
+} // namespace control
+
 
 #endif

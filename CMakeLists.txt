@@ -108,10 +108,13 @@ add_library(engine STATIC
     src/lennardjonesium/engine/integrator.cpp
     src/lennardjonesium/engine/initial_condition.hpp
     src/lennardjonesium/engine/initial_condition.cpp
-    src/lennardjonesium/engine/simulation_phase.hpp
-    src/lennardjonesium/engine/simulation_phase.cpp
-    # src/lennardjonesium/engine/equilibrator.hpp
-    # src/lennardjonesium/engine/equilibrator.cpp
+)
+
+add_library(control STATIC
+    src/lennardjonesium/control/simulation_phase.hpp
+    src/lennardjonesium/control/simulation_phase.cpp
+    # src/lennardjonesium/control/equilibrator.hpp
+    # src/lennardjonesium/control/equilibrator.cpp
 )
 
 # Link the various dependencies
@@ -132,9 +135,16 @@ target_link_libraries(physics
 
 target_link_libraries(engine
     PRIVATE Eigen3::Eigen
+    PRIVATE tools
+    PRIVATE physics
+)
+
+target_link_libraries(control
+    PRIVATE Eigen3::Eigen
     PRIVATE fmt::fmt
     PRIVATE tools
     PRIVATE physics
+    PRIVATE engine
 )
 
 if(SKBUILD)
@@ -173,9 +183,10 @@ else()
         tests/lennardjonesium/engine/test_short_range_force_calculation.cpp
         tests/lennardjonesium/engine/test_velocity_verlet_integrator.cpp
         tests/lennardjonesium/engine/test_initial_condition.cpp
-        tests/lennardjonesium/engine/test_equilibration_phase.cpp
-        tests/lennardjonesium/engine/test_observation_phase.cpp
-        # tests/lennardjonesium/engine/test_equilibrator.cpp
+
+        tests/lennardjonesium/control/test_equilibration_phase.cpp
+        tests/lennardjonesium/control/test_observation_phase.cpp
+        # tests/lennardjonesium/control/test_equilibrator.cpp
     )
 
     target_link_libraries(tests
@@ -188,6 +199,7 @@ else()
         PRIVATE tools
         PRIVATE physics
         PRIVATE engine
+        PRIVATE control
     )
 
     include(Catch)
