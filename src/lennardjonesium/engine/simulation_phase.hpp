@@ -118,7 +118,7 @@ namespace engine
          * sample_size:  The number of recent temperature measurements to use when estimating
          *      the system temperature.
          * 
-         * assessment_interval:  The number of time steps after which to estimate the system
+         * adjustment_interval:  The number of time steps after which to estimate the system
          *      temperature and make a decision.  If the temperature falls outside the
          *      tolerance range from the target temperature, then we issue a Command to rescale
          *      the system temperature.
@@ -133,7 +133,7 @@ namespace engine
 
         double tolerance = 0.05;
         int sample_size = 50;
-        int assessment_interval = 200;
+        int adjustment_interval = 200;
         int steady_state_time = 1000;
         int timeout = 5000;
     };
@@ -162,7 +162,7 @@ namespace engine
                   temperature_analyzer_(system_parameters, equilibration_parameters.sample_size),
                   system_parameters_{system_parameters},
                   equilibration_parameters_{equilibration_parameters},
-                  last_assessment_time_{start_time},
+                  last_adjustment_check_time_{start_time},
                   last_adjustment_time_{start_time}
             {}
 
@@ -174,7 +174,7 @@ namespace engine
             tools::SystemParameters system_parameters_;
             EquilibrationParameters equilibration_parameters_;
             double last_temperature_{std::numeric_limits<double>::signaling_NaN()};
-            int last_assessment_time_;
+            int last_adjustment_check_time_;
             int last_adjustment_time_;
     };
 
