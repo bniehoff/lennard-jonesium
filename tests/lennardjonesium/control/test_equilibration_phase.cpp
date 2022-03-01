@@ -34,7 +34,7 @@ SCENARIO("Equilibration Phase decision-making")
     physics::ThermodynamicMeasurement measurement;
 
     // Create the equilibration parameters
-    engine::EquilibrationParameters equilibration_parameters{
+    control::EquilibrationParameters equilibration_parameters{
         .sample_size {2},
         .adjustment_interval {10},
         .steady_state_time {100},
@@ -44,7 +44,7 @@ SCENARIO("Equilibration Phase decision-making")
     int start_time{0};
 
     // Create the EquilibrationPhase object
-    engine::EquilibrationPhase equilibration_phase{
+    control::EquilibrationPhase equilibration_phase{
         start_time,
         system_parameters,
         equilibration_parameters
@@ -87,10 +87,10 @@ SCENARIO("Equilibration Phase decision-making")
         THEN("The command at adjustment_interval should be to set the temperature")
         {
             REQUIRE(1 == commands.size());
-            REQUIRE(std::holds_alternative<engine::AdjustTemperature>(commands.front()));
+            REQUIRE(std::holds_alternative<control::AdjustTemperature>(commands.front()));
             REQUIRE(
                 Approx(system_parameters.temperature)
-                    == std::get<engine::AdjustTemperature>(commands.front()).temperature
+                    == std::get<control::AdjustTemperature>(commands.front()).temperature
             );
         }
     }
@@ -122,7 +122,7 @@ SCENARIO("Equilibration Phase decision-making")
 
     WHEN("I measure the correct temperature at the steady state time")
     {
-        std::vector<engine::Command> commands;
+        std::vector<control::Command> commands;
 
         state | physics::set_temperature(system_parameters.temperature) | measurement;
 
@@ -142,13 +142,13 @@ SCENARIO("Equilibration Phase decision-making")
         THEN("The command at steady_state_time should indicate success")
         {
             REQUIRE(1 == commands.size());
-            REQUIRE(std::holds_alternative<engine::PhaseComplete>(commands.front()));
+            REQUIRE(std::holds_alternative<control::PhaseComplete>(commands.front()));
         }
     }
 
     WHEN("I measure the wrong temperature at timeout")
     {
-        std::vector<engine::Command> commands;
+        std::vector<control::Command> commands;
 
         state | physics::set_temperature(system_parameters.temperature * 2) | measurement;
 
@@ -161,7 +161,7 @@ SCENARIO("Equilibration Phase decision-making")
                     && (time_step % equilibration_parameters.adjustment_interval == 0))
             {
                 REQUIRE(1 == commands.size());
-                REQUIRE(std::holds_alternative<engine::AdjustTemperature>(commands.front()));
+                REQUIRE(std::holds_alternative<control::AdjustTemperature>(commands.front()));
             }
             else
             {
@@ -178,8 +178,8 @@ SCENARIO("Equilibration Phase decision-making")
             // Note that a temperature adjustment command will also be issued, since the
             // temperature is outside the desired range
             REQUIRE(2 == commands.size());
-            REQUIRE(std::holds_alternative<engine::AdjustTemperature>(commands[0]));
-            REQUIRE(std::holds_alternative<engine::AbortSimulation>(commands[1]));
+            REQUIRE(std::holds_alternative<control::AdjustTemperature>(commands[0]));
+            REQUIRE(std::holds_alternative<control::AbortSimulation>(commands[1]));
         }
     }
 }
