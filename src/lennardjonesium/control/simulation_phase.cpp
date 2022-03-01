@@ -29,7 +29,7 @@
 
 #include <lennardjonesium/control/simulation_phase.hpp>
 
-namespace engine
+namespace control
 {   
     std::vector<Command>
     EquilibrationPhase::evaluate
@@ -111,5 +111,5 @@ namespace engine
         
         return commands;
     }
-} // namespace engine
+} // namespace control
 

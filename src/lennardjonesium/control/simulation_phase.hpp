@@ -33,7 +33,7 @@
 #include <lennardjonesium/physics/measurements.hpp>
 #include <lennardjonesium/physics/analyzers.hpp>
 
-namespace engine
+namespace control
 {
     /**
      * We use the Command pattern to implement communication between the SimulationPhase and the
@@ -251,5 +251,5 @@ namespace engine
             int observation_count_{0};
     };
 
-} // namespace engine
+} // namespace control
 #endif

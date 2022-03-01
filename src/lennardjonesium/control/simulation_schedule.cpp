@@ -19,3 +19,66 @@
  * License along with Lennard-Jonesium.  If not, see
  * <https://www.gnu.org/licenses/>.
  */
+
+#include <vector>
+#include <variant>
+#include <memory>
+
+#include <lennardjonesium/control/simulation_phase.hpp>
+#include <lennardjonesium/control/simulation_schedule.hpp>
+
+namespace
+{
+    // Used for writing elegant std::visitor, anonymous namespace for file scope only
+    template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+} // namespace
+
+
+namespace control
+{
+    SimulationSchedule::SimulationSchedule
+    (tools::SystemParameters system_parameters, std::vector<SimulationPhaseRequest> schedule)
+        : SimulationSchedule(system_parameters)
+    {
+        for (auto request : schedule)
+        {
+            schedule_.push(request);
+        }
+    }
+
+    std::unique_ptr<SimulationPhase> SimulationSchedule::next(int start_time)
+    {
+        if (schedule_.empty()) {return nullptr;}
+        
+        const auto& request = schedule_.front();
+
+        auto simulation_phase = std::visit(
+            overloaded {
+                [this, start_time](const EquilibrationPhaseRequest& request)
+                    -> std::unique_ptr<SimulationPhase>
+                {
+                    return std::make_unique<EquilibrationPhase>(
+                        start_time,
+                        this->system_parameters_,
+                        request.parameters
+                    );
+                },
+                [this, start_time](const ObservationPhaseRequest& request)
+                    -> std::unique_ptr<SimulationPhase>
+                {
+                    return std::make_unique<ObservationPhase>(
+                        start_time,
+                        this->system_parameters_,
+                        request.parameters
+                    );
+                }
+            },
+            request
+        );
+
+        schedule_.pop();
+
+        return simulation_phase;
+    }
+} // namespace control
+

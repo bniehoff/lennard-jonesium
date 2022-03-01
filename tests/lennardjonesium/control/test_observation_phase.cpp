@@ -34,7 +34,7 @@ SCENARIO("Observation Phase decision-making")
     physics::ThermodynamicMeasurement measurement;
 
     // Create observation parameters
-    engine::ObservationParameters observation_parameters{
+    control::ObservationParameters observation_parameters{
         .sample_size {2},
         .observation_interval {10},
         .observation_count {10}
@@ -43,7 +43,7 @@ SCENARIO("Observation Phase decision-making")
     int start_time{0};
 
     // Create the ObservationPhase object
-    engine::ObservationPhase observation_phase{
+    control::ObservationPhase observation_phase{
         start_time,
         system_parameters,
         observation_parameters
@@ -86,13 +86,13 @@ SCENARIO("Observation Phase decision-making")
         THEN("The command at observation_interval should be to record an observation")
         {
             REQUIRE(1 == commands.size());
-            REQUIRE(std::holds_alternative<engine::RecordObservation>(commands.front()));
+            REQUIRE(std::holds_alternative<control::RecordObservation>(commands.front()));
         }
     }
 
     WHEN("I make the desired number of observations")
     {
-        std::vector<engine::Command> commands;
+        std::vector<control::Command> commands;
 
         state | physics::set_temperature(system_parameters.temperature) | measurement;
 
@@ -109,7 +109,7 @@ SCENARIO("Observation Phase decision-making")
                     && (time_step % observation_parameters.observation_interval == 0))
             {
                 REQUIRE(1 == commands.size());
-                REQUIRE(std::holds_alternative<engine::RecordObservation>(commands.front()));
+                REQUIRE(std::holds_alternative<control::RecordObservation>(commands.front()));
             }
             else
             {
@@ -123,8 +123,8 @@ SCENARIO("Observation Phase decision-making")
         THEN("The final list of commands should indicate success")
         {
             REQUIRE(2 == commands.size());
-            REQUIRE(std::holds_alternative<engine::RecordObservation>(commands[0]));
-            REQUIRE(std::holds_alternative<engine::PhaseComplete>(commands[1]));
+            REQUIRE(std::holds_alternative<control::RecordObservation>(commands[0]));
+            REQUIRE(std::holds_alternative<control::PhaseComplete>(commands[1]));
         }
     }
 
@@ -150,7 +150,7 @@ SCENARIO("Observation Phase decision-making")
         THEN("The command at observation_interval should be to abort")
         {
             REQUIRE(1 == commands.size());
-            REQUIRE(std::holds_alternative<engine::AbortSimulation>(commands.front()));
+            REQUIRE(std::holds_alternative<control::AbortSimulation>(commands.front()));
         }
     }
 }
