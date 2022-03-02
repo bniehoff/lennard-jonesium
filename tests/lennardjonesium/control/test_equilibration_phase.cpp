@@ -45,6 +45,7 @@ SCENARIO("Equilibration Phase decision-making")
 
     // Create the EquilibrationPhase object
     control::EquilibrationPhase equilibration_phase{
+        "Test Equilibration Phase",
         start_time,
         system_parameters,
         equilibration_parameters

@@ -58,6 +58,7 @@ namespace control
                     -> std::unique_ptr<SimulationPhase>
                 {
                     return std::make_unique<EquilibrationPhase>(
+                        request.name,
                         start_time,
                         this->system_parameters_,
                         request.parameters
@@ -67,6 +68,7 @@ namespace control
                     -> std::unique_ptr<SimulationPhase>
                 {
                     return std::make_unique<ObservationPhase>(
+                        request.name,
                         start_time,
                         this->system_parameters_,
                         request.parameters
