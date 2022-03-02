@@ -44,6 +44,7 @@ SCENARIO("Observation Phase decision-making")
 
     // Create the ObservationPhase object
     control::ObservationPhase observation_phase{
+        "Test Observation Phase",
         start_time,
         system_parameters,
         observation_parameters

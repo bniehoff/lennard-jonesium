@@ -27,6 +27,7 @@
 #include <vector>
 #include <variant>
 #include <limits>
+#include <string>
 
 #include <lennardjonesium/tools/system_parameters.hpp>
 #include <lennardjonesium/tools/moving_sample.hpp>
@@ -89,12 +90,18 @@ namespace control
             virtual std::vector<Command>
             evaluate(int time_step, const physics::ThermodynamicMeasurement& measurement) = 0;
 
+            int start_time() {return start_time_;}
+            std::string name() {return name_;}
+
             virtual ~SimulationPhase() = default;
         
         protected:
+            const std::string name_;
             const int start_time_{};
 
-            explicit SimulationPhase(int start_time) : start_time_{start_time} {}
+            SimulationPhase(std::string name, int start_time)
+                : name_{name}, start_time_{start_time}
+            {}
     };
 
     struct EquilibrationParameters
@@ -154,11 +161,12 @@ namespace control
         public:
             // The parameters will use the above defaults if not given
             EquilibrationPhase(
+                std::string name,
                 int start_time,
                 tools::SystemParameters system_parameters,
                 EquilibrationParameters equilibration_parameters = {}
             )
-                : SimulationPhase{start_time},
+                : SimulationPhase{name, start_time},
                   temperature_analyzer_(system_parameters, equilibration_parameters.sample_size),
                   system_parameters_{system_parameters},
                   equilibration_parameters_{equilibration_parameters},
@@ -229,11 +237,12 @@ namespace control
         public:
             // The parameters will use the above defaults if not given
             ObservationPhase(
+                std::string name,
                 int start_time,
                 tools::SystemParameters system_parameters,
                 ObservationParameters observation_parameters = {}
             )
-                : SimulationPhase{start_time},
+                : SimulationPhase{name, start_time},
                   thermodynamic_analyzer_{system_parameters, observation_parameters.sample_size},
                   system_parameters_{system_parameters},
                   observation_parameters_{observation_parameters},
