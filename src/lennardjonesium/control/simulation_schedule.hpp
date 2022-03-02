@@ -45,13 +45,13 @@ namespace control
     struct EquilibrationPhaseRequest
     {
         std::string name;
-        EquilibrationParameters parameters;
+        EquilibrationPhase::Parameters parameters;
     };
 
     struct ObservationPhaseRequest
     {
         std::string name;
-        ObservationParameters parameters;
+        ObservationPhase::Parameters parameters;
     };
 
     using SimulationPhaseRequest = std::variant<

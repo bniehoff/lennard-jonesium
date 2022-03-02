@@ -30,7 +30,15 @@
 #include <lennardjonesium/control/simulation_phase.hpp>
 
 namespace control
-{   
+{
+    EquilibrationPhase::EquilibrationPhase(
+        std::string name,
+        int start_time,
+        tools::SystemParameters system_parameters
+    )
+        : EquilibrationPhase::EquilibrationPhase(name, start_time, system_parameters, {})
+    {}
+
     std::vector<Command>
     EquilibrationPhase::evaluate
         (int time_step, const physics::ThermodynamicMeasurement& measurement)
@@ -71,6 +79,14 @@ namespace control
 
         return commands;
     }
+
+    ObservationPhase::ObservationPhase(
+        std::string name,
+        int start_time,
+        tools::SystemParameters system_parameters
+    )
+        : ObservationPhase::ObservationPhase(name, start_time, system_parameters, {})
+    {}
 
     std::vector<Command>
     ObservationPhase::evaluate
