@@ -23,6 +23,7 @@
 #ifndef LJ_SIMULATION_SCHEDULE_HPP
 #define LJ_SIMULATION_SCHEDULE_HPP
 
+#include <string>
 #include <list>
 #include <queue>
 #include <vector>
@@ -43,12 +44,14 @@ namespace control
      */
     struct EquilibrationPhaseRequest
     {
-        EquilibrationParameters parameters;
+        std::string name;
+        EquilibrationPhase::Parameters parameters;
     };
 
     struct ObservationPhaseRequest
     {
-        ObservationParameters parameters;
+        std::string name;
+        ObservationPhase::Parameters parameters;
     };
 
     using SimulationPhaseRequest = std::variant<

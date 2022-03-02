@@ -34,7 +34,7 @@ SCENARIO("Observation Phase decision-making")
     physics::ThermodynamicMeasurement measurement;
 
     // Create observation parameters
-    control::ObservationParameters observation_parameters{
+    control::ObservationPhase::Parameters observation_parameters{
         .sample_size {2},
         .observation_interval {10},
         .observation_count {10}
@@ -44,6 +44,7 @@ SCENARIO("Observation Phase decision-making")
 
     // Create the ObservationPhase object
     control::ObservationPhase observation_phase{
+        "Test Observation Phase",
         start_time,
         system_parameters,
         observation_parameters

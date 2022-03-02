@@ -27,6 +27,7 @@
 #include <vector>
 #include <variant>
 #include <limits>
+#include <string>
 
 #include <lennardjonesium/tools/system_parameters.hpp>
 #include <lennardjonesium/tools/moving_sample.hpp>
@@ -89,25 +90,31 @@ namespace control
             virtual std::vector<Command>
             evaluate(int time_step, const physics::ThermodynamicMeasurement& measurement) = 0;
 
+            int start_time() {return start_time_;}
+            std::string name() {return name_;}
+
             virtual ~SimulationPhase() = default;
         
         protected:
+            const std::string name_;
             const int start_time_{};
 
-            explicit SimulationPhase(int start_time) : start_time_{start_time} {}
+            SimulationPhase(std::string name, int start_time)
+                : name_{name}, start_time_{start_time}
+            {}
     };
 
-    struct EquilibrationParameters
+    class EquilibrationPhase : public SimulationPhase
     {
         /**
-         * This really ought to be a nested struct inside EquilibrationPhase below, however there
-         * is a bug in GCC that prevents default-initializing it properly:
-         * 
-         *      https://gcc.gnu.org/bugzilla/show_bug.cgi?id=88165
-         * 
-         * An alternative is to provide a default constructor, but then it will not be recognized
-         * as an aggregate type, and thus wouldn't allow designated initialization (which is a very
-         * convenient way to define these parameters).
+         * EquilibrationPhase will attempt to drive the system toward equilibrium at the desired
+         * temperature.  Since temperature is a dependent variable in the microcanonical ensemble,
+         * we cannot actually set a temperature directly; it must be measured instead.  The
+         * InitialCondition attempts to build a state which is close to the desired temperature
+         * by using a Maxwell distribution of velocities.  However, this process is not perfect.
+         * So, the EquilibrationPhase monitors the system for some time, taking
+         * temperature readings, and occasionally rescaling the velocities until the desired
+         * temperature is reached and remains sufficiently stable for some amount of time.
          * 
          * EquilibrationPhase has a lot of parameters that govern the equilibration process.
          * Their meaning is as follows:
@@ -131,34 +138,24 @@ namespace control
          *      determine that the system cannot equilibrate and we abort the simulation.
          */
 
-        double tolerance = 0.05;
-        int sample_size = 50;
-        int adjustment_interval = 200;
-        int steady_state_time = 1000;
-        int timeout = 5000;
-    };
-
-    class EquilibrationPhase : public SimulationPhase
-    {
-        /**
-         * EquilibrationPhase will attempt to drive the system toward equilibrium at the desired
-         * temperature.  Since temperature is a dependent variable in the microcanonical ensemble,
-         * we cannot actually set a temperature directly; it must be measured instead.  The
-         * InitialCondition attempts to build a state which is close to the desired temperature
-         * by using a Maxwell distribution of velocities.  However, this process is not perfect.
-         * So, the EquilibrationPhase monitors the system for some time, taking
-         * temperature readings, and occasionally rescaling the velocities until the desired
-         * temperature is reached and remains sufficiently stable for some amount of time.
-         */
-
         public:
-            // The parameters will use the above defaults if not given
+            struct Parameters
+            {
+                double tolerance = 0.05;
+                int sample_size = 50;
+                int adjustment_interval = 200;
+                int steady_state_time = 1000;
+                int timeout = 5000;
+            };
+
+            // Main constructor requlres all arguments
             EquilibrationPhase(
+                std::string name,
                 int start_time,
                 tools::SystemParameters system_parameters,
-                EquilibrationParameters equilibration_parameters = {}
+                Parameters equilibration_parameters
             )
-                : SimulationPhase{start_time},
+                : SimulationPhase{name, start_time},
                   temperature_analyzer_(system_parameters, equilibration_parameters.sample_size),
                   system_parameters_{system_parameters},
                   equilibration_parameters_{equilibration_parameters},
@@ -166,30 +163,33 @@ namespace control
                   last_adjustment_time_{start_time}
             {}
 
+            // If parameters are not given, defaults will be used
+            EquilibrationPhase(
+                std::string name,
+                int start_time,
+                tools::SystemParameters system_parameters
+            );
+
             virtual std::vector<Command>
             evaluate(int time_step, const physics::ThermodynamicMeasurement& measurement) override;
         
         private:
             physics::TemperatureAnalyzer temperature_analyzer_;
             tools::SystemParameters system_parameters_;
-            EquilibrationParameters equilibration_parameters_;
+            Parameters equilibration_parameters_;
             double last_temperature_{std::numeric_limits<double>::signaling_NaN()};
             int last_adjustment_check_time_;
             int last_adjustment_time_;
     };
 
-    struct ObservationParameters
+    class ObservationPhase : public SimulationPhase
     {
         /**
-         * This really ought to be a nested struct inside EquilibrationPhase below, however there
-         * is a bug in GCC that prevents default-initializing it properly:
+         * The ObservationPhase passively observes the SystemState and makes periodic Observations
+         * of physically relevant quantities.  These include, e.g., the temperature, total energy,
+         * pressure, specific heat, and diffusion coefficient.
          * 
-         *      https://gcc.gnu.org/bugzilla/show_bug.cgi?id=88165
-         * 
-         * An alternative is to provide a default constructor, but then it will not be recognized
-         * as an aggregate type, and thus wouldn't allow designated initialization (which is a very
-         * convenient way to define these parameters).
-         * 
+         * ObservationPhase has a number of parameters to control its behavior.
          * The entries have the following meanings:
          * 
          * tolerance:  Since temperature is a dependent variable, even after the Equilibration
@@ -212,33 +212,35 @@ namespace control
          *      the allowed tolerance.)
          */
 
-        double tolerance = 0.10;
-        int sample_size = 50;
-        int observation_interval = 200;
-        int observation_count = 20;
-    };
-
-    class ObservationPhase : public SimulationPhase
-    {
-        /**
-         * The ObservationPhase passively observes the SystemState and makes periodic Observations
-         * of physically relevant quantities.  These include, e.g., the temperature, total energy,
-         * pressure, specific heat, and diffusion coefficient.
-         */
-
         public:
-            // The parameters will use the above defaults if not given
+            struct Parameters
+            {
+                double tolerance = 0.10;
+                int sample_size = 50;
+                int observation_interval = 200;
+                int observation_count = 20;
+            };
+
+            // Main constructor requires all arguments
             ObservationPhase(
+                std::string name,
                 int start_time,
                 tools::SystemParameters system_parameters,
-                ObservationParameters observation_parameters = {}
+                Parameters observation_parameters
             )
-                : SimulationPhase{start_time},
+                : SimulationPhase{name, start_time},
                   thermodynamic_analyzer_{system_parameters, observation_parameters.sample_size},
                   system_parameters_{system_parameters},
                   observation_parameters_{observation_parameters},
                   last_observation_time_{start_time}
             {}
+
+            // If no parameters given, use defaults
+            ObservationPhase(
+                std::string name,
+                int start_time,
+                tools::SystemParameters system_parameters
+            );
 
             virtual std::vector<Command>
             evaluate(int time_step, const physics::ThermodynamicMeasurement& measurement) override;
@@ -246,7 +248,7 @@ namespace control
         private:
             physics::ThermodynamicAnalyzer thermodynamic_analyzer_;
             tools::SystemParameters system_parameters_;
-            ObservationParameters observation_parameters_;
+            Parameters observation_parameters_;
             int last_observation_time_;
             int observation_count_{0};
     };

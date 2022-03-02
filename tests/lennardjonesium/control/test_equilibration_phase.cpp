@@ -34,7 +34,7 @@ SCENARIO("Equilibration Phase decision-making")
     physics::ThermodynamicMeasurement measurement;
 
     // Create the equilibration parameters
-    control::EquilibrationParameters equilibration_parameters{
+    control::EquilibrationPhase::Parameters equilibration_parameters{
         .sample_size {2},
         .adjustment_interval {10},
         .steady_state_time {100},
@@ -45,6 +45,7 @@ SCENARIO("Equilibration Phase decision-making")
 
     // Create the EquilibrationPhase object
     control::EquilibrationPhase equilibration_phase{
+        "Test Equilibration Phase",
         start_time,
         system_parameters,
         equilibration_parameters
