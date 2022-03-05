@@ -41,22 +41,23 @@ SCENARIO("Equilibration Phase decision-making")
         .timeout {500}
     };
 
-    int start_time{0};
+    int start_time{1337};
 
     // Create the EquilibrationPhase object
     control::EquilibrationPhase equilibration_phase{
         "Test Equilibration Phase",
-        start_time,
         system_parameters,
         equilibration_parameters
     };
+
+    equilibration_phase.set_start_time(start_time);
 
     WHEN("I pass a time step that is before the first adjustment interval")
     {
         state | measurement;
 
         auto commands = equilibration_phase.evaluate(
-            equilibration_parameters.adjustment_interval - 3,
+            start_time + equilibration_parameters.adjustment_interval - 3,
             measurement
         );
 
@@ -71,7 +72,7 @@ SCENARIO("Equilibration Phase decision-making")
         state | physics::set_temperature(system_parameters.temperature * 2) | measurement;
 
         auto commands = equilibration_phase.evaluate(
-            equilibration_parameters.adjustment_interval - 1,
+            start_time + equilibration_parameters.adjustment_interval - 1,
             measurement
         );
 
@@ -81,7 +82,7 @@ SCENARIO("Equilibration Phase decision-making")
         }
 
         commands = equilibration_phase.evaluate(
-            equilibration_parameters.adjustment_interval,
+            start_time + equilibration_parameters.adjustment_interval,
             measurement
         );
 
@@ -101,7 +102,7 @@ SCENARIO("Equilibration Phase decision-making")
         state | physics::set_temperature(system_parameters.temperature) | measurement;
 
         auto commands = equilibration_phase.evaluate(
-            equilibration_parameters.adjustment_interval - 1,
+            start_time + equilibration_parameters.adjustment_interval - 1,
             measurement
         );
 
@@ -111,7 +112,7 @@ SCENARIO("Equilibration Phase decision-making")
         }
 
         commands = equilibration_phase.evaluate(
-            equilibration_parameters.adjustment_interval,
+            start_time + equilibration_parameters.adjustment_interval,
             measurement
         );
 
@@ -130,13 +131,13 @@ SCENARIO("Equilibration Phase decision-making")
         // We need to run the "simulation" from the beginning, with fixed temperature
         for (int time_step : std::views::iota(0, equilibration_parameters.steady_state_time))
         {
-            commands = equilibration_phase.evaluate(time_step, measurement);
+            commands = equilibration_phase.evaluate(start_time + time_step, measurement);
             REQUIRE(commands.empty());
         }
 
         // Now execute the final step
         commands = equilibration_phase.evaluate(
-            equilibration_parameters.steady_state_time,
+            start_time + equilibration_parameters.steady_state_time,
             measurement
         );
 
@@ -156,7 +157,7 @@ SCENARIO("Equilibration Phase decision-making")
         // We need to force adjustments to happen over the entire time evolution up until timeout
         for (int time_step : std::views::iota(0, equilibration_parameters.timeout))
         {
-            commands = equilibration_phase.evaluate(time_step, measurement);
+            commands = equilibration_phase.evaluate(start_time + time_step, measurement);
 
             if ((time_step > 0)
                     && (time_step % equilibration_parameters.adjustment_interval == 0))
@@ -172,7 +173,9 @@ SCENARIO("Equilibration Phase decision-making")
 
         // Now execute the final step
 
-        commands = equilibration_phase.evaluate(equilibration_parameters.timeout, measurement);
+        commands = equilibration_phase.evaluate(
+            start_time + equilibration_parameters.timeout, measurement
+        );
 
         THEN("The command at timeout should indicate failure")
         {
