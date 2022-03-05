@@ -33,10 +33,10 @@ namespace control
 {
     EquilibrationPhase::EquilibrationPhase(
         std::string name,
-        int start_time,
-        tools::SystemParameters system_parameters
+        tools::SystemParameters system_parameters,
+        int start_time
     )
-        : EquilibrationPhase::EquilibrationPhase(name, start_time, system_parameters, {})
+        : EquilibrationPhase::EquilibrationPhase(name, system_parameters, {}, start_time)
     {}
 
     std::vector<Command>
@@ -82,10 +82,10 @@ namespace control
 
     ObservationPhase::ObservationPhase(
         std::string name,
-        int start_time,
-        tools::SystemParameters system_parameters
+        tools::SystemParameters system_parameters,
+        int start_time
     )
-        : ObservationPhase::ObservationPhase(name, start_time, system_parameters, {})
+        : ObservationPhase::ObservationPhase(name, system_parameters, {}, start_time)
     {}
 
     std::vector<Command>
