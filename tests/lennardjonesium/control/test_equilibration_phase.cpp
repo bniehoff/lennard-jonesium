@@ -5,6 +5,7 @@
 #include <ranges>
 #include <string>
 #include <variant>
+#include <queue>
 
 #include <catch2/catch.hpp>
 #include <Eigen/Dense>
@@ -124,7 +125,7 @@ SCENARIO("Equilibration Phase decision-making")
 
     WHEN("I measure the correct temperature at the steady state time")
     {
-        std::vector<control::Command> commands;
+        std::queue<control::Command> commands;
 
         state | physics::set_temperature(system_parameters.temperature) | measurement;
 
@@ -150,7 +151,7 @@ SCENARIO("Equilibration Phase decision-making")
 
     WHEN("I measure the wrong temperature at timeout")
     {
-        std::vector<control::Command> commands;
+        std::queue<control::Command> commands;
 
         state | physics::set_temperature(system_parameters.temperature * 2) | measurement;
 
@@ -182,8 +183,9 @@ SCENARIO("Equilibration Phase decision-making")
             // Note that a temperature adjustment command will also be issued, since the
             // temperature is outside the desired range
             REQUIRE(2 == commands.size());
-            REQUIRE(std::holds_alternative<control::AdjustTemperature>(commands[0]));
-            REQUIRE(std::holds_alternative<control::AbortSimulation>(commands[1]));
+            REQUIRE(std::holds_alternative<control::AdjustTemperature>(commands.front()));
+            commands.pop();
+            REQUIRE(std::holds_alternative<control::AbortSimulation>(commands.front()));
         }
     }
 }
