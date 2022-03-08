@@ -24,7 +24,7 @@
 #define LJ_SIMULATION_PHASE_HPP
 
 #include <memory>
-#include <vector>
+#include <queue>
 #include <variant>
 #include <limits>
 #include <string>
@@ -87,21 +87,26 @@ namespace control
          */
         public:
             // Evaluate the thermodynamic properties of the state and issue commands
-            virtual std::vector<Command>
+            virtual std::queue<Command>
             evaluate(int time_step, const physics::ThermodynamicMeasurement& measurement) = 0;
 
-            int start_time() {return start_time_;}
             std::string name() {return name_;}
+            int start_time() {return start_time_;}
+            
+            // Derived classes may have further work to do
+            virtual void set_start_time(int start_time) {start_time_ = start_time;}
 
             virtual ~SimulationPhase() = default;
         
         protected:
             const std::string name_;
-            const int start_time_{};
+            int start_time_{};
 
-            SimulationPhase(std::string name, int start_time)
-                : name_{name}, start_time_{start_time}
-            {}
+            SimulationPhase(const std::string& name) : name_{name} {}
+
+            SimulationPhase(const std::string& name, int start_time)
+                : SimulationPhase{name}
+            {set_start_time(start_time);}
     };
 
     class EquilibrationPhase : public SimulationPhase
@@ -148,29 +153,35 @@ namespace control
                 int timeout = 5000;
             };
 
+            // Set all clocks to match start time
+            virtual void set_start_time(int start_time) override
+            {
+                start_time_ = start_time;
+                last_adjustment_check_time_ = start_time;
+                last_adjustment_time_ = start_time;
+            }
+
             // Main constructor requlres all arguments
             EquilibrationPhase(
                 std::string name,
-                int start_time,
                 tools::SystemParameters system_parameters,
-                Parameters equilibration_parameters
+                Parameters equilibration_parameters,
+                int start_time = 0
             )
-                : SimulationPhase{name, start_time},
+                : SimulationPhase{name},
                   temperature_analyzer_(system_parameters, equilibration_parameters.sample_size),
                   system_parameters_{system_parameters},
-                  equilibration_parameters_{equilibration_parameters},
-                  last_adjustment_check_time_{start_time},
-                  last_adjustment_time_{start_time}
-            {}
+                  equilibration_parameters_{equilibration_parameters}
+            {set_start_time(start_time);}
 
-            // If parameters are not given, defaults will be used
+            // If equilibration parameters are not given, defaults will be used
             EquilibrationPhase(
                 std::string name,
-                int start_time,
-                tools::SystemParameters system_parameters
+                tools::SystemParameters system_parameters,
+                int start_time = 0
             );
 
-            virtual std::vector<Command>
+            virtual std::queue<Command>
             evaluate(int time_step, const physics::ThermodynamicMeasurement& measurement) override;
         
         private:
@@ -221,28 +232,34 @@ namespace control
                 int observation_count = 20;
             };
 
+            // Set all clocks to match start time
+            virtual void set_start_time(int start_time) override
+            {
+                start_time_ = start_time;
+                last_observation_time_ = start_time;
+            }
+
             // Main constructor requires all arguments
             ObservationPhase(
                 std::string name,
-                int start_time,
                 tools::SystemParameters system_parameters,
-                Parameters observation_parameters
+                Parameters observation_parameters,
+                int start_time = 0
             )
-                : SimulationPhase{name, start_time},
+                : SimulationPhase{name},
                   thermodynamic_analyzer_{system_parameters, observation_parameters.sample_size},
                   system_parameters_{system_parameters},
-                  observation_parameters_{observation_parameters},
-                  last_observation_time_{start_time}
-            {}
+                  observation_parameters_{observation_parameters}
+            {set_start_time(start_time);}
 
             // If no parameters given, use defaults
             ObservationPhase(
                 std::string name,
-                int start_time,
-                tools::SystemParameters system_parameters
+                tools::SystemParameters system_parameters,
+                int start_time = 0
             );
 
-            virtual std::vector<Command>
+            virtual std::queue<Command>
             evaluate(int time_step, const physics::ThermodynamicMeasurement& measurement) override;
         
         private:

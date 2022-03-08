@@ -22,6 +22,7 @@
 
 #include <memory>
 #include <variant>
+#include <queue>
 
 #include <lennardjonesium/tools/math.hpp>
 #include <lennardjonesium/tools/moving_sample.hpp>
@@ -33,18 +34,18 @@ namespace control
 {
     EquilibrationPhase::EquilibrationPhase(
         std::string name,
-        int start_time,
-        tools::SystemParameters system_parameters
+        tools::SystemParameters system_parameters,
+        int start_time
     )
-        : EquilibrationPhase::EquilibrationPhase(name, start_time, system_parameters, {})
+        : EquilibrationPhase::EquilibrationPhase(name, system_parameters, {}, start_time)
     {}
 
-    std::vector<Command>
+    std::queue<Command>
     EquilibrationPhase::evaluate
         (int time_step, const physics::ThermodynamicMeasurement& measurement)
     {
         // Prepare the sequence of commands to be returned
-        std::vector<Command> commands;
+        std::queue<Command> commands;
 
         // Collect temperature sample every time step
         temperature_analyzer_.collect(measurement);
@@ -60,7 +61,7 @@ namespace control
                 >= equilibration_parameters_.tolerance) [[unlikely]]
             {
                 last_adjustment_time_ = time_step;
-                commands.push_back(AdjustTemperature{system_parameters_.temperature});
+                commands.push(AdjustTemperature{system_parameters_.temperature});
             }
         }
 
@@ -68,13 +69,13 @@ namespace control
         if (time_step - last_adjustment_time_ >= equilibration_parameters_.steady_state_time)
             [[unlikely]]
         {
-            commands.push_back(PhaseComplete{});
+            commands.push(PhaseComplete{});
         }
 
         // Check whether we have reached timeout
         if (time_step - start_time_ >= equilibration_parameters_.timeout) [[unlikely]]
         {
-            commands.push_back(AbortSimulation{});
+            commands.push(AbortSimulation{});
         }
 
         return commands;
@@ -82,18 +83,18 @@ namespace control
 
     ObservationPhase::ObservationPhase(
         std::string name,
-        int start_time,
-        tools::SystemParameters system_parameters
+        tools::SystemParameters system_parameters,
+        int start_time
     )
-        : ObservationPhase::ObservationPhase(name, start_time, system_parameters, {})
+        : ObservationPhase::ObservationPhase(name, system_parameters, {}, start_time)
     {}
 
-    std::vector<Command>
+    std::queue<Command>
     ObservationPhase::evaluate
         (int time_step, const physics::ThermodynamicMeasurement& measurement)
     {
         // Prepare the sequence of commands to be returned
-        std::vector<Command> commands;
+        std::queue<Command> commands;
 
         // Collect relevant data every time step
         thermodynamic_analyzer_.collect(measurement);
@@ -110,19 +111,19 @@ namespace control
             if (tools::relative_error(observation.temperature, system_parameters_.temperature)
                 >= observation_parameters_.tolerance) [[unlikely]]
             {
-                commands.push_back(AbortSimulation{});
+                commands.push(AbortSimulation{});
             }
             else
             {
                 ++observation_count_;
-                commands.push_back(RecordObservation{observation});
+                commands.push(RecordObservation{observation});
             }
         }
 
         // Check whether we have collected enough Observations
         if (observation_count_ >= observation_parameters_.observation_count) [[unlikely]]
         {
-            commands.push_back(PhaseComplete{});
+            commands.push(PhaseComplete{});
         }
         
         return commands;

@@ -5,6 +5,7 @@
 #include <ranges>
 #include <string>
 #include <variant>
+#include <queue>
 
 #include <catch2/catch.hpp>
 #include <Eigen/Dense>
@@ -40,22 +41,23 @@ SCENARIO("Observation Phase decision-making")
         .observation_count {10}
     };
 
-    int start_time{0};
+    int start_time{37};
 
     // Create the ObservationPhase object
     control::ObservationPhase observation_phase{
         "Test Observation Phase",
-        start_time,
         system_parameters,
         observation_parameters
     };
+
+    observation_phase.set_start_time(start_time);
 
     WHEN("I pass a time step that is before the first observation interval")
     {
         state | measurement;
 
         auto commands = observation_phase.evaluate(
-            observation_parameters.observation_interval - 3,
+            start_time + observation_parameters.observation_interval - 3,
             measurement
         );
 
@@ -70,7 +72,7 @@ SCENARIO("Observation Phase decision-making")
         state | physics::set_temperature(system_parameters.temperature) | measurement;
 
         auto commands = observation_phase.evaluate(
-            observation_parameters.observation_interval - 1,
+            start_time + observation_parameters.observation_interval - 1,
             measurement
         );
 
@@ -80,7 +82,7 @@ SCENARIO("Observation Phase decision-making")
         }
 
         commands = observation_phase.evaluate(
-            observation_parameters.observation_interval,
+            start_time + observation_parameters.observation_interval,
             measurement
         );
 
@@ -93,7 +95,7 @@ SCENARIO("Observation Phase decision-making")
 
     WHEN("I make the desired number of observations")
     {
-        std::vector<control::Command> commands;
+        std::queue<control::Command> commands;
 
         state | physics::set_temperature(system_parameters.temperature) | measurement;
 
@@ -104,7 +106,7 @@ SCENARIO("Observation Phase decision-making")
 
         for (int time_step : std::views::iota(0, total_time))
         {
-            commands = observation_phase.evaluate(time_step, measurement);
+            commands = observation_phase.evaluate(start_time + time_step, measurement);
             
             if ((time_step > 0)
                     && (time_step % observation_parameters.observation_interval == 0))
@@ -119,13 +121,14 @@ SCENARIO("Observation Phase decision-making")
         }
 
         // Now execute the final step
-        commands = observation_phase.evaluate(total_time, measurement);
+        commands = observation_phase.evaluate(start_time + total_time, measurement);
 
         THEN("The final list of commands should indicate success")
         {
             REQUIRE(2 == commands.size());
-            REQUIRE(std::holds_alternative<control::RecordObservation>(commands[0]));
-            REQUIRE(std::holds_alternative<control::PhaseComplete>(commands[1]));
+            REQUIRE(std::holds_alternative<control::RecordObservation>(commands.front()));
+            commands.pop();
+            REQUIRE(std::holds_alternative<control::PhaseComplete>(commands.front()));
         }
     }
 
@@ -134,7 +137,7 @@ SCENARIO("Observation Phase decision-making")
         state | physics::set_temperature(system_parameters.temperature * 2) | measurement;
 
         auto commands = observation_phase.evaluate(
-            observation_parameters.observation_interval - 1,
+            start_time + observation_parameters.observation_interval - 1,
             measurement
         );
 
@@ -144,7 +147,7 @@ SCENARIO("Observation Phase decision-making")
         }
 
         commands = observation_phase.evaluate(
-            observation_parameters.observation_interval,
+            start_time + observation_parameters.observation_interval,
             measurement
         );
 

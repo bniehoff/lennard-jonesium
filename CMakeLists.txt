@@ -113,8 +113,8 @@ add_library(engine STATIC
 add_library(control STATIC
     src/lennardjonesium/control/simulation_phase.hpp
     src/lennardjonesium/control/simulation_phase.cpp
-    src/lennardjonesium/control/simulation_schedule.hpp
-    src/lennardjonesium/control/simulation_schedule.cpp
+    src/lennardjonesium/control/simulation.hpp
+    src/lennardjonesium/control/simulation.cpp
     # src/lennardjonesium/control/equilibrator.hpp
     # src/lennardjonesium/control/equilibrator.cpp
 )
