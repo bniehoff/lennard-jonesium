@@ -5,6 +5,7 @@
 #include <ranges>
 #include <string>
 #include <variant>
+#include <queue>
 
 #include <catch2/catch.hpp>
 #include <Eigen/Dense>
@@ -94,7 +95,7 @@ SCENARIO("Observation Phase decision-making")
 
     WHEN("I make the desired number of observations")
     {
-        std::vector<control::Command> commands;
+        std::queue<control::Command> commands;
 
         state | physics::set_temperature(system_parameters.temperature) | measurement;
 
@@ -125,8 +126,9 @@ SCENARIO("Observation Phase decision-making")
         THEN("The final list of commands should indicate success")
         {
             REQUIRE(2 == commands.size());
-            REQUIRE(std::holds_alternative<control::RecordObservation>(commands[0]));
-            REQUIRE(std::holds_alternative<control::PhaseComplete>(commands[1]));
+            REQUIRE(std::holds_alternative<control::RecordObservation>(commands.front()));
+            commands.pop();
+            REQUIRE(std::holds_alternative<control::PhaseComplete>(commands.front()));
         }
     }
 

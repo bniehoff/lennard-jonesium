@@ -24,7 +24,7 @@
 #define LJ_SIMULATION_PHASE_HPP
 
 #include <memory>
-#include <vector>
+#include <queue>
 #include <variant>
 #include <limits>
 #include <string>
@@ -87,7 +87,7 @@ namespace control
          */
         public:
             // Evaluate the thermodynamic properties of the state and issue commands
-            virtual std::vector<Command>
+            virtual std::queue<Command>
             evaluate(int time_step, const physics::ThermodynamicMeasurement& measurement) = 0;
 
             std::string name() {return name_;}
@@ -181,7 +181,7 @@ namespace control
                 int start_time = 0
             );
 
-            virtual std::vector<Command>
+            virtual std::queue<Command>
             evaluate(int time_step, const physics::ThermodynamicMeasurement& measurement) override;
         
         private:
@@ -259,7 +259,7 @@ namespace control
                 int start_time = 0
             );
 
-            virtual std::vector<Command>
+            virtual std::queue<Command>
             evaluate(int time_step, const physics::ThermodynamicMeasurement& measurement) override;
         
         private:
