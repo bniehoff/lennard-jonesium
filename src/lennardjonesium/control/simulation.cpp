@@ -24,8 +24,8 @@
 #include <queue>
 
 #include <lennardjonesium/physics/system_state.hpp>
-#include <src/lennardjonesium/physics/transformations.hpp>
-#include <src/lennardjonesium/physics/measurements.hpp>
+#include <lennardjonesium/physics/transformations.hpp>
+#include <lennardjonesium/physics/measurements.hpp>
 #include <lennardjonesium/engine/integrator.hpp>
 #include <lennardjonesium/control/simulation_phase.hpp>
 #include <lennardjonesium/control/simulation.hpp>
