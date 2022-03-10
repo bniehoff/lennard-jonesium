@@ -5,7 +5,6 @@
 #include <ranges>
 #include <string>
 #include <variant>
-#include <queue>
 
 #include <catch2/catch.hpp>
 #include <Eigen/Dense>
@@ -14,6 +13,7 @@
 #include <src/lennardjonesium/physics/system_state.hpp>
 #include <src/lennardjonesium/physics/transformations.hpp>
 #include <src/lennardjonesium/physics/measurements.hpp>
+#include <src/lennardjonesium/control/command_queue.hpp>
 #include <src/lennardjonesium/control/simulation_phase.hpp>
 
 SCENARIO("Equilibration Phase decision-making")
@@ -53,18 +53,23 @@ SCENARIO("Equilibration Phase decision-making")
 
     equilibration_phase.set_start_time(start_time);
 
+    // Create empty command queue
+    control::CommandQueue command_queue;
+
     WHEN("I pass a time step that is before the first adjustment interval")
     {
         state | measurement;
 
-        auto commands = equilibration_phase.evaluate(
+        equilibration_phase.evaluate(
+            command_queue,
             start_time + equilibration_parameters.adjustment_interval - 3,
             measurement
         );
 
-        THEN("I get no response")
+        THEN("I get the default time advance command")
         {
-            REQUIRE(commands.empty());
+            REQUIRE(1 == command_queue.size());
+            REQUIRE(std::holds_alternative<control::AdvanceTime>(command_queue.front()));
         }
     }
 
@@ -72,29 +77,35 @@ SCENARIO("Equilibration Phase decision-making")
     {
         state | physics::set_temperature(system_parameters.temperature * 2) | measurement;
 
-        auto commands = equilibration_phase.evaluate(
+        equilibration_phase.evaluate(
+            command_queue,
             start_time + equilibration_parameters.adjustment_interval - 1,
             measurement
         );
 
-        THEN("The command at adjustment_interval - 1 should be empty")
+        THEN("The command at adjustment_interval - 1 should be AdvanceTime")
         {
-            REQUIRE(commands.empty());
+            REQUIRE(1 == command_queue.size());
+            REQUIRE(std::holds_alternative<control::AdvanceTime>(command_queue.front()));
         }
 
-        commands = equilibration_phase.evaluate(
+        command_queue.pop();
+        equilibration_phase.evaluate(
+            command_queue,
             start_time + equilibration_parameters.adjustment_interval,
             measurement
         );
 
         THEN("The command at adjustment_interval should be to set the temperature")
         {
-            REQUIRE(1 == commands.size());
-            REQUIRE(std::holds_alternative<control::AdjustTemperature>(commands.front()));
+            REQUIRE(2 == command_queue.size());
+            REQUIRE(std::holds_alternative<control::AdjustTemperature>(command_queue.front()));
             REQUIRE(
                 Approx(system_parameters.temperature)
-                    == std::get<control::AdjustTemperature>(commands.front()).temperature
+                    == std::get<control::AdjustTemperature>(command_queue.front()).temperature
             );
+            command_queue.pop();
+            REQUIRE(std::holds_alternative<control::AdvanceTime>(command_queue.front()));
         }
     }
 
@@ -102,90 +113,101 @@ SCENARIO("Equilibration Phase decision-making")
     {
         state | physics::set_temperature(system_parameters.temperature) | measurement;
 
-        auto commands = equilibration_phase.evaluate(
+        equilibration_phase.evaluate(
+            command_queue,
             start_time + equilibration_parameters.adjustment_interval - 1,
             measurement
         );
 
-        THEN("The command at adjustment_interval - 1 should be empty")
+        THEN("The command at adjustment_interval - 1 should be AdvanceTime")
         {
-            REQUIRE(commands.empty());
+            REQUIRE(1 == command_queue.size());
+            REQUIRE(std::holds_alternative<control::AdvanceTime>(command_queue.front()));
         }
 
-        commands = equilibration_phase.evaluate(
+        command_queue.pop();
+        equilibration_phase.evaluate(
+            command_queue,
             start_time + equilibration_parameters.adjustment_interval,
             measurement
         );
 
-        THEN("The command at adjustment_interval should also be empty")
+        THEN("The command at adjustment_interval should also be AdvanceTime")
         {
-            REQUIRE(commands.empty());
+            REQUIRE(1 == command_queue.size());
+            REQUIRE(std::holds_alternative<control::AdvanceTime>(command_queue.front()));
         }
     }
 
     WHEN("I measure the correct temperature at the steady state time")
     {
-        std::queue<control::Command> commands;
-
         state | physics::set_temperature(system_parameters.temperature) | measurement;
 
         // We need to run the "simulation" from the beginning, with fixed temperature
         for (int time_step : std::views::iota(0, equilibration_parameters.steady_state_time))
         {
-            commands = equilibration_phase.evaluate(start_time + time_step, measurement);
-            REQUIRE(commands.empty());
+            equilibration_phase.evaluate(command_queue, start_time + time_step, measurement);
+            
+            REQUIRE(1 == command_queue.size());
+            REQUIRE(std::holds_alternative<control::AdvanceTime>(command_queue.front()));
+            
+            command_queue.pop();
         }
 
         // Now execute the final step
-        commands = equilibration_phase.evaluate(
+        equilibration_phase.evaluate(
+            command_queue,
             start_time + equilibration_parameters.steady_state_time,
             measurement
         );
 
         THEN("The command at steady_state_time should indicate success")
         {
-            REQUIRE(1 == commands.size());
-            REQUIRE(std::holds_alternative<control::PhaseComplete>(commands.front()));
+            REQUIRE(1 == command_queue.size());
+            REQUIRE(std::holds_alternative<control::PhaseComplete>(command_queue.front()));
         }
     }
 
     WHEN("I measure the wrong temperature at timeout")
     {
-        std::queue<control::Command> commands;
-
         state | physics::set_temperature(system_parameters.temperature * 2) | measurement;
 
         // We need to force adjustments to happen over the entire time evolution up until timeout
         for (int time_step : std::views::iota(0, equilibration_parameters.timeout))
         {
-            commands = equilibration_phase.evaluate(start_time + time_step, measurement);
+            equilibration_phase.evaluate(command_queue, start_time + time_step, measurement);
 
             if ((time_step > 0)
                     && (time_step % equilibration_parameters.adjustment_interval == 0))
             {
-                REQUIRE(1 == commands.size());
-                REQUIRE(std::holds_alternative<control::AdjustTemperature>(commands.front()));
+                REQUIRE(2 == command_queue.size());
+                REQUIRE(std::holds_alternative<control::AdjustTemperature>(command_queue.front()));
+                command_queue.pop();
+                REQUIRE(std::holds_alternative<control::AdvanceTime>(command_queue.front()));
             }
             else
             {
-                REQUIRE(commands.empty());
+                REQUIRE(1 == command_queue.size());
+                REQUIRE(std::holds_alternative<control::AdvanceTime>(command_queue.front()));
             }
+
+            command_queue.pop();
         }
 
         // Now execute the final step
 
-        commands = equilibration_phase.evaluate(
-            start_time + equilibration_parameters.timeout, measurement
+        equilibration_phase.evaluate(
+            command_queue, start_time + equilibration_parameters.timeout, measurement
         );
 
         THEN("The command at timeout should indicate failure")
         {
             // Note that a temperature adjustment command will also be issued, since the
             // temperature is outside the desired range
-            REQUIRE(2 == commands.size());
-            REQUIRE(std::holds_alternative<control::AdjustTemperature>(commands.front()));
-            commands.pop();
-            REQUIRE(std::holds_alternative<control::AbortSimulation>(commands.front()));
+            REQUIRE(2 == command_queue.size());
+            REQUIRE(std::holds_alternative<control::AdjustTemperature>(command_queue.front()));
+            command_queue.pop();
+            REQUIRE(std::holds_alternative<control::AbortSimulation>(command_queue.front()));
         }
     }
 }

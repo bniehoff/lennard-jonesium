@@ -27,6 +27,7 @@
 #include <lennardjonesium/tools/math.hpp>
 #include <lennardjonesium/tools/moving_sample.hpp>
 #include <lennardjonesium/physics/measurements.hpp>
+#include <lennardjonesium/physics/observation.hpp>
 
 #include <lennardjonesium/control/simulation_phase.hpp>
 
@@ -40,13 +41,12 @@ namespace control
         : EquilibrationPhase::EquilibrationPhase(name, system_parameters, {}, start_time)
     {}
 
-    std::queue<Command>
-    EquilibrationPhase::evaluate
-        (int time_step, const physics::ThermodynamicMeasurement& measurement)
+    void EquilibrationPhase::evaluate(
+        CommandQueue& command_queue,    // Output parameter
+        int time_step,
+        const physics::ThermodynamicMeasurement& measurement
+    )
     {
-        // Prepare the sequence of commands to be returned
-        std::queue<Command> commands;
-
         // Collect temperature sample every time step
         temperature_analyzer_.collect(measurement);
 
@@ -61,24 +61,27 @@ namespace control
                 >= equilibration_parameters_.tolerance) [[unlikely]]
             {
                 last_adjustment_time_ = time_step;
-                commands.push(AdjustTemperature{system_parameters_.temperature});
+                command_queue.push(AdjustTemperature{system_parameters_.temperature});
             }
         }
 
-        // Check whether we are in steady state
-        if (time_step - last_adjustment_time_ >= equilibration_parameters_.steady_state_time)
-            [[unlikely]]
+        // Check whether we are in steady state and return early
+        if (time_step - last_adjustment_time_
+            >= equilibration_parameters_.steady_state_time) [[unlikely]]
         {
-            commands.push(PhaseComplete{});
+            command_queue.push(PhaseComplete{});
+            return;
         }
 
-        // Check whether we have reached timeout
+        // Check whether we have reached timeout and return early
         if (time_step - start_time_ >= equilibration_parameters_.timeout) [[unlikely]]
         {
-            commands.push(AbortSimulation{});
+            command_queue.push(AbortSimulation{});
+            return;
         }
 
-        return commands;
+        // If we reach here, add the default command to advance to next time step
+        command_queue.push(AdvanceTime{});
     }
 
     ObservationPhase::ObservationPhase(
@@ -89,19 +92,18 @@ namespace control
         : ObservationPhase::ObservationPhase(name, system_parameters, {}, start_time)
     {}
 
-    std::queue<Command>
-    ObservationPhase::evaluate
-        (int time_step, const physics::ThermodynamicMeasurement& measurement)
+    void ObservationPhase::evaluate(
+        CommandQueue& command_queue,    // Output parameter
+        int time_step,
+        const physics::ThermodynamicMeasurement& measurement
+    )
     {
-        // Prepare the sequence of commands to be returned
-        std::queue<Command> commands;
-
         // Collect relevant data every time step
         thermodynamic_analyzer_.collect(measurement);
 
         // Check whether we should compute an Observation
-        if (time_step - last_observation_time_ >= observation_parameters_.observation_interval)
-            [[unlikely]]
+        if (time_step - last_observation_time_
+            >= observation_parameters_.observation_interval) [[unlikely]]
         {
             last_observation_time_ = time_step;
 
@@ -111,22 +113,26 @@ namespace control
             if (tools::relative_error(observation.temperature, system_parameters_.temperature)
                 >= observation_parameters_.tolerance) [[unlikely]]
             {
-                commands.push(AbortSimulation{});
+                // Issue abort command and return early
+                command_queue.push(AbortSimulation{});
+                return;
             }
             else
             {
                 ++observation_count_;
-                commands.push(RecordObservation{observation});
+                command_queue.push(RecordObservation{observation});
             }
         }
 
-        // Check whether we have collected enough Observations
+        // Check whether we have collected enough Observations and return early
         if (observation_count_ >= observation_parameters_.observation_count) [[unlikely]]
         {
-            commands.push(PhaseComplete{});
+            command_queue.push(PhaseComplete{});
+            return;
         }
-        
-        return commands;
+
+        // If we reach here, add the default command to advance to next time step
+        command_queue.push(AdvanceTime{});
     }
 } // namespace control
 
