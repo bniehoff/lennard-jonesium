@@ -24,8 +24,6 @@
 #define LJ_SIMULATION_PHASE_HPP
 
 #include <memory>
-#include <queue>
-#include <variant>
 #include <limits>
 #include <string>
 
@@ -33,45 +31,10 @@
 #include <lennardjonesium/tools/moving_sample.hpp>
 #include <lennardjonesium/physics/measurements.hpp>
 #include <lennardjonesium/physics/analyzers.hpp>
+#include <lennardjonesium/control/command_queue.hpp>
 
 namespace control
 {
-    /**
-     * We use the Command pattern to implement communication between the SimulationPhase and the
-     * Simulation.  A Command is a std::variant among the following types.  When the Simulation
-     * receives a Command, it will execute the appropriate action.
-     * 
-     * We use std::variant and delegate the interpretation of these commands to the Simulation, so
-     * that SimulationPhase does not acquire a dependency on Simulation in order to effectively
-     * control it.
-     */
-
-    // Record an observation result computed from statistical data
-    struct RecordObservation
-    {
-        physics::Observation observation;
-    };
-
-    // Adjust the temperature of the system
-    struct AdjustTemperature
-    {
-        double temperature;
-    };
-
-    // On success, end this phase and move on to next
-    struct PhaseComplete {};
-
-    // On failure, end simulation
-    struct AbortSimulation {};
-
-    // The Command variant itself
-    using Command = std::variant<
-        RecordObservation,
-        AdjustTemperature,
-        PhaseComplete,
-        AbortSimulation
-    >;
-
     class SimulationPhase
     {
         /**
@@ -87,8 +50,11 @@ namespace control
          */
         public:
             // Evaluate the thermodynamic properties of the state and issue commands
-            virtual std::queue<Command>
-            evaluate(int time_step, const physics::ThermodynamicMeasurement& measurement) = 0;
+            virtual void evaluate(
+                CommandQueue& command_queue,    // Output parameter
+                int time_step,
+                const physics::ThermodynamicMeasurement& measurement
+            ) = 0;
 
             std::string name() {return name_;}
             int start_time() {return start_time_;}
@@ -181,8 +147,12 @@ namespace control
                 int start_time = 0
             );
 
-            virtual std::queue<Command>
-            evaluate(int time_step, const physics::ThermodynamicMeasurement& measurement) override;
+            // Evaluate the thermodynamic properties of the state and issue commands
+            virtual void evaluate(
+                CommandQueue& command_queue,    // Output parameter
+                int time_step,
+                const physics::ThermodynamicMeasurement& measurement
+            ) override;
         
         private:
             physics::TemperatureAnalyzer temperature_analyzer_;
@@ -259,8 +229,12 @@ namespace control
                 int start_time = 0
             );
 
-            virtual std::queue<Command>
-            evaluate(int time_step, const physics::ThermodynamicMeasurement& measurement) override;
+            // Evaluate the thermodynamic properties of the state and issue commands
+            virtual void evaluate(
+                CommandQueue& command_queue,    // Output parameter
+                int time_step,
+                const physics::ThermodynamicMeasurement& measurement
+            ) override;
         
         private:
             physics::ThermodynamicAnalyzer thermodynamic_analyzer_;

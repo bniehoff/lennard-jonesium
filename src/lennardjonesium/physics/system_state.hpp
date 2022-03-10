@@ -146,8 +146,12 @@ namespace physics
      * Operators can act on SystemStates via the pipe syntax
      * 
      *      state | op1 | op2 | ...;
+     * 
+     * Note: Since the Operator argument is non-const and we have some parametrized Operators such
+     * as integrator(time_steps), we need the rvalue reference overload.
      */
-    SystemState& operator| (SystemState& s, const Operator auto& op) {return op(s);}
+    SystemState& operator| (SystemState& s, Operator auto& op) {return op(s);}
+    SystemState& operator| (SystemState& s, Operator auto&& op) {return op(s);}
 
     /**
      * Similarly for Measurements (note that the Measurement itself is not const, as it may have
@@ -169,7 +173,7 @@ namespace physics
      * 
      *      combined_op = op1 | op2 | op3 | ...;
      */
-    Operator auto operator| (const Operator auto& op1, const Operator auto& op2)
+    Operator auto operator| (Operator auto& op1, Operator auto& op2)
     {
         using S = SystemState;
         return [op1=std::move(op1), op2=std::move(op2)](S& s) -> S& {return op2(op1(s));};
