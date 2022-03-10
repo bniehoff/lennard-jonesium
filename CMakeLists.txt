@@ -93,6 +93,7 @@ add_library(physics STATIC
     src/lennardjonesium/physics/measurements.hpp
     src/lennardjonesium/physics/transformations.hpp
     src/lennardjonesium/physics/transformations.cpp
+    src/lennardjonesium/physics/observation.hpp
     src/lennardjonesium/physics/analyzers.hpp
     src/lennardjonesium/physics/analyzers.cpp
 )
@@ -111,6 +112,7 @@ add_library(engine STATIC
 )
 
 add_library(control STATIC
+    src/lennardjonesium/control/command_queue.hpp
     src/lennardjonesium/control/simulation_phase.hpp
     src/lennardjonesium/control/simulation_phase.cpp
     src/lennardjonesium/control/simulation.hpp

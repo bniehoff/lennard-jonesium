@@ -21,12 +21,12 @@
  */
 
 #include <variant>
-#include <queue>
 
 #include <lennardjonesium/physics/system_state.hpp>
 #include <lennardjonesium/physics/transformations.hpp>
 #include <lennardjonesium/physics/measurements.hpp>
 #include <lennardjonesium/engine/integrator.hpp>
+#include <lennardjonesium/control/command_queue.hpp>
 #include <lennardjonesium/control/simulation_phase.hpp>
 #include <lennardjonesium/control/simulation.hpp>
 
@@ -51,73 +51,61 @@ namespace control
         // Initialize the first SimulationPhase
         simulation_phases_.front()->set_start_time(time_step);
 
-        // Prepare a queue of Commands to be received from the SimulationPhase
-        std::queue<Command> commands;
+        // Log phase start event
 
-        // Signal to tell us when to exit the loop
-        bool running = true;
+        // Prepare the CommandQueue which will control execution
+        CommandQueue command_queue;
+        command_queue.push(AdvanceTime{});
 
         // Create the visitor object once
         auto command_interpreter = Overloaded
         {
+            [&](const AdvanceTime& command)
+            {
+                state | this->integrator_(command.time_steps) | measurement;
+                time_step += command.time_steps;
+                this->simulation_phases_.front()->evaluate(command_queue, time_step, measurement);
+            },
+
             [&](const RecordObservation& command [[maybe_unused]])
             {
-                // Need to use the _previous_ time step here, since time has already incremented
+                // Send observation to file
+                // Log observation event
             },
 
             [&](const AdjustTemperature& command)
             {
                 state | physics::set_temperature(command.temperature);
+
+                // Log temperature adjustment event
             },
 
             [&](const PhaseComplete& command [[maybe_unused]])
             {
                 this->simulation_phases_.pop();
 
-                if (this->simulation_phases_.empty())
+                // Log phase success event
+
+                // Initialize the new phase with the time step
+                if (!this->simulation_phases_.empty())
                 {
-                    // End the simulation if there are no more phases
-                    running = false;
-                }
-                else
-                {
-                    // Initialize the new phase with the time step and start a new command queue
                     this->simulation_phases_.front()->set_start_time(time_step);
-                    commands = {};
+
+                    // Log phase start event
                 }
             },
 
             [&](const AbortSimulation& command [[maybe_unused]])
             {
-                running = false;
+                // Log abort event
             }
         };
         
         // Main simulation loop
-        while (running)
+        while (!command_queue.empty())
         {
-            /**
-             * We use a two-state loop structure that either advances the simulation by one time
-             * step OR processes the commands from the SimulationPhase.  This allows us to process
-             * a queue of multiple commands, while having only one level of loop nesting.
-             * 
-             * This makes it much easier to break out of the loop when the simulation ends.  It also
-             * helps make sure that we fully process one command at a time (and, for example, not
-             * process any additional commands after an AbortSimulation command, even if there may
-             * be some in the queue).
-             */
-
-            if (commands.empty())
-            {
-                state | integrator_ | measurement;
-                commands = simulation_phases_.front()->evaluate(time_step, measurement);
-                ++time_step;
-            }
-            else
-            {
-                std::visit(command_interpreter, commands.front());
-                commands.pop();
-            }
+            std::visit(command_interpreter, command_queue.front());
+            command_queue.pop();
         }
 
         return state;

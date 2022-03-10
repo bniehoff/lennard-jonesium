@@ -28,6 +28,7 @@
 #include <lennardjonesium/tools/system_parameters.hpp>
 #include <lennardjonesium/tools/moving_sample.hpp>
 #include <lennardjonesium/physics/measurements.hpp>
+#include <lennardjonesium/physics/observation.hpp>
 
 namespace physics
 {
@@ -89,19 +90,6 @@ namespace physics
             tools::MovingSample<double> temperature_sample_;
             tools::SystemParameters system_parameters_;
             int sample_size_;
-    };
-
-    struct Observation
-    {
-        /**
-         * An Observation collects together the main physical quantities that constitute the
-         * "result" of the experiment.
-         */
-
-        double temperature;
-        double pressure;
-        double specific_heat;
-        double diffusion_coefficient;
     };
 
     class ThermodynamicAnalyzer : public Analyzer<Observation>
