@@ -1,9 +1,11 @@
 /**
- * Test Equilibrator.  This is really more of an integration test.  We have to put almost all
- * the pieces of the system together.
+ * Test Simulation.  This is more of an integration test.  We should have enough of the pieces
+ * put together to run a complete simulation.
  */
 
 #include <ranges>
+#include <utility>
+#include <memory>
 
 #include <catch2/catch.hpp>
 #include <Eigen/Dense>
@@ -11,6 +13,7 @@
 #include <src/lennardjonesium/tools/math.hpp>
 #include <src/lennardjonesium/tools/moving_sample.hpp>
 #include <src/lennardjonesium/tools/bounding_box.hpp>
+#include <src/lennardjonesium/tools/system_parameters.hpp>
 #include <src/lennardjonesium/physics/system_state.hpp>
 #include <src/lennardjonesium/physics/measurements.hpp>
 #include <src/lennardjonesium/engine/particle_pair_filter.hpp>
@@ -18,7 +21,8 @@
 #include <src/lennardjonesium/engine/boundary_condition.hpp>
 #include <src/lennardjonesium/engine/initial_condition.hpp>
 #include <src/lennardjonesium/engine/integrator.hpp>
-#include <src/lennardjonesium/control/equilibrator.hpp>
+#include <src/lennardjonesium/control/simulation_phase.hpp>
+#include <src/lennardjonesium/control/simulation.hpp>
 
 #include <tests/lennardjonesium/test_utils/constant_short_range_force.hpp>
 
@@ -45,22 +49,30 @@ double measure_temperature(physics::SystemState state, const engine::Integrator&
     return temperature_samples.statistics().mean;
 }
 
+
 SCENARIO("Equilibrating the system")
 {
     /**
      * First create the initial condition.  We will deliberately create an initial condition with
      * the wrong temperature, so that we can test that the equilibrator rescales appropriately.
      */
-    int particle_count = 500;
-    double density = 0.8;
-    double initial_temperature = 0.2;
-    double target_temperature = 0.8;
+
+    // Define system parameters
+    tools::SystemParameters system_parameters{
+        .temperature {0.2},
+        .density {0.8},
+        .particle_count {500}
+    };
+
+    // Target system parameters are different (this is not normal)
+    auto target_system_parameters = system_parameters;
+    target_system_parameters.temperature = 0.8;
 
     // This always uses the default random seed, so the test is repeatable
-    engine::InitialCondition initial_condition(particle_count, density, initial_temperature);
+    engine::InitialCondition initial_condition(system_parameters);
 
-    // Now set up the Integrator
-    double force = -4.0;
+    // Now set up the Integrator (could really use a factory method for this)
+    double force = 4.0;
     double cutoff_distance = 2.0;
     double time_step = 0.005;
 
@@ -74,48 +86,43 @@ SCENARIO("Equilibrating the system")
 
     engine::VelocityVerletIntegrator integrator(time_step, boundary_condition, force_calculation);
 
-    WHEN("I attempt to equilibrate with a large tolerance")
+    GIVEN("An EquilibrationPhase with a large tolerance")
     {
-        physics::SystemState state = initial_condition.system_state();
-        engine::Equilibrator::Parameters parameters{};
+        control::EquilibrationPhase::Parameters equilibration_parameters{
+            .tolerance {0.10},
+            .sample_size {50},
+            .adjustment_interval {100},
+            .steady_state_time {5000},
+            .timeout {50000}
+        };
 
-        parameters.tolerance = 0.10;
+        control::Simulation::Schedule schedule;
 
-        engine::Equilibrator equilibrator{integrator, parameters};
+        schedule.push(
+            std::make_unique<control::EquilibrationPhase>(
+                "Large-tolerance Equilibration Phase",
+                target_system_parameters,
+                equilibration_parameters
+            )
+        );
 
-        THEN("The system equilibrates")
+        control::Simulation simulation(integrator, std::move(schedule));
+
+        WHEN("I run the simulation")
         {
-            try
+            auto state = initial_condition.system_state();
+
+            state | simulation;
+
+            THEN("The system equilibrates to the desired temperature")
             {
-                state | equilibrator(target_temperature);
+                REQUIRE(
+                    tools::relative_error(
+                        measure_temperature(state, integrator),
+                        target_system_parameters.temperature
+                    ) < equilibration_parameters.tolerance
+                );
             }
-            catch(const engine::EquilibrationError& e)
-            {
-                FAIL("Failed to equilibrate");
-            }
-
-            REQUIRE(
-                tools::relative_error(measure_temperature(state, integrator), target_temperature)
-                < parameters.tolerance
-            );
-        }
-    }
-
-    WHEN("I attempt to equilibrate with a small tolerance")
-    {
-        physics::SystemState state = initial_condition.system_state();
-        engine::Equilibrator::Parameters parameters{};
-
-        parameters.tolerance = 0.0000001;
-
-        engine::Equilibrator equilibrator{integrator, parameters};
-
-        THEN("The system fails to equilibrate")
-        {
-            REQUIRE_THROWS_AS(
-                state | equilibrator(target_temperature),
-                engine::EquilibrationError
-            );
         }
     }
 }
