@@ -25,23 +25,26 @@
 
 #include <src/lennardjonesium/physics/forces.hpp>
 
-// We define this derived class for testing purposes only
-class ConstantShortRangeForce : public physics::ShortRangeForce
+namespace mock
 {
-    public:
-        /**
-         * A negative force value is an attractive force, and a positive value is repulsive.
-         */
-        ConstantShortRangeForce(double force, double cutoff_length);
+    // We define this derived class for testing purposes only
+    class ConstantShortRangeForce : public physics::ShortRangeForce
+    {
+        public:
+            /**
+             * A negative force value is an attractive force, and a positive value is repulsive.
+             */
+            ConstantShortRangeForce(double force, double cutoff_length);
 
-        virtual physics::ForceContribution
-        operator() (const Eigen::Ref<const Eigen::Vector4d>& separation) const override;
+            virtual physics::ForceContribution
+            operator() (const Eigen::Ref<const Eigen::Vector4d>& separation) const override;
 
-        virtual double cutoff_distance() const override;
-    
-    protected:
-        const double force_;
-        const double cutoff_distance_;
-};
+            virtual double cutoff_distance() const override;
+        
+        protected:
+            const double force_;
+            const double cutoff_distance_;
+    };
+} // namespace mock
 
 #endif
