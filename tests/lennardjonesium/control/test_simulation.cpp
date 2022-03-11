@@ -24,7 +24,7 @@
 #include <src/lennardjonesium/control/simulation_phase.hpp>
 #include <src/lennardjonesium/control/simulation.hpp>
 
-#include <tests/lennardjonesium/test_utils/constant_short_range_force.hpp>
+#include <tests/mock/constant_short_range_force.hpp>
 
 double measure_temperature(physics::SystemState state, const engine::Integrator& integrator)
 {
@@ -78,7 +78,7 @@ SCENARIO("Equilibrating the system")
 
     tools::BoundingBox bounding_box = initial_condition.bounding_box();
 
-    ConstantShortRangeForce short_range_force{force, cutoff_distance};
+    mock::ConstantShortRangeForce short_range_force{force, cutoff_distance};
     engine::CellListParticlePairFilter particle_pair_filter(bounding_box, cutoff_distance);
 
     engine::ShortRangeForceCalculation force_calculation{short_range_force, particle_pair_filter};
