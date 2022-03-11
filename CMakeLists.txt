@@ -162,15 +162,26 @@ else()
 
     find_package(Catch2 REQUIRED)
 
-    add_executable(tests
-        tests/other/test_eigen.cpp
-        tests/other/test_modulo.cpp
-
-        tests/lennardjonesium/greeter/test_greeter.cpp
-
+    add_library(mock STATIC
         tests/mock/constant_short_range_force.hpp
         tests/mock/constant_short_range_force.cpp
-        tests/mock/test_constant_short_range_force.cpp
+    )
+
+    target_link_libraries(mock
+        PRIVATE Eigen3::Eigen
+        # PRIVATE fmt::fmt
+        PRIVATE tools
+        PRIVATE physics
+        PRIVATE engine
+        PRIVATE control
+    )
+
+    add_executable(unit_tests
+        tests/other/test_eigen.cpp
+        tests/other/test_modulo.cpp
+        tests/other/test_constant_short_range_force.cpp
+
+        tests/lennardjonesium/greeter/test_greeter.cpp
 
         tests/lennardjonesium/tools/test_bounding_box.cpp
         tests/lennardjonesium/tools/test_cell_list_array.cpp
@@ -188,16 +199,33 @@ else()
 
         tests/lennardjonesium/control/test_equilibration_phase.cpp
         tests/lennardjonesium/control/test_observation_phase.cpp
-        tests/lennardjonesium/control/test_simulation.cpp
     )
 
-    target_link_libraries(tests
+    target_link_libraries(unit_tests
         PRIVATE Eigen3::Eigen
         PRIVATE Catch2::Catch2WithMain
         # PRIVATE fmt::fmt
         # PRIVATE Microsoft.GSL::GSL
         # PRIVATE ktl::ktl
         PRIVATE greeter
+        PRIVATE mock
+        PRIVATE tools
+        PRIVATE physics
+        PRIVATE engine
+        PRIVATE control
+    )
+
+    add_executable(integration_tests
+        tests/integration/test_system_equilibration.cpp
+    )
+
+    target_link_libraries(integration_tests
+        PRIVATE Eigen3::Eigen
+        PRIVATE Catch2::Catch2WithMain
+        # PRIVATE fmt::fmt
+        # PRIVATE Microsoft.GSL::GSL
+        # PRIVATE ktl::ktl
+        PRIVATE mock
         PRIVATE tools
         PRIVATE physics
         PRIVATE engine
@@ -205,5 +233,6 @@ else()
     )
 
     include(Catch)
-    catch_discover_tests(tests)
+    catch_discover_tests(unit_tests)
+    catch_discover_tests(integration_tests)
 endif()

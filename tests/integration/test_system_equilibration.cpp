@@ -59,13 +59,13 @@ SCENARIO("Equilibrating the system")
 
     // Define system parameters
     tools::SystemParameters system_parameters{
-        .temperature {0.2},
+        .temperature {0.3},
         .density {0.8},
         .particle_count {500}
     };
 
     // Target system parameters are different (this is not normal)
-    auto target_system_parameters = system_parameters;
+    tools::SystemParameters target_system_parameters = system_parameters;
     target_system_parameters.temperature = 0.8;
 
     // This always uses the default random seed, so the test is repeatable
@@ -108,21 +108,55 @@ SCENARIO("Equilibrating the system")
 
         control::Simulation simulation(integrator, std::move(schedule));
 
-        WHEN("I run the simulation")
+        THEN("The system equilibrates to the desired temperature")
         {
-            auto state = initial_condition.system_state();
+            physics::SystemState state = initial_condition.system_state();
 
             state | simulation;
 
-            THEN("The system equilibrates to the desired temperature")
-            {
-                REQUIRE(
-                    tools::relative_error(
-                        measure_temperature(state, integrator),
-                        target_system_parameters.temperature
-                    ) < equilibration_parameters.tolerance
-                );
-            }
+            REQUIRE(
+                tools::relative_error(
+                    measure_temperature(state, integrator),
+                    target_system_parameters.temperature
+                ) < equilibration_parameters.tolerance
+            );
+        }
+    }
+
+    GIVEN("An EquilibrationPhase with a very small tolerance")
+    {
+        control::EquilibrationPhase::Parameters equilibration_parameters{
+            .tolerance {0.000001},
+            .sample_size {50},
+            .adjustment_interval {100},
+            .steady_state_time {5000},
+            .timeout {20000}
+        };
+
+        control::Simulation::Schedule schedule;
+
+        schedule.push(
+            std::make_unique<control::EquilibrationPhase>(
+                "Small-tolerance Equilibration Phase",
+                target_system_parameters,
+                equilibration_parameters
+            )
+        );
+
+        control::Simulation simulation(integrator, std::move(schedule));
+
+        THEN("The system fails to equilibrate")
+        {
+            physics::SystemState state = initial_condition.system_state();
+
+            state | simulation;
+
+            REQUIRE(
+                tools::relative_error(
+                    measure_temperature(state, integrator),
+                    target_system_parameters.temperature
+                ) > equilibration_parameters.tolerance
+            );
         }
     }
 }
