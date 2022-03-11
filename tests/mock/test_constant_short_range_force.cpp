@@ -7,7 +7,7 @@
 
 #include <src/lennardjonesium/physics/forces.hpp>
 
-#include <tests/lennardjonesium/test_utils/constant_short_range_force.hpp>
+#include <tests/mock/constant_short_range_force.hpp>
 
 SCENARIO("Constant forces with cutoff distance")
 {
@@ -16,7 +16,7 @@ SCENARIO("Constant forces with cutoff distance")
         double force = -3.0;
         double cutoff_distance = 5.0;
 
-        ConstantShortRangeForce short_range_force{force, cutoff_distance};
+        mock::ConstantShortRangeForce short_range_force{force, cutoff_distance};
 
         WHEN("I ask for the force at separation distance 2.0")
         {

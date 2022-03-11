@@ -10,7 +10,7 @@
 #include <src/lennardjonesium/engine/particle_pair_filter.hpp>
 #include <src/lennardjonesium/engine/force_calculation.hpp>
 
-#include <tests/lennardjonesium/test_utils/constant_short_range_force.hpp>
+#include <tests/mock/constant_short_range_force.hpp>
 
 
 SCENARIO("Computing forces between particles")
@@ -26,7 +26,7 @@ SCENARIO("Computing forces between particles")
         double force_strength{-10.0};
 
         tools::BoundingBox bounding_box{box_size};
-        ConstantShortRangeForce short_range_force{force_strength, cutoff_distance};
+        mock::ConstantShortRangeForce short_range_force{force_strength, cutoff_distance};
         engine::CellListParticlePairFilter filter{bounding_box, cutoff_distance};
 
         engine::ShortRangeForceCalculation force_calculation{short_range_force, filter};
@@ -115,7 +115,7 @@ SCENARIO("Computing forces between particles")
         double force_strength{-10.0};
 
         tools::BoundingBox bounding_box{box_size};
-        ConstantShortRangeForce short_range_force{force_strength, cutoff_distance};
+        mock::ConstantShortRangeForce short_range_force{force_strength, cutoff_distance};
         engine::CellListParticlePairFilter filter{bounding_box, cutoff_distance};
 
         engine::ShortRangeForceCalculation force_calculation{short_range_force, filter};

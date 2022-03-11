@@ -168,14 +168,14 @@ else()
 
         tests/lennardjonesium/greeter/test_greeter.cpp
 
+        tests/mock/constant_short_range_force.hpp
+        tests/mock/constant_short_range_force.cpp
+        tests/mock/test_constant_short_range_force.cpp
+
         tests/lennardjonesium/tools/test_bounding_box.cpp
         tests/lennardjonesium/tools/test_cell_list_array.cpp
         tests/lennardjonesium/tools/test_cubic_lattice.cpp
         tests/lennardjonesium/tools/test_moving_sample.cpp
-
-        tests/lennardjonesium/test_utils/constant_short_range_force.hpp
-        tests/lennardjonesium/test_utils/constant_short_range_force.cpp
-        tests/lennardjonesium/test_utils/test_constant_short_range_force.cpp
 
         tests/lennardjonesium/physics/test_system_state.cpp
         tests/lennardjonesium/physics/test_measurements.cpp
