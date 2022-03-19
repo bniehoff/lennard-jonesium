@@ -28,6 +28,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <optional>
+#include <utility>
 
 namespace tools
 {
@@ -60,7 +61,7 @@ namespace tools
             std::mutex mutex_;
 
             // The Producer signals the condition variable when it makes changes
-            std::condition_variable producer_updated_;
+            std::condition_variable update_signal_;
 
             std::queue<T> buffer_;
 
@@ -73,11 +74,11 @@ namespace tools
         // Lock the mutex within a scope
         {
             std::lock_guard<std::mutex> lock(mutex_);
-            buffer_.push(message);
+            buffer_.push(std::move(message));
         }
 
         // Signal that an item is in the buffer
-        producer_updated_.notify_one();
+        update_signal_.notify_one();
     }
 
     template<class T>
@@ -90,7 +91,7 @@ namespace tools
         }
 
         // Signal that producer_finished_ has been set
-        producer_updated_.notify_one();
+        update_signal_.notify_one();
     }
 
     template<class T>
@@ -101,14 +102,14 @@ namespace tools
             std::unique_lock<std::mutex> lock(mutex_);
 
             // Wait until either the buffer is nonempty, or producer_finished_ is set
-            producer_updated_.wait(
+            update_signal_.wait(
                 lock,
                 [&]() {return !this->buffer_.empty() || this->producer_finished_;}
             );
 
             if (!buffer_.empty())
             {
-                auto message = buffer_.front()
+                auto message = std::move(buffer_.front());
                 buffer_.pop();
                 return message;
             }
