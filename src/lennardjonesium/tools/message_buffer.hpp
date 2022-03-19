@@ -97,7 +97,7 @@ namespace tools
             input_finished_ = true;
         }
 
-        // We also need to signal when changing input_finished_
+        // Signal that input_finished_ has been set
         input_available_.notify_one();
     }
 
@@ -109,7 +109,7 @@ namespace tools
         if (output_iterator_ == output_.end())
         {
             /**
-             * Here we have exhausted the output buffer.  We should check whether this is anything
+             * Here we have exhausted the output buffer.  We should check whether there is anything
              * more to do.  If the input buffer is nonempty, then we can swap the buffers.  If it
              * is empty, but the Producer is not yet finished, then we should wait until the
              * Producer either pushes another message or signals that it is finished.
