@@ -71,7 +71,7 @@ namespace tools
      * MovingSample acts a bit like an STL container, but only exposes a minimal set of
      * methods, and adds the method statistics().  For simple template parameters like <double>,
      * the mean and variance are the same type.  However, for Eigen::Vector types, we will want
-     * to comptute a covariance matrix, which is a different type.
+     * to compute a covariance matrix, which is a different type.
      * 
      * Because of this specialization for Eigen::Vector types, we split some of the shared
      * functionality into a MovingSampleBase template class, which allows us to specialize only

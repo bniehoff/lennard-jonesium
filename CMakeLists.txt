@@ -82,6 +82,7 @@ add_library(tools STATIC
     src/lennardjonesium/tools/cubic_lattice.hpp
     src/lennardjonesium/tools/cubic_lattice.cpp
     src/lennardjonesium/tools/moving_sample.hpp
+    src/lennardjonesium/tools/message_buffer.hpp
 )
 
 add_library(physics STATIC
@@ -234,5 +235,5 @@ else()
 
     include(Catch)
     catch_discover_tests(unit_tests)
-    catch_discover_tests(integration_tests)
+    # catch_discover_tests(integration_tests)
 endif()
