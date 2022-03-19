@@ -44,6 +44,8 @@
 #include <string>
 #include <variant>
 #include <queue>
+#include <mutex>
+#include <condition_variable>
 
 #include <Eigen/Dense>
 
@@ -188,6 +190,31 @@ namespace tools
             bool full();
             Statistics statistics();
     }
+
+    template<class T>
+    class MessageBuffer
+    {
+        /**
+         * MessageBuffer allows two threads to communicate in a single-producer, single-consumer
+         * configuration, using condition variables and mutex locks to protect the buffer during
+         * operations on it.
+         */
+
+        public:
+            /**
+             * We hide the locking mechanisms behind this interface.  The Producer should use
+             * put(T) to place an item in the buffer, and call end() when it has no more items to
+             * place (this allows the Consumer to know when the Producer is finished).  The Consumer
+             * should get() to obtain an item from the buffer.  The call to get() will block until
+             * an item is obtained; or, if the Producer has called end(), then get() will return
+             * std::nullopt.  In this way, the Consumer can deduce that the buffer is empty and will
+             * receive no further input, so that the Consumer can terminate.
+             */
+            
+            void put(T);
+            void end();
+            std::optional<T> get();
+    };
 } // namespace tools
 
 namespace physics
