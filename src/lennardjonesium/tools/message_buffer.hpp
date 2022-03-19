@@ -23,7 +23,7 @@
 #ifndef LJ_MESSAGE_BUFFER_HPP
 #define LJ_MESSAGE_BUFFER_HPP
 
-#include <vector>
+#include <queue>
 #include <algorithm>
 #include <mutex>
 #include <condition_variable>
@@ -56,23 +56,15 @@ namespace tools
             std::optional<T> get();
 
         private:
-            // The mutex is used to lock access to the input_ buffer and the input_finished_ flag
-            std::mutex input_mutex_;
+            // The mutex is used to lock access to the buffer_ and the producer_finished_ flag
+            std::mutex mutex_;
 
             // The Producer signals the condition variable when it makes changes
-            std::condition_variable input_available_;
+            std::condition_variable producer_updated_;
 
-            /**
-             * We will use double buffering to implement the queue, assuming the Producer will get
-             * ahead of the Consumer.
-             */
-            std::vector<T> input_;
-            std::vector<T> output_;
+            std::queue<T> buffer_;
 
-            // We track our current position in the output_ vector with an iterator
-            std::vector<T>::iterator output_iterator_ = output_.begin();
-
-            bool input_finished_ = false;
+            bool producer_finished_ = false;
     };
 
     template<class T>
@@ -80,12 +72,12 @@ namespace tools
     {
         // Lock the mutex within a scope
         {
-            std::lock_guard<std::mutex> lock(input_mutex_);
-            input_.push_back(message);
+            std::lock_guard<std::mutex> lock(mutex_);
+            buffer_.push(message);
         }
 
         // Signal that an item is in the buffer
-        input_available_.notify_one();
+        producer_updated_.notify_one();
     }
 
     template<class T>
@@ -93,65 +85,37 @@ namespace tools
     {
         // Lock the mutex within a scope
         {
-            std::lock_guard<std::mutex> lock(input_mutex_);
-            input_finished_ = true;
+            std::lock_guard<std::mutex> lock(mutex_);
+            producer_finished_ = true;
         }
 
-        // Signal that input_finished_ has been set
-        input_available_.notify_one();
+        // Signal that producer_finished_ has been set
+        producer_updated_.notify_one();
     }
 
     template<class T>
     std::optional<T> MessageBuffer<T>::get()
     {
-        std::optional<T> message = std::nullopt;
-
-        if (output_iterator_ == output_.end())
+        // Get a unique lock in order to (possibly) wait on the condition variable
         {
-            /**
-             * Here we have exhausted the output buffer.  We should check whether there is anything
-             * more to do.  If the input buffer is nonempty, then we can swap the buffers.  If it
-             * is empty, but the Producer is not yet finished, then we should wait until the
-             * Producer either pushes another message or signals that it is finished.
-             */
+            std::unique_lock<std::mutex> lock(mutex_);
 
-            // Get a unique lock in order to (possibly) wait on the condition variable
+            // Wait until either the buffer is nonempty, or producer_finished_ is set
+            producer_updated_.wait(
+                lock,
+                [&]() {return !this->buffer_.empty() || this->producer_finished_;}
+            );
+
+            if (!buffer_.empty())
             {
-                std::unique_lock<std::mutex> lock(input_mutex_);
-
-                if (input_.empty() && !input_finished_)
-                {
-                    // There are no messages available, but the Producer has not indicated they
-                    // are finished.  Therefore, wait for new messages.
-                    input_available_.wait(lock);
-                }
-                
-                if (!input_.empty())
-                {
-                    // There are messages available, so we can swap the buffers
-                    output_.clear();
-                    std::swap(input_, output_);
-                    output_iterator_ = output_.begin();
-                }
-
-                // If the input buffer is empty and input_finished_ = true, then we fall through
+                auto message = buffer_.front()
+                buffer_.pop();
+                return message;
             }
+
+            // If the buffer is empty and the Producer is finished, return std::nullopt
+            return {};
         }
-
-        /**
-         * This condition must be separate from `if (output_iterator_ == output_end())` rather than
-         * given as an `else` clause, because after waiting on the condition variable, the buffers
-         * may have been swapped, in which case there may be items in the output buffer to read. 
-         */
-
-        if (output_iterator_ < output_.end())
-        {
-            // Read an item from the output buffer
-            message = *output_iterator_;
-            ++output_iterator_;
-        }
-
-        return message;
     }
 } // namespace tools
 
