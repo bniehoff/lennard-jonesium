@@ -24,15 +24,17 @@
 #define LJ_MESSAGE_BUFFER_HPP
 
 #include <queue>
+#include <deque>
 #include <algorithm>
 #include <mutex>
 #include <condition_variable>
 #include <optional>
 #include <utility>
+#include <memory>
 
 namespace tools
 {
-    template<class T>
+    template<class T, class Alloc = std::allocator<T>>
     class MessageBuffer
     {
         /**
@@ -63,13 +65,13 @@ namespace tools
             // The Producer signals the condition variable when it makes changes
             std::condition_variable update_signal_;
 
-            std::queue<T> buffer_;
+            std::queue<T, std::deque<T, Alloc>> buffer_;
 
             bool producer_finished_ = false;
     };
 
-    template<class T>
-    void MessageBuffer<T>::put(T message)
+    template<class T, class Alloc>
+    void MessageBuffer<T, Alloc>::put(T message)
     {
         // Lock the mutex within a scope
         {
@@ -81,8 +83,8 @@ namespace tools
         update_signal_.notify_one();
     }
 
-    template<class T>
-    void MessageBuffer<T>::end()
+    template<class T, class Alloc>
+    void MessageBuffer<T, Alloc>::end()
     {
         // Lock the mutex within a scope
         {
@@ -94,8 +96,8 @@ namespace tools
         update_signal_.notify_one();
     }
 
-    template<class T>
-    std::optional<T> MessageBuffer<T>::get()
+    template<class T, class Alloc>
+    std::optional<T> MessageBuffer<T, Alloc>::get()
     {
         // Get a unique lock in order to (possibly) wait on the condition variable
         {
