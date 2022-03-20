@@ -188,6 +188,7 @@ else()
         tests/lennardjonesium/tools/test_cell_list_array.cpp
         tests/lennardjonesium/tools/test_cubic_lattice.cpp
         tests/lennardjonesium/tools/test_moving_sample.cpp
+        tests/lennardjonesium/tools/test_message_buffer.cpp
 
         tests/lennardjonesium/physics/test_system_state.cpp
         tests/lennardjonesium/physics/test_measurements.cpp
