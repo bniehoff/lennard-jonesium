@@ -102,8 +102,8 @@ SCENARIO("Measurements of bulk properties of the system")
             REQUIRE(Approx(kinetic_energy) == physics::kinetic_energy(state));
             REQUIRE(Approx(temperature) == physics::temperature(state));
 
-            REQUIRE(Approx(kinetic_energy) == thermodynamics.kinetic_energy());
-            REQUIRE(Approx(temperature) == thermodynamics.temperature());
+            REQUIRE(Approx(kinetic_energy) == thermodynamics.result().kinetic_energy);
+            REQUIRE(Approx(temperature) == thermodynamics.result().temperature);
         }
 
         THEN("The measured total momentum is correct")
@@ -166,8 +166,8 @@ SCENARIO("Measurements of bulk properties of the system")
             REQUIRE(Approx(kinetic_energy) == physics::kinetic_energy(state));
             REQUIRE(Approx(temperature) == physics::temperature(state));
 
-            REQUIRE(Approx(kinetic_energy) == thermodynamics.kinetic_energy());
-            REQUIRE(Approx(temperature) == thermodynamics.temperature());
+            REQUIRE(Approx(kinetic_energy) == thermodynamics.result().kinetic_energy);
+            REQUIRE(Approx(temperature) == thermodynamics.result().temperature);
         }
 
         THEN("The measured total momentum is correct")
@@ -538,7 +538,7 @@ SCENARIO("Transformations of bulk properties on a larger random state")
             {
                 REQUIRE(Approx(new_temperature) == physics::temperature(state));
 
-                REQUIRE(Approx(new_temperature) == thermodynamics.temperature());
+                REQUIRE(Approx(new_temperature) == thermodynamics.result().temperature);
             }
         }
 
