@@ -27,6 +27,7 @@
 #include <utility>
 #include <memory>
 
+#include <lennardjonesium/tools/message_buffer.hpp>
 #include <lennardjonesium/physics/system_state.hpp>
 #include <lennardjonesium/engine/integrator.hpp>
 #include <lennardjonesium/control/simulation_phase.hpp>
@@ -42,7 +43,11 @@ namespace control
          * keeping track of the time step count, as well as pushing relevant data to various
          * message queues.
          * 
-         * TODO: Add log/message queue(s)
+         * We need the following message queues for logging, which each go to separate files:
+         *  1. Events (such as when phases start and stop)
+         *  2. Observations (results obtained during ObservationPhase)
+         *  3. Thermodynamic measurements (every time step, instantaneous measurements are taken)
+         *  4. System trajectory (snapshot every time step of first N particles in SystemState)
          */
 
         public:
