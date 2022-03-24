@@ -112,6 +112,10 @@ add_library(engine STATIC
     src/lennardjonesium/engine/initial_condition.cpp
 )
 
+add_library(output STATIC
+    src/lennardjonesium/output/buffer.hpp
+)
+
 add_library(control STATIC
     src/lennardjonesium/control/command_queue.hpp
     src/lennardjonesium/control/simulation_phase.hpp
@@ -142,12 +146,21 @@ target_link_libraries(engine
     PRIVATE physics
 )
 
+target_link_libraries(output
+    PRIVATE Eigen3::Eigen
+    PRIVATE fmt::fmt
+    PRIVATE tools
+    PRIVATE physics
+    PRIVATE engine
+)
+
 target_link_libraries(control
     PRIVATE Eigen3::Eigen
     PRIVATE fmt::fmt
     PRIVATE tools
     PRIVATE physics
     PRIVATE engine
+    PRIVATE output
 )
 
 if(SKBUILD)
@@ -174,6 +187,7 @@ else()
         PRIVATE tools
         PRIVATE physics
         PRIVATE engine
+        PRIVATE output
         PRIVATE control
     )
 
@@ -214,6 +228,7 @@ else()
         PRIVATE tools
         PRIVATE physics
         PRIVATE engine
+        PRIVATE output
         PRIVATE control
     )
 
@@ -231,6 +246,7 @@ else()
         PRIVATE tools
         PRIVATE physics
         PRIVATE engine
+        PRIVATE output
         PRIVATE control
     )
 
