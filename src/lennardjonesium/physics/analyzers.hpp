@@ -72,7 +72,7 @@ namespace physics
 
         public:
             virtual void collect(const ThermodynamicMeasurement& measurement) override
-                {temperature_sample_.push_back(measurement.temperature());}
+                {temperature_sample_.push_back(measurement.result().temperature);}
 
             virtual result_type result() override
                 {return temperature_sample_.statistics().mean;}

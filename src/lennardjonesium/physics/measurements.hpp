@@ -39,37 +39,41 @@ namespace physics
          */
 
         public:
+            struct Result
+            {
+                /**
+                 * It is useful to package the result of the measurement into a struct, so that
+                 * it can be passed between functions as a single piece of data.
+                 */
+
+                double time{};
+                double kinetic_energy{};
+                double potential_energy{};
+                double total_energy{};
+                double virial{};
+                double temperature{};
+                double mean_square_displacement{};
+            };
+
             // Takes the measurements and populates the internal fields
             const SystemState& operator() (const SystemState& state)
             {
-                time_ = state | physics::time;
-                kinetic_energy_ = state | physics::kinetic_energy;
-                potential_energy_ = state | physics::potential_energy;
-                total_energy_ = state | physics::total_energy(kinetic_energy_);
-                virial_ = state | physics::virial;
-                temperature_ = state | physics::temperature(kinetic_energy_);
-                mean_square_displacement_ = state | physics::mean_square_displacement;
+                result_.time = state | physics::time;
+                result_.kinetic_energy = state | physics::kinetic_energy;
+                result_.potential_energy = state | physics::potential_energy;
+                result_.total_energy = state | physics::total_energy(result_.kinetic_energy);
+                result_.virial = state | physics::virial;
+                result_.temperature = state | physics::temperature(result_.kinetic_energy);
+                result_.mean_square_displacement = state | physics::mean_square_displacement;
 
                 return state;
             }
 
-            // Get the properties measured
-            double time() const {return time_;}
-            double kinetic_energy() const {return kinetic_energy_;}
-            double potential_energy() const {return potential_energy_;}
-            double total_energy() const {return total_energy_;}
-            double virial() const {return virial_;}
-            double temperature() const {return temperature_;}
-            double mean_square_displacement() const {return mean_square_displacement_;}
+            // Get the result of measurement
+            const Result& result() const {return result_;}
 
         private:
-            double time_{};
-            double kinetic_energy_{};
-            double potential_energy_{};
-            double total_energy_{};
-            double virial_{};
-            double temperature_{};
-            double mean_square_displacement_{};
+            Result result_;
     };
 
     class KinematicMeasurement
