@@ -27,9 +27,9 @@
 #include <utility>
 #include <memory>
 
-#include <lennardjonesium/tools/message_buffer.hpp>
 #include <lennardjonesium/physics/system_state.hpp>
 #include <lennardjonesium/engine/integrator.hpp>
+#include <lennardjonesium/output/buffer.hpp>
 #include <lennardjonesium/control/simulation_phase.hpp>
 
 namespace control
@@ -48,6 +48,19 @@ namespace control
          *  2. Observations (results obtained during ObservationPhase)
          *  3. Thermodynamic measurements (every time step, instantaneous measurements are taken)
          *  4. System trajectory (snapshot every time step of first N particles in SystemState)
+         * 
+         * The first three will be combined into a single buffer, which is then dispatched to the
+         * appropriate output destination by the Dispatcher at the other end of the buffer.
+         * 
+         * The system trajectory should be given its own buffer and its own consumer thread, because
+         * one possible use of this will be to draw to the screen to give a live visualization of
+         * the simulation.
+         * 
+         * TODO: It is possible that we might want to display other information on the screen,
+         * so this may be something to revisit when we ever get around to learning something like
+         * OpenGL.  For now, the system trajectory will only be used to write to a file for later
+         * visualization.  (Actually, it may be skipped entirely until a later stage of this
+         * project, since it is not important for computing the physics.)
          */
 
         public:
@@ -55,13 +68,20 @@ namespace control
 
             physics::SystemState& operator() (physics::SystemState&);
 
-            Simulation(const engine::Integrator& integrator, Schedule schedule)
-                : integrator_{integrator}, simulation_phases_{std::move(schedule)}
+            Simulation(
+                const engine::Integrator& integrator,
+                Schedule schedule,
+                std::shared_ptr<output::Buffer> output_buffer
+            )
+                : integrator_{integrator},
+                  simulation_phases_{std::move(schedule)},
+                  output_buffer_{std::move(output_buffer)}
             {}
         
         private:
             const engine::Integrator& integrator_;
             Schedule simulation_phases_;
+            std::shared_ptr<output::Buffer> output_buffer_;
     };
 } // namespace control
 

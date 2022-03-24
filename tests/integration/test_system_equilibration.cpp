@@ -21,6 +21,7 @@
 #include <src/lennardjonesium/engine/boundary_condition.hpp>
 #include <src/lennardjonesium/engine/initial_condition.hpp>
 #include <src/lennardjonesium/engine/integrator.hpp>
+#include <src/lennardjonesium/output/buffer.hpp>
 #include <src/lennardjonesium/control/simulation_phase.hpp>
 #include <src/lennardjonesium/control/simulation.hpp>
 
@@ -106,7 +107,9 @@ SCENARIO("Equilibrating the system")
             )
         );
 
-        control::Simulation simulation(integrator, std::move(schedule));
+        auto output_buffer = std::make_shared<output::Buffer>();
+
+        control::Simulation simulation(integrator, std::move(schedule), output_buffer);
 
         THEN("The system equilibrates to the desired temperature")
         {
@@ -143,7 +146,9 @@ SCENARIO("Equilibrating the system")
             )
         );
 
-        control::Simulation simulation(integrator, std::move(schedule));
+        auto output_buffer = std::make_shared<output::Buffer>();
+
+        control::Simulation simulation(integrator, std::move(schedule), output_buffer);
 
         THEN("The system fails to equilibrate")
         {
