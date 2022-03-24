@@ -31,11 +31,13 @@ namespace physics
 {
     void ThermodynamicAnalyzer::collect(const ThermodynamicMeasurement& measurement)
     {
-        temperature_sample_.push_back(measurement.temperature());
-        virial_sample_.push_back(measurement.virial());
+        temperature_sample_.push_back(measurement.result().temperature);
+        virial_sample_.push_back(measurement.result().virial);
 
         // The mean square displacement as a function of time will be used for linear regression
-        msd_vs_time_sample_.push_back({measurement.time(), measurement.mean_square_displacement()});
+        msd_vs_time_sample_.push_back(
+            {measurement.result().time, measurement.result().mean_square_displacement}
+        );
     }
 
     ThermodynamicAnalyzer::result_type ThermodynamicAnalyzer::result()
