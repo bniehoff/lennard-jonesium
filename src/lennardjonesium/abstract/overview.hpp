@@ -68,6 +68,8 @@
  *          in practically calculating the forces, integrating the equations of motion to update
  *          the system state, etc.
  * 
+ * output:  Classes/functions related to output, such as printing various quantities to files, etc.
+ * 
  * control: Structures related to simulation on a higher level: The main simulation loop, the
  *          equilibration and observation phases, etc.
  */
@@ -331,21 +333,44 @@ namespace physics
     class ThermodynamicMeasurement
     {
         public:
+            struct Result
+            {
+                /**
+                 * It is useful to package the result of the measurement into a struct, so that
+                 * it can be passed between functions as a single piece of data.
+                 */
+
+                double time{};
+                double kinetic_energy{};
+                double potential_energy{};
+                double total_energy{};
+                double virial{};
+                double temperature{};
+                double mean_square_displacement{};
+            };
+
             // Takes the measurements and populates the internal fields
             const SystemState& operator() (const SystemState& state);
 
-            // Get the properties measured
-            double time() const;
-            double kinetic_energy() const;
-            double potential_energy() const;
-            double total_energy() const;
-            double virial() const;
-            double temperature() const;
-            double mean_square_displacement() const;
+            // Get the result of measurement
+            const Result& result() const;
     };
 
     // This one will be related to bulk conservation laws
     class KinematicMeasurement;
+
+    struct Observation
+    {
+        /**
+         * An Observation collects together the main physical quantities that constitute the
+         * "result" of the experiment.
+         */
+
+        double temperature;
+        double pressure;
+        double specific_heat;
+        double diffusion_coefficient;
+    };
 } // namespace physics
 
 namespace engine
@@ -488,6 +513,43 @@ namespace engine
             physics::SystemState system_state();
     };
 } // namespace engine
+
+namespace output
+{
+    /**
+     * We first define the format we expect to use for Messages which will be logged to various
+     * files.  They will be combined into a std::variant so that we can switch on the type of
+     * message.
+     */
+
+    struct EventMessage
+    {
+        int time_step;
+        std::string description;
+    };
+
+    struct ObservationMessage
+    {
+        int time_step;
+        physics::Observation observation;
+    };
+
+    struct ThermodynamicMessage
+    {
+        int time_step;
+        physics::ThermodynamicMeasurement::Result result;
+    };
+
+    using Message = std::variant<
+        EventMessage,
+        ObservationMessage,
+        ThermodynamicMessage
+    >;
+
+    // The Buffer class itself is just a type alias
+    using Buffer = tools::MessageBuffer<Message>;
+} // namespace output
+
 
 namespace control
 {
