@@ -82,6 +82,7 @@ add_library(tools STATIC
     src/lennardjonesium/tools/cubic_lattice.hpp
     src/lennardjonesium/tools/cubic_lattice.cpp
     src/lennardjonesium/tools/moving_sample.hpp
+    src/lennardjonesium/tools/overloaded_visitor.hpp
     src/lennardjonesium/tools/message_buffer.hpp
 )
 
