@@ -24,6 +24,7 @@
 
 #include <fmt/core.h>
 
+#include <lennardjonesium/tools/overloaded_visitor.hpp>
 #include <lennardjonesium/physics/system_state.hpp>
 #include <lennardjonesium/physics/transformations.hpp>
 #include <lennardjonesium/physics/measurements.hpp>
@@ -32,14 +33,6 @@
 #include <lennardjonesium/control/command_queue.hpp>
 #include <lennardjonesium/control/simulation_phase.hpp>
 #include <lennardjonesium/control/simulation.hpp>
-
-namespace
-{
-    // Define an overload template for visiting the Command variant
-    template<class... Lambdas>
-    struct Overloaded : Lambdas... { using Lambdas::operator()...; };
-} // namespace
-
 
 namespace control
 {
@@ -65,7 +58,7 @@ namespace control
         command_queue.push(AdvanceTime{});
 
         // Create the visitor object once
-        auto command_interpreter = Overloaded
+        auto command_interpreter = tools::OverloadedVisitor
         {
             [&](const AdvanceTime& command)
             {
