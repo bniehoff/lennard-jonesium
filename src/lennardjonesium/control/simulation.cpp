@@ -22,24 +22,14 @@
 
 #include <variant>
 
-#include <fmt/core.h>
-
+#include <lennardjonesium/tools/overloaded_visitor.hpp>
 #include <lennardjonesium/physics/system_state.hpp>
 #include <lennardjonesium/physics/transformations.hpp>
 #include <lennardjonesium/physics/measurements.hpp>
 #include <lennardjonesium/engine/integrator.hpp>
-#include <lennardjonesium/output/buffer.hpp>
 #include <lennardjonesium/control/command_queue.hpp>
 #include <lennardjonesium/control/simulation_phase.hpp>
 #include <lennardjonesium/control/simulation.hpp>
-
-namespace
-{
-    // Define an overload template for visiting the Command variant
-    template<class... Lambdas>
-    struct Overloaded : Lambdas... { using Lambdas::operator()...; };
-} // namespace
-
 
 namespace control
 {
@@ -55,45 +45,29 @@ namespace control
         simulation_phases_.front()->set_start_time(time_step);
 
         // Log phase start event
-        output_buffer_->put(output::EventMessage{
-            time_step,
-            fmt::format("Phase started: {}", simulation_phases_.front()->name())
-        });
 
         // Prepare the CommandQueue which will control execution
         CommandQueue command_queue;
         command_queue.push(AdvanceTime{});
 
         // Create the visitor object once
-        auto command_interpreter = Overloaded
+        auto command_interpreter = tools::OverloadedVisitor
         {
             [&](const AdvanceTime& command)
             {
                 state | this->integrator_(command.time_steps) | measurement;
 
                 // Log the measurement
-                this->output_buffer_->put(output::ThermodynamicMessage{
-                    time_step,
-                    measurement.result()
-                });
 
                 time_step += command.time_steps;
                 this->simulation_phases_.front()->evaluate(command_queue, time_step, measurement);
             },
 
-            [&](const RecordObservation& command)
+            [&](const RecordObservation& command [[maybe_unused]])
             {
                 // Send observation to file
-                this->output_buffer_->put(output::ObservationMessage{
-                    time_step,
-                    command.observation
-                });
 
                 // Log observation event
-                this->output_buffer_->put(output::EventMessage{
-                    time_step,
-                    "Observation recorded"
-                });
             },
 
             [&](const AdjustTemperature& command)
@@ -101,19 +75,11 @@ namespace control
                 state | physics::set_temperature(command.temperature);
 
                 // Log temperature adjustment event
-                this->output_buffer_->put(output::EventMessage{
-                    time_step,
-                    fmt::format("Temperature scaled to {}", command.temperature)
-                });
             },
 
             [&](const PhaseComplete& command [[maybe_unused]])
             {
                 // Log phase complete event
-                this->output_buffer_->put(output::EventMessage{
-                    time_step,
-                    fmt::format("Phase complete: {}", this->simulation_phases_.front()->name())
-                });
                 
                 this->simulation_phases_.pop();
 
@@ -123,20 +89,12 @@ namespace control
                     this->simulation_phases_.front()->set_start_time(time_step);
 
                     // Log phase start event
-                    this->output_buffer_->put(output::EventMessage{
-                        time_step,
-                        fmt::format("Phase started: {}", simulation_phases_.front()->name())
-                    });
                 }
             },
 
             [&](const AbortSimulation& command [[maybe_unused]])
             {
                 // Log abort event
-                this->output_buffer_->put(output::EventMessage{
-                    time_step,
-                    fmt::format("Phase aborted: {}", simulation_phases_.front()->name())
-                });
             }
         };
         
@@ -146,9 +104,6 @@ namespace control
             std::visit(command_interpreter, command_queue.front());
             command_queue.pop();
         }
-
-        // Kill output buffer
-        output_buffer_->end();
 
         return state;
     }

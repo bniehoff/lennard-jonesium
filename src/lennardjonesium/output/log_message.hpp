@@ -1,5 +1,5 @@
 /**
- * message.hpp
+ * log_message.hpp
  * 
  * Copyright (c) 2021-2022 Benjamin E. Niehoff
  * 
@@ -20,52 +20,64 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LJ_MESSAGE_HPP
-#define LJ_MESSAGE_HPP
+#ifndef LJ_LOG_MESSAGE_HPP
+#define LJ_LOG_MESSAGE_HPP
 
 #include <string>
 #include <variant>
 
 #include <lennardjonesium/physics/measurements.hpp>
 #include <lennardjonesium/physics/observation.hpp>
-#include <lennardjonesium/tools/message_buffer.hpp>
 
 namespace output
 {
     /**
-     * We define the format we expect to use for Messages which will be logged to various files.
-     * They will be combined into a std::variant so that we can switch on the type of message.
-     * 
-     * Note: We could have used std::pair<int, T> for each of these, but then it wouldn't be so
-     * clear that the int is intended to be the time step.
+     * There are several types of LogMessages which will be combined into a std::variant.  The
+     * Dispatcher will be responsible for taking these messages from the message buffer and sending
+     * them to the appropriate destination.
      */
 
-    struct EventMessage
+    struct PhaseStartEvent
     {
-        int time_step;
-        std::string description;
+        std::string name;
     };
 
-    struct ObservationMessage
+    struct AdjustTemperatureEvent
     {
-        int time_step;
-        physics::Observation observation;
+        double temperature;
     };
 
-    struct ThermodynamicMessage
+    struct RecordObservationEvent {};
+
+    struct PhaseCompleteEvent
     {
-        int time_step;
-        physics::ThermodynamicMeasurement::Result result;
+        std::string name;
     };
 
-    using Message = std::variant<
-        EventMessage,
-        ObservationMessage,
-        ThermodynamicMessage
+    struct AbortSimulationEvent
+    {
+        std::string reason;
+    };
+
+    struct ThermodynamicData
+    {
+        physics::ThermodynamicMeasurement::Result data;
+    };
+
+    struct ObservationData
+    {
+        physics::Observation data;
+    };
+
+    using LogMessage = std::variant<
+        PhaseStartEvent,
+        AdjustTemperatureEvent,
+        RecordObservationEvent,
+        PhaseCompleteEvent,
+        AbortSimulationEvent,
+        ThermodynamicData,
+        ObservationData
     >;
-
-    // The Buffer class itself is just a type alias
-    using Buffer = tools::MessageBuffer<Message>;
 } // namespace output
 
 
