@@ -76,7 +76,7 @@ namespace control
         // Check whether we have reached timeout and return early
         if (time_step - start_time_ >= equilibration_parameters_.timeout) [[unlikely]]
         {
-            command_queue.push(AbortSimulation{});
+            command_queue.push(AbortSimulation{"Could not equilibrate"});
             return;
         }
 
@@ -114,7 +114,7 @@ namespace control
                 >= observation_parameters_.tolerance) [[unlikely]]
             {
                 // Issue abort command and return early
-                command_queue.push(AbortSimulation{});
+                command_queue.push(AbortSimulation{"Temperature drifted outside acceptable range"});
                 return;
             }
             else

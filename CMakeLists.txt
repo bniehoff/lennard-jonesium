@@ -114,7 +114,9 @@ add_library(engine STATIC
 )
 
 add_library(output STATIC
-    src/lennardjonesium/output/buffer.hpp
+    src/lennardjonesium/output/log_message.hpp
+    src/lennardjonesium/output/sinks.hpp
+    src/lennardjonesium/output/sinks.cpp
 )
 
 add_library(control STATIC
@@ -213,6 +215,8 @@ else()
         tests/lennardjonesium/engine/test_short_range_force_calculation.cpp
         tests/lennardjonesium/engine/test_velocity_verlet_integrator.cpp
         tests/lennardjonesium/engine/test_initial_condition.cpp
+
+        tests/lennardjonesium/output/test_sinks.cpp
 
         tests/lennardjonesium/control/test_equilibration_phase.cpp
         tests/lennardjonesium/control/test_observation_phase.cpp

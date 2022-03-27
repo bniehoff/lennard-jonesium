@@ -29,7 +29,6 @@
 
 #include <lennardjonesium/physics/system_state.hpp>
 #include <lennardjonesium/engine/integrator.hpp>
-#include <lennardjonesium/output/buffer.hpp>
 #include <lennardjonesium/control/simulation_phase.hpp>
 
 namespace control
@@ -70,18 +69,15 @@ namespace control
 
             Simulation(
                 const engine::Integrator& integrator,
-                Schedule schedule,
-                std::shared_ptr<output::Buffer> output_buffer
+                Schedule schedule
             )
                 : integrator_{integrator},
-                  simulation_phases_{std::move(schedule)},
-                  output_buffer_{std::move(output_buffer)}
+                  simulation_phases_{std::move(schedule)}
             {}
         
         private:
             const engine::Integrator& integrator_;
             Schedule simulation_phases_;
-            std::shared_ptr<output::Buffer> output_buffer_;
     };
 } // namespace control
 

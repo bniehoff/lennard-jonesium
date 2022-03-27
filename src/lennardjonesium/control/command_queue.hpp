@@ -23,6 +23,7 @@
 #ifndef LJ_COMMAND_QUEUE_HPP
 #define LJ_COMMAND_QUEUE_HPP
 
+#include <string>
 #include <queue>
 #include <variant>
 
@@ -62,7 +63,10 @@ namespace control
     struct PhaseComplete {};
 
     // On failure, end simulation
-    struct AbortSimulation {};
+    struct AbortSimulation
+    {
+        std::string reason;
+    };
 
     // The Command variant itself
     using Command = std::variant<
