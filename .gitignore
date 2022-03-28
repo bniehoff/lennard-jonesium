@@ -17,6 +17,9 @@ build/
 # Scikit-build directory
 _skbuild/
 
+# Temp directory (test output files)
+temp/
+
 # Python .egg-* files/directories
 *.egg-*
 

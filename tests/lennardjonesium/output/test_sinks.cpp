@@ -2,8 +2,9 @@
  * Test functionality of different Sinks.
  */
 
+#include <filesystem>
+#include <fstream>
 #include <sstream>
-#include <string>
 
 #include <catch2/catch.hpp>
 
@@ -40,36 +41,45 @@ SCENARIO("Testing Sink concept")
     REQUIRE(observation_sink_check);
 }
 
-SCENARIO("Sinks produce correct output")
+SCENARIO("Sinks write correct output to files")
 {
-    // Create some mock output files
-    std::ostringstream event_log;
-    std::ostringstream thermodynamic_log;
-    std::ostringstream observation_log;
+    namespace fs = std::filesystem;
+
+    fs::path test_dir{"test_sinks"};
+    fs::create_directory(test_dir);
 
     /**
-     * Note: We use floating point numbers which should have exact representations, in order to
-     * make it more obvious what string output to expect.
+     * We use floating point numbers which should have exact representations, in order to make it
+     * more obvious what string output to expect.
      */
 
-    GIVEN("An EventSink")
+    GIVEN("An Eventsink has written a file")
     {
+        fs::path event_log_path = test_dir / "events.txt";
+        std::ofstream event_log{event_log_path};
         output::EventSink event_sink{event_log};
 
         std::string phase_name{"Test Phase"};
         double target_temperature{0.5};
         std::string abort_reason{"Could not reverse the polarity"};
 
-        WHEN("I send various Event messages")
-        {
-            event_sink.write_header();
-            event_sink.write(0, output::PhaseStartEvent{phase_name});
-            event_sink.write(3, output::AdjustTemperatureEvent{target_temperature});
-            event_sink.write(5, output::PhaseCompleteEvent{phase_name});
-            event_sink.write(6, output::RecordObservationEvent{});
-            event_sink.write(8, output::AbortSimulationEvent{abort_reason});
+        event_sink.write_header();
+        event_sink.write(0, output::PhaseStartEvent{phase_name});
+        event_sink.write(3, output::AdjustTemperatureEvent{target_temperature});
+        event_sink.write(5, output::PhaseCompleteEvent{phase_name});
+        event_sink.write(6, output::RecordObservationEvent{});
+        event_sink.write(8, output::AbortSimulationEvent{abort_reason});
 
-            THEN("I get the expected file contents")
+        event_log.close();
+
+        WHEN("I read the file back in")
+        {
+            std::ifstream fin{event_log_path};
+            std::ostringstream contents;
+
+            contents << fin.rdbuf();
+
+            THEN("I get the expected contents")
             {
                 std::ostringstream expected;
                 expected
@@ -79,13 +89,15 @@ SCENARIO("Sinks produce correct output")
                     << "6: Observation recorded\n"
                     << "8: Simulation aborted: Could not reverse the polarity\n";
                 
-                REQUIRE(expected.view() == event_log.view());
+                REQUIRE(expected.view() == contents.view());
             }
         }
     }
 
-    GIVEN("A ThermodynamicSink")
+    GIVEN("A ThermodynamicSink has written a file")
     {
+        fs::path thermodynamic_log_path = test_dir / "thermodynamics.csv";
+        std::ofstream thermodynamic_log{thermodynamic_log_path};
         output::ThermodynamicSink thermodynamic_sink{thermodynamic_log};
 
         physics::ThermodynamicMeasurement::Result thermodynamic_result{
@@ -98,12 +110,19 @@ SCENARIO("Sinks produce correct output")
             .mean_square_displacement = 7.25
         };
 
-        WHEN("I send a ThermodynamicData message")
-        {
-            thermodynamic_sink.write_header();
-            thermodynamic_sink.write(7, output::ThermodynamicData{thermodynamic_result});
+        thermodynamic_sink.write_header();
+        thermodynamic_sink.write(7, output::ThermodynamicData{thermodynamic_result});
 
-            THEN("I get the expacted file contents")
+        thermodynamic_log.close();
+
+        WHEN("I read the file back in")
+        {
+            std::ifstream fin{thermodynamic_log_path};
+            std::ostringstream contents;
+
+            contents << fin.rdbuf();
+
+            THEN("I get the expected contents")
             {
                 std::ostringstream expected;
                 expected
@@ -111,13 +130,15 @@ SCENARIO("Sinks produce correct output")
                     << "Virial,Temperature,MeanSquareDisplacement\n"
                     << "7,3.5,2.25,4.25,6.5,5.5,0.5,7.25\n";
                 
-                REQUIRE(expected.view() == thermodynamic_log.view());
+                REQUIRE(expected.view() == contents.view());
             }
         }
     }
 
-    GIVEN("An ObservationSink")
+    GIVEN("An ObservationSink has written a file")
     {
+        fs::path observation_log_path = test_dir / "observations.csv";
+        std::ofstream observation_log{observation_log_path};
         output::ObservationSink observation_sink{observation_log};
 
         physics::Observation observation{
@@ -127,10 +148,17 @@ SCENARIO("Sinks produce correct output")
             .diffusion_coefficient = 5.25
         };
 
-        WHEN("I send an ObservationData message")
+        observation_sink.write_header();
+        observation_sink.write(3, output::ObservationData{observation});
+
+        observation_log.close();
+
+        WHEN("I read the file back in")
         {
-            observation_sink.write_header();
-            observation_sink.write(3, output::ObservationData{observation});
+            std::ifstream fin{observation_log_path};
+            std::ostringstream contents;
+
+            contents << fin.rdbuf();
 
             THEN("I get the expected file contents")
             {
@@ -139,8 +167,11 @@ SCENARIO("Sinks produce correct output")
                     << "TimeStep,Temperature,Pressure,SpecificHeat,DiffusionCoefficient\n"
                     << "3,0.5,3.25,2.5,5.25\n";
                 
-                REQUIRE(expected.view() == observation_log.view());
+                REQUIRE(expected.view() == contents.view());
             }
         }
     }
+
+    // Clean up
+    fs::remove_all(test_dir);
 }
