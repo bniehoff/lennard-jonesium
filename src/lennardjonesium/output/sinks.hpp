@@ -35,12 +35,18 @@ namespace detail
         public:
             virtual void write_header() = 0;
 
+            void flush() {destination_.flush();}
+
             SinkCommon() = default;
             explicit SinkCommon(std::ostream& destination) : destination_{destination} {}
 
             virtual ~SinkCommon() = default;
 
         protected:
+            /**
+             * NOTE: A Sink does not own its destination stream, the caller must ensure it remains
+             * open for the duration that the Sink is writing.
+             */
             std::ostream& destination_ = std::cout;
     };
 
