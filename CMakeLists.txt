@@ -256,6 +256,6 @@ else()
     )
 
     include(Catch)
-    catch_discover_tests(unit_tests)
-    # catch_discover_tests(integration_tests)
+    catch_discover_tests(unit_tests WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/temp)
+    # catch_discover_tests(integration_tests WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/temp)
 endif()
