@@ -71,7 +71,7 @@ namespace output
     {
         fmt::print(
             destination_,
-            "{}: Simulation aborted: {}",
+            "{}: Simulation aborted: {}\n",
             time_step,
             message.reason
         );
