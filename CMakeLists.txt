@@ -159,7 +159,7 @@ target_link_libraries(output
 
 target_link_libraries(control
     PRIVATE Eigen3::Eigen
-    PRIVATE fmt::fmt
+    # PRIVATE fmt::fmt
     PRIVATE tools
     PRIVATE physics
     PRIVATE engine
