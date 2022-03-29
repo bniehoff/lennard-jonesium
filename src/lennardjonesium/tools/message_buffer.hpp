@@ -23,6 +23,7 @@
 #ifndef LJ_MESSAGE_BUFFER_HPP
 #define LJ_MESSAGE_BUFFER_HPP
 
+#include <cassert>
 #include <queue>
 #include <deque>
 #include <algorithm>
@@ -38,25 +39,40 @@ namespace tools
     class MessageBuffer
     {
         /**
-         * MessageBuffer allows two threads to communicate in a single-producer, single-consumer
+         * MessageBuffer allows two threads to communicate in a multi-producer, multi-consumer
          * configuration, using condition variables and mutex locks to protect the buffer during
          * operations on it.
          */
 
         public:
             /**
-             * We hide the locking mechanisms behind this interface.  The Producer should use
-             * put(T) to place an item in the buffer, and call end() when it has no more items to
-             * place (this allows the Consumer to know when the Producer is finished).  The Consumer
-             * should call get() to obtain an item from the buffer.  The call to get() will block
-             * until an item is obtained; or, if the Producer has called end(), then get() will
-             * return std::nullopt.  In this way, the Consumer can deduce that the buffer is empty
-             * and will receive no further input, so that the Consumer can terminate.
+             * We hide the locking mechanisms behind the following interface:
+             * 
+             *  1. MessageBuffer(int producer_count): We must tell the MessageBuffer how many
+             *      producers are expected to generate output, otherwise the consumers have no
+             *      way of knowing when all the producers are finished.  The default producer
+             *      count is 1.
+             * 
+             *  2. put(T): A producer calls put(T) to add an item to the buffer.
+             * 
+             *  3. end(): A producer must call end() when it is finished.  When all the producers
+             *      have called end(), the consumer thread will then know that it has no further
+             *      messages to wait for, and can terminate once it finishes processing the
+             *      remaining items in the buffer.
+             * 
+             *  4. std::optional<T> get(): A consumer should call get() to obtain an item from the
+             *      buffer.  This call is blocking until either an item exists on the buffer, or
+             *      all the producers have finished.  If all producers have finished and the buffer
+             *      is empty, then get() returns std::nullopt.  Then the consumer knows that it can
+             *      terminate.
              */
 
             void put(T);
             void end();
             std::optional<T> get();
+
+            MessageBuffer() = default;
+            explicit MessageBuffer(int producer_count) : producers_pending_{producer_count} {}
 
         private:
             // The mutex is used to lock access to the buffer_ and the producer_finished_ flag
@@ -67,7 +83,13 @@ namespace tools
 
             std::queue<T, std::deque<T, Alloc>> buffer_;
 
-            bool producer_finished_ = false;
+            /**
+             * The producers have no way of knowing how many more producers are expected in the
+             * future unless we say explicitly.  When a producer calls end(), we decrement the
+             * pending count.  When it reaches zero, we know that we are not waiting for any
+             * further input.
+             */
+            int producers_pending_ = 1;
     };
 
     template<class T, class Alloc>
@@ -89,11 +111,12 @@ namespace tools
         // Lock the mutex within a scope
         {
             std::lock_guard<std::mutex> lock(mutex_);
-            producer_finished_ = true;
+            --producers_pending_;
+            assert(producers_pending_ >= 0 && "Tried to end more producers than expected");
         }
 
-        // Signal that producer_finished_ has been set
-        update_signal_.notify_one();
+        // Signal that the pending count has changed
+        update_signal_.notify_all();
     }
 
     template<class T, class Alloc>
@@ -103,10 +126,10 @@ namespace tools
         {
             std::unique_lock<std::mutex> lock(mutex_);
 
-            // Wait until either the buffer is nonempty, or producer_finished_ is set
+            // Wait until either the buffer is nonempty, or there are no producers active
             update_signal_.wait(
                 lock,
-                [&]() {return !this->buffer_.empty() || this->producer_finished_;}
+                [&]() {return !this->buffer_.empty() || (this->producers_pending_ == 0);}
             );
 
             if (!buffer_.empty())
@@ -116,7 +139,7 @@ namespace tools
                 return message;
             }
 
-            // If the buffer is empty and the Producer is finished, return std::nullopt
+            // If the buffer is empty and there are no producers pending, return std::nullopt
             return {};
         }
     }
