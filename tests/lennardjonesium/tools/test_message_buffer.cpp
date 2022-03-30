@@ -29,11 +29,11 @@ SCENARIO("Message buffer in single-threaded environment")
         }
     }
 
-    WHEN("I send the end() signal")
+    WHEN("I send the close() signal")
     {
         message_buffer.put(1);
         message_buffer.put(2);
-        message_buffer.end();
+        message_buffer.close();
 
         THEN("I read back std::nullopt")
         {
@@ -61,8 +61,6 @@ SCENARIO("Message buffer with producer and consumer threads")
                     message_buffer.put(i);
                     std::this_thread::sleep_for(std::chrono::milliseconds(10));
                 }
-
-                message_buffer.end();
             }
         );
 
@@ -78,6 +76,7 @@ SCENARIO("Message buffer with producer and consumer threads")
         );
 
         producer.join();
+        message_buffer.close();
         consumer.join();
 
         THEN("The output vector now has the same contents as the input")
@@ -89,7 +88,7 @@ SCENARIO("Message buffer with producer and consumer threads")
 
 SCENARIO("Message buffer with multiple producers and consumers")
 {
-    tools::MessageBuffer<int> message_buffer(2);
+    tools::MessageBuffer<int> message_buffer;
 
     std::vector<int> even = {0, 2, 4, 6, 8};
     std::vector<int> odd = {1, 3, 5, 7, 9};
@@ -107,8 +106,6 @@ SCENARIO("Message buffer with multiple producers and consumers")
                     message_buffer.put(i);
                     std::this_thread::sleep_for(std::chrono::milliseconds(10));
                 }
-
-                message_buffer.end();
             }
         );
         
@@ -120,8 +117,6 @@ SCENARIO("Message buffer with multiple producers and consumers")
                     message_buffer.put(i);
                     std::this_thread::sleep_for(std::chrono::milliseconds(10));
                 }
-
-                message_buffer.end();
             }
         );
 
@@ -149,6 +144,7 @@ SCENARIO("Message buffer with multiple producers and consumers")
 
         producer1.join();
         producer2.join();
+        message_buffer.close();
         consumer1.join();
         consumer2.join();
 
