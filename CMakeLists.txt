@@ -117,6 +117,8 @@ add_library(output STATIC
     src/lennardjonesium/output/log_message.hpp
     src/lennardjonesium/output/sinks.hpp
     src/lennardjonesium/output/sinks.cpp
+    src/lennardjonesium/output/dispatcher.hpp
+    src/lennardjonesium/output/dispatcher.cpp
 )
 
 add_library(control STATIC
@@ -217,6 +219,7 @@ else()
         tests/lennardjonesium/engine/test_initial_condition.cpp
 
         tests/lennardjonesium/output/test_sinks.cpp
+        tests/lennardjonesium/output/test_dispatcher.cpp
 
         tests/lennardjonesium/control/test_equilibration_phase.cpp
         tests/lennardjonesium/control/test_observation_phase.cpp
