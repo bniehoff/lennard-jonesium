@@ -8,8 +8,8 @@
 
 #include <catch2/catch.hpp>
 
-#include <lennardjonesium/physics/measurements.hpp>
-#include <lennardjonesium/physics/observation.hpp>
+#include <src/lennardjonesium/physics/measurements.hpp>
+#include <src/lennardjonesium/physics/observation.hpp>
 #include <src/lennardjonesium/output/log_message.hpp>
 #include <src/lennardjonesium/output/sinks.hpp>
 
