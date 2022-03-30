@@ -23,7 +23,6 @@
 #ifndef LJ_MESSAGE_BUFFER_HPP
 #define LJ_MESSAGE_BUFFER_HPP
 
-#include <cassert>
 #include <queue>
 #include <deque>
 #include <algorithm>
