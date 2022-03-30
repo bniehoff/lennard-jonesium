@@ -48,31 +48,56 @@ namespace tools
             /**
              * We hide the locking mechanisms behind the following interface:
              * 
-             *  1. MessageBuffer(int producer_count): We must tell the MessageBuffer how many
-             *      producers are expected to generate output, otherwise the consumers have no
-             *      way of knowing when all the producers are finished.  The default producer
-             *      count is 1.
+             *  1. put(T): A producer calls put(T) to add an item to the buffer.
              * 
-             *  2. put(T): A producer calls put(T) to add an item to the buffer.
-             * 
-             *  3. end(): A producer must call end() when it is finished.  When all the producers
-             *      have called end(), the consumer thread will then know that it has no further
-             *      messages to wait for, and can terminate once it finishes processing the
-             *      remaining items in the buffer.
-             * 
-             *  4. std::optional<T> get(): A consumer should call get() to obtain an item from the
+             *  2. std::optional<T> get(): A consumer should call get() to obtain an item from the
              *      buffer.  This call is blocking until either an item exists on the buffer, or
-             *      all the producers have finished.  If all producers have finished and the buffer
-             *      is empty, then get() returns std::nullopt.  Then the consumer knows that it can
+             *      the buffer has been closed.  If close() has been called and the buffer is
+             *      empty, then get() returns std::nullopt.  Then the consumer knows that it can
              *      terminate.
+             * 
+             *  3. close(): The owner of the MessageBuffer should call close() after all the
+             *      producers have finished.  This allows the consumers to get whatever items
+             *      remain in the queue, and then terminate themselves.
+             * 
+             * Whoever calls close() must of course know when the producers are actually finished.
+             * If there is only one produce, then it could call close() itself.  If there are
+             * multiple producers, then they will need to negotiate amongst themselves.  One
+             * possibility is for the ownership of the MessageBuffer to remain held by the process
+             * that launches the producer and consumer threads, rather than relinquish ownership
+             * via std::move().  Then one can have the following usage:
+             * 
+             *  {
+             *      MessageBuffer buffer;
+             *      std::thread producer1{...};
+             *      ...
+             *      std::thread producerM{...};
+             *      std::thread consumer1{...};
+             *      ...
+             *      std::thread consumerN{...};
+             * 
+             *      producer1.join();
+             *      ...
+             *      producerM.join();
+             *      buffer.close();
+             *      consumer1.join();
+             *      ...
+             *      consumerN.join();
+             *  }
+             * 
+             * This way, the buffer is closed after the producers finish.
+             * 
+             * NOTE: If close() is called before the producers finish, then some items produced
+             * might not be written to the queue.
+             * 
+             * NOTE: If join() is called on a consumer before buffer.close() is called, then the
+             * program will hang, since the consumer will be stuck waiting for the close() signal
+             * which will never be sent.
              */
 
             void put(T);
-            void end();
             std::optional<T> get();
-
-            MessageBuffer() = default;
-            explicit MessageBuffer(int producer_count) : producers_pending_{producer_count} {}
+            void close();
 
         private:
             // The mutex is used to lock access to the buffer_ and the producer_finished_ flag
@@ -83,13 +108,8 @@ namespace tools
 
             std::queue<T, std::deque<T, Alloc>> buffer_;
 
-            /**
-             * The producers have no way of knowing how many more producers are expected in the
-             * future unless we say explicitly.  When a producer calls end(), we decrement the
-             * pending count.  When it reaches zero, we know that we are not waiting for any
-             * further input.
-             */
-            int producers_pending_ = 1;
+            // Tracks whether the buffer is still accepting messages from producers
+            bool open_for_write_ = true;
     };
 
     template<class T, class Alloc>
@@ -98,25 +118,11 @@ namespace tools
         // Lock the mutex within a scope
         {
             std::lock_guard<std::mutex> lock(mutex_);
-            buffer_.push(std::move(message));
+            if (open_for_write_) {buffer_.push(std::move(message));}
         }
 
         // Signal that an item is in the buffer
         update_signal_.notify_one();
-    }
-
-    template<class T, class Alloc>
-    void MessageBuffer<T, Alloc>::end()
-    {
-        // Lock the mutex within a scope
-        {
-            std::lock_guard<std::mutex> lock(mutex_);
-            --producers_pending_;
-            assert(producers_pending_ >= 0 && "Tried to end more producers than expected");
-        }
-
-        // Signal that the pending count has changed
-        update_signal_.notify_all();
     }
 
     template<class T, class Alloc>
@@ -126,10 +132,10 @@ namespace tools
         {
             std::unique_lock<std::mutex> lock(mutex_);
 
-            // Wait until either the buffer is nonempty, or there are no producers active
+            // Wait until either the buffer is nonempty, or the buffer has been closed
             update_signal_.wait(
                 lock,
-                [&]() {return !this->buffer_.empty() || (this->producers_pending_ == 0);}
+                [&]() {return !this->buffer_.empty() || !this->open_for_write_;}
             );
 
             if (!buffer_.empty())
@@ -139,9 +145,22 @@ namespace tools
                 return message;
             }
 
-            // If the buffer is empty and there are no producers pending, return std::nullopt
+            // If the buffer is empty and closed for write, return std::nullopt
             return {};
         }
+    }
+
+    template<class T, class Alloc>
+    void MessageBuffer<T, Alloc>::close()
+    {
+        // Lock the mutex within a scope
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            open_for_write_ = false;
+        }
+
+        // Signal that the buffer is closed
+        update_signal_.notify_all();
     }
 } // namespace tools
 
