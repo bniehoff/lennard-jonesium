@@ -21,6 +21,7 @@
  */
 
 #include <variant>
+#include <algorithm>
 
 #include <lennardjonesium/tools/overloaded_visitor.hpp>
 #include <lennardjonesium/physics/system_state.hpp>
@@ -97,6 +98,9 @@ namespace control
                 if (!this->simulation_phases_.empty())
                 {
                     this->simulation_phases_.front()->set_start_time(time_step);
+                    
+                    // Prepare the command queue
+                    command_queue.push(AdvanceTime{});
 
                     // Log phase start event
                     this->logger_.log(time_step, output::PhaseStartEvent{
