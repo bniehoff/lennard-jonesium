@@ -3,6 +3,9 @@
  * put together to run a complete simulation.
  */
 
+#include <filesystem>
+#include <fstream>
+#include <sstream>
 #include <ranges>
 #include <utility>
 #include <memory>
@@ -21,6 +24,7 @@
 #include <src/lennardjonesium/engine/boundary_condition.hpp>
 #include <src/lennardjonesium/engine/initial_condition.hpp>
 #include <src/lennardjonesium/engine/integrator.hpp>
+#include <src/lennardjonesium/output/logger.hpp>
 #include <src/lennardjonesium/control/simulation_phase.hpp>
 #include <src/lennardjonesium/control/simulation.hpp>
 
@@ -53,7 +57,15 @@ double measure_temperature(physics::SystemState state, const engine::Integrator&
 SCENARIO("Equilibrating the system")
 {
     /**
-     * First create the initial condition.  We will deliberately create an initial condition with
+     * First set up the directory for writing simulation data files
+     */
+    namespace fs = std::filesystem;
+
+    fs::path test_dir{"test_system_equilibration"};
+    fs::create_directory(test_dir);
+
+    /**
+     * Next create the initial condition.  We will deliberately create an initial condition with
      * the wrong temperature, so that we can test that the equilibrator rescales appropriately.
      */
 
@@ -88,6 +100,23 @@ SCENARIO("Equilibrating the system")
 
     GIVEN("An EquilibrationPhase with a large tolerance")
     {
+        // Set up files for logging
+        fs::path local_dir = test_dir / "good_run";
+        fs::create_directory(local_dir);
+
+        fs::path event_log_path = local_dir / "events.txt";
+        std::ofstream event_log{event_log_path};
+
+        fs::path thermodynamic_log_path = local_dir / "thermodynamics.csv";
+        std::ofstream thermodynamic_log{thermodynamic_log_path};
+        
+        fs::path observation_log_path = local_dir / "observations.csv";
+        std::ofstream observation_log{observation_log_path};
+
+        // Set up the logger
+        output::Logger logger{event_log, thermodynamic_log, observation_log};
+
+        // Set up the Simulation
         control::EquilibrationPhase::Parameters equilibration_parameters{
             .tolerance {0.10},
             .sample_size {50},
@@ -106,7 +135,7 @@ SCENARIO("Equilibrating the system")
             )
         );
 
-        control::Simulation simulation(integrator, std::move(schedule));
+        control::Simulation simulation(integrator, std::move(schedule), logger);
 
         THEN("The system equilibrates to the desired temperature")
         {
@@ -125,6 +154,23 @@ SCENARIO("Equilibrating the system")
 
     GIVEN("An EquilibrationPhase with a very small tolerance")
     {
+        // Set up files for logging
+        fs::path local_dir = test_dir / "bad_run";
+        fs::create_directory(local_dir);
+
+        fs::path event_log_path = local_dir / "events.txt";
+        std::ofstream event_log{event_log_path};
+
+        fs::path thermodynamic_log_path = local_dir / "thermodynamics.csv";
+        std::ofstream thermodynamic_log{thermodynamic_log_path};
+        
+        fs::path observation_log_path = local_dir / "observations.csv";
+        std::ofstream observation_log{observation_log_path};
+
+        // Set up the logger
+        output::Logger logger{event_log, thermodynamic_log, observation_log};
+
+        // Set up the Simulation
         control::EquilibrationPhase::Parameters equilibration_parameters{
             .tolerance {0.000001},
             .sample_size {50},
@@ -143,7 +189,7 @@ SCENARIO("Equilibrating the system")
             )
         );
 
-        control::Simulation simulation(integrator, std::move(schedule));
+        control::Simulation simulation(integrator, std::move(schedule), logger);
 
         THEN("The system fails to equilibrate")
         {
@@ -159,4 +205,7 @@ SCENARIO("Equilibrating the system")
             );
         }
     }
+
+    // Clean up
+    fs::remove_all(test_dir);
 }
