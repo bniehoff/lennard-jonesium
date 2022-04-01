@@ -21,12 +21,15 @@
  */
 
 #include <variant>
+#include <algorithm>
 
 #include <lennardjonesium/tools/overloaded_visitor.hpp>
 #include <lennardjonesium/physics/system_state.hpp>
 #include <lennardjonesium/physics/transformations.hpp>
 #include <lennardjonesium/physics/measurements.hpp>
 #include <lennardjonesium/engine/integrator.hpp>
+#include <lennardjonesium/output/log_message.hpp>
+#include <lennardjonesium/output/logger.hpp>
 #include <lennardjonesium/control/command_queue.hpp>
 #include <lennardjonesium/control/simulation_phase.hpp>
 #include <lennardjonesium/control/simulation.hpp>
@@ -45,6 +48,7 @@ namespace control
         simulation_phases_.front()->set_start_time(time_step);
 
         // Log phase start event
+        logger_.log(time_step, output::PhaseStartEvent{simulation_phases_.front()->name()});
 
         // Prepare the CommandQueue which will control execution
         CommandQueue command_queue;
@@ -58,16 +62,19 @@ namespace control
                 state | this->integrator_(command.time_steps) | measurement;
 
                 // Log the measurement
+                this->logger_.log(time_step, output::ThermodynamicData{measurement.result()});
 
                 time_step += command.time_steps;
                 this->simulation_phases_.front()->evaluate(command_queue, time_step, measurement);
             },
 
-            [&](const RecordObservation& command [[maybe_unused]])
+            [&](const RecordObservation& command)
             {
                 // Send observation to file
+                this->logger_.log(time_step, output::ObservationData{command.observation});
 
                 // Log observation event
+                this->logger_.log(time_step, output::RecordObservationEvent{});
             },
 
             [&](const AdjustTemperature& command)
@@ -75,11 +82,15 @@ namespace control
                 state | physics::set_temperature(command.temperature);
 
                 // Log temperature adjustment event
+                this->logger_.log(time_step, output::AdjustTemperatureEvent{command.temperature});
             },
 
             [&](const PhaseComplete& command [[maybe_unused]])
             {
                 // Log phase complete event
+                this->logger_.log(time_step, output::PhaseCompleteEvent{
+                    this->simulation_phases_.front()->name()
+                });
                 
                 this->simulation_phases_.pop();
 
@@ -87,14 +98,21 @@ namespace control
                 if (!this->simulation_phases_.empty())
                 {
                     this->simulation_phases_.front()->set_start_time(time_step);
+                    
+                    // Prepare the command queue
+                    command_queue.push(AdvanceTime{});
 
                     // Log phase start event
+                    this->logger_.log(time_step, output::PhaseStartEvent{
+                        this->simulation_phases_.front()->name()
+                    });
                 }
             },
 
-            [&](const AbortSimulation& command [[maybe_unused]])
+            [&](const AbortSimulation& command)
             {
                 // Log abort event
+                this->logger_.log(time_step, output::AbortSimulationEvent{command.reason});
             }
         };
         

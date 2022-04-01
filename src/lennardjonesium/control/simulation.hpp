@@ -29,6 +29,7 @@
 
 #include <lennardjonesium/physics/system_state.hpp>
 #include <lennardjonesium/engine/integrator.hpp>
+#include <lennardjonesium/output/logger.hpp>
 #include <lennardjonesium/control/simulation_phase.hpp>
 
 namespace control
@@ -42,24 +43,10 @@ namespace control
          * keeping track of the time step count, as well as pushing relevant data to various
          * message queues.
          * 
-         * We need the following message queues for logging, which each go to separate files:
-         *  1. Events (such as when phases start and stop)
-         *  2. Observations (results obtained during ObservationPhase)
-         *  3. Thermodynamic measurements (every time step, instantaneous measurements are taken)
-         *  4. System trajectory (snapshot every time step of first N particles in SystemState)
-         * 
-         * The first three will be combined into a single buffer, which is then dispatched to the
-         * appropriate output destination by the Dispatcher at the other end of the buffer.
-         * 
-         * The system trajectory should be given its own buffer and its own consumer thread, because
-         * one possible use of this will be to draw to the screen to give a live visualization of
-         * the simulation.
-         * 
-         * TODO: It is possible that we might want to display other information on the screen,
-         * so this may be something to revisit when we ever get around to learning something like
-         * OpenGL.  For now, the system trajectory will only be used to write to a file for later
-         * visualization.  (Actually, it may be skipped entirely until a later stage of this
-         * project, since it is not important for computing the physics.)
+         * TODO: We have implemented the main message queue, however one thing we'd like to add is
+         * some output of the full system trajectory.  This could be used to draw to the screen,
+         * or write to a file which could afterwards be used to make a movie.  The system trajectory
+         * should get its own buffer, as it will require some special handling.
          */
 
         public:
@@ -69,15 +56,18 @@ namespace control
 
             Simulation(
                 const engine::Integrator& integrator,
-                Schedule schedule
+                Schedule schedule,
+                output::Logger& logger
             )
                 : integrator_{integrator},
-                  simulation_phases_{std::move(schedule)}
+                  simulation_phases_{std::move(schedule)},
+                  logger_{logger}
             {}
         
         private:
             const engine::Integrator& integrator_;
             Schedule simulation_phases_;
+            output::Logger& logger_;
     };
 } // namespace control
 

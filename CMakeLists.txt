@@ -186,6 +186,8 @@ else()
     add_library(mock STATIC
         tests/mock/constant_short_range_force.hpp
         tests/mock/constant_short_range_force.cpp
+        tests/mock/fixed_phases.hpp
+        tests/mock/fixed_phases.cpp
     )
 
     target_link_libraries(mock
@@ -226,6 +228,7 @@ else()
 
         tests/lennardjonesium/control/test_equilibration_phase.cpp
         tests/lennardjonesium/control/test_observation_phase.cpp
+        tests/lennardjonesium/control/test_simulation.cpp
     )
 
     target_link_libraries(unit_tests
