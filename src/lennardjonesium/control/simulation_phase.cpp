@@ -20,15 +20,11 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include <memory>
-#include <variant>
-#include <queue>
-
 #include <lennardjonesium/tools/math.hpp>
 #include <lennardjonesium/tools/moving_sample.hpp>
 #include <lennardjonesium/physics/measurements.hpp>
 #include <lennardjonesium/physics/observation.hpp>
-
+#include <lennardjonesium/control/command_queue.hpp>
 #include <lennardjonesium/control/simulation_phase.hpp>
 
 namespace control
