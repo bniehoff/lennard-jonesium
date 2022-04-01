@@ -103,4 +103,7 @@ SCENARIO("Simulation correctly interprets commands")
             }
         }
     }
+
+    // Clean up
+    fs::remove_all(test_dir);
 }
