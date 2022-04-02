@@ -265,6 +265,11 @@ else()
     )
 
     include(Catch)
-    catch_discover_tests(unit_tests WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/temp)
-    # catch_discover_tests(integration_tests WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/temp)
+
+    # Make sure the temp directory exists (otherwise catch_discover_tests fails!)
+    set(lj_temp_dir ${PROJECT_SOURCE_DIR}/temp)
+    file(MAKE_DIRECTORY ${lj_temp_dir})
+
+    catch_discover_tests(unit_tests WORKING_DIRECTORY ${lj_temp_dir})
+    # catch_discover_tests(integration_tests WORKING_DIRECTORY ${lj_temp_dir})
 endif()
