@@ -69,6 +69,11 @@ SCENARIO("Logger sends to correct files")
 
         // Close the logger
         logger.close();
+
+        // Close the files
+        event_log.close();
+        thermodynamic_log.close();
+        observation_log.close();
         
         WHEN("I read the events log back in")
         {
