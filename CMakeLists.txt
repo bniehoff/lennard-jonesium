@@ -111,6 +111,8 @@ add_library(engine STATIC
     src/lennardjonesium/engine/integrator.cpp
     src/lennardjonesium/engine/initial_condition.hpp
     src/lennardjonesium/engine/initial_condition.cpp
+    src/lennardjonesium/engine/integrator_factory.hpp
+    src/lennardjonesium/engine/integrator_factory.cpp
 )
 
 add_library(output STATIC
@@ -246,23 +248,23 @@ else()
         PRIVATE control
     )
 
-    # add_executable(integration_tests
-    #     tests/integration/test_system_equilibration.cpp
-    # )
+    add_executable(integration_tests
+        tests/integration/test_system_equilibration.cpp
+    )
 
-    # target_link_libraries(integration_tests
-    #     PRIVATE Eigen3::Eigen
-    #     PRIVATE Catch2::Catch2WithMain
-    #     # PRIVATE fmt::fmt
-    #     # PRIVATE Microsoft.GSL::GSL
-    #     # PRIVATE ktl::ktl
-    #     PRIVATE mock
-    #     PRIVATE tools
-    #     PRIVATE physics
-    #     PRIVATE engine
-    #     PRIVATE output
-    #     PRIVATE control
-    # )
+    target_link_libraries(integration_tests
+        PRIVATE Eigen3::Eigen
+        PRIVATE Catch2::Catch2WithMain
+        # PRIVATE fmt::fmt
+        # PRIVATE Microsoft.GSL::GSL
+        # PRIVATE ktl::ktl
+        PRIVATE mock
+        PRIVATE tools
+        PRIVATE physics
+        PRIVATE engine
+        PRIVATE output
+        PRIVATE control
+    )
 
     include(Catch)
 

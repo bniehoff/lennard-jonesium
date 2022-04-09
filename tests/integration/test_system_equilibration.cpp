@@ -19,11 +19,12 @@
 #include <src/lennardjonesium/tools/system_parameters.hpp>
 #include <src/lennardjonesium/physics/system_state.hpp>
 #include <src/lennardjonesium/physics/measurements.hpp>
-#include <src/lennardjonesium/engine/particle_pair_filter.hpp>
-#include <src/lennardjonesium/engine/force_calculation.hpp>
-#include <src/lennardjonesium/engine/boundary_condition.hpp>
+// #include <src/lennardjonesium/engine/particle_pair_filter.hpp>
+// #include <src/lennardjonesium/engine/force_calculation.hpp>
+// #include <src/lennardjonesium/engine/boundary_condition.hpp>
 #include <src/lennardjonesium/engine/initial_condition.hpp>
 #include <src/lennardjonesium/engine/integrator.hpp>
+#include <src/lennardjonesium/engine/integrator_factory.hpp>
 #include <src/lennardjonesium/output/logger.hpp>
 #include <src/lennardjonesium/control/simulation_phase.hpp>
 #include <src/lennardjonesium/control/simulation.hpp>
@@ -86,17 +87,23 @@ SCENARIO("Equilibrating the system")
     // Now set up the Integrator (could really use a factory method for this)
     double force = 4.0;
     double cutoff_distance = 2.0;
-    double time_step = 0.005;
+    double time_delta = 0.005;
 
-    tools::BoundingBox bounding_box = initial_condition.bounding_box();
+    auto short_range_force = std::make_unique<mock::ConstantShortRangeForce>(
+        force, cutoff_distance
+    );
 
-    mock::ConstantShortRangeForce short_range_force{force, cutoff_distance};
-    engine::CellListParticlePairFilter particle_pair_filter(bounding_box, cutoff_distance);
+    engine::IntegratorFactory::TypeSelections type_selections{
+        // Don't try this, it actually takes forever!
+        // .particle_pair_filter = engine::ParticlePairFilterType::naive
+    };
 
-    engine::ShortRangeForceCalculation force_calculation{short_range_force, particle_pair_filter};
-    engine::PeriodicBoundaryCondition boundary_condition(bounding_box);
-
-    engine::VelocityVerletIntegrator integrator(time_step, boundary_condition, force_calculation);
+    auto integrator = engine::IntegratorFactory::make_integrator(
+        time_delta,
+        initial_condition.bounding_box(),
+        std::move(short_range_force),
+        type_selections
+    );
 
     GIVEN("An EquilibrationPhase with a large tolerance")
     {
@@ -135,7 +142,7 @@ SCENARIO("Equilibrating the system")
             )
         );
 
-        control::Simulation simulation(integrator, std::move(schedule), logger);
+        control::Simulation simulation(*integrator, std::move(schedule), logger);
 
         THEN("The system equilibrates to the desired temperature")
         {
@@ -145,7 +152,7 @@ SCENARIO("Equilibrating the system")
 
             REQUIRE(
                 tools::relative_error(
-                    measure_temperature(state, integrator),
+                    measure_temperature(state, *integrator),
                     target_system_parameters.temperature
                 ) < equilibration_parameters.tolerance
             );
@@ -189,7 +196,7 @@ SCENARIO("Equilibrating the system")
             )
         );
 
-        control::Simulation simulation(integrator, std::move(schedule), logger);
+        control::Simulation simulation(*integrator, std::move(schedule), logger);
 
         THEN("The system fails to equilibrate")
         {
@@ -199,7 +206,7 @@ SCENARIO("Equilibrating the system")
 
             REQUIRE(
                 tools::relative_error(
-                    measure_temperature(state, integrator),
+                    measure_temperature(state, *integrator),
                     target_system_parameters.temperature
                 ) > equilibration_parameters.tolerance
             );
