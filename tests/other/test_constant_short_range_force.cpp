@@ -23,7 +23,7 @@ SCENARIO("Constant forces with cutoff distance")
             double distance = 2.0;
 
             Eigen::Vector4d separation{0, 0, distance, 0};
-            physics::ForceContribution fc = short_range_force(separation);
+            physics::ForceContribution fc = short_range_force.compute(separation);
 
             THEN("I get the expected values")
             {
@@ -41,7 +41,7 @@ SCENARIO("Constant forces with cutoff distance")
             double distance = 4.0;
 
             Eigen::Vector4d separation{0, 0, distance, 0};
-            physics::ForceContribution fc = short_range_force(separation);
+            physics::ForceContribution fc = short_range_force.compute(separation);
 
             THEN("I get the expected values")
             {
@@ -59,7 +59,7 @@ SCENARIO("Constant forces with cutoff distance")
             double distance = 8.0;
 
             Eigen::Vector4d separation{0, 0, distance, 0};
-            physics::ForceContribution fc = short_range_force(separation);
+            physics::ForceContribution fc = short_range_force.compute(separation);
 
             THEN("I get zero")
             {

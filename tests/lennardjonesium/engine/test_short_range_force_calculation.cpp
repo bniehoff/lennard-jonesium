@@ -2,6 +2,8 @@
  * Test ShortRangeForceCalculation
  */
 
+#include <memory>
+
 #include <catch2/catch.hpp>
 #include <Eigen/Dense>
 
@@ -26,10 +28,11 @@ SCENARIO("Computing forces between particles")
         double force_strength{-10.0};
 
         tools::BoundingBox bounding_box{box_size};
-        mock::ConstantShortRangeForce short_range_force{force_strength, cutoff_distance};
-        engine::CellListParticlePairFilter filter{bounding_box, cutoff_distance};
 
-        engine::ShortRangeForceCalculation force_calculation{short_range_force, filter};
+        engine::ShortRangeForceCalculation force_calculation(
+            std::make_unique<mock::ConstantShortRangeForce>(force_strength, cutoff_distance),
+            std::make_unique<engine::CellListParticlePairFilter>(bounding_box, cutoff_distance)
+        );
 
         WHEN("I put the particles near each other in the same cell")
         {
@@ -115,10 +118,11 @@ SCENARIO("Computing forces between particles")
         double force_strength{-10.0};
 
         tools::BoundingBox bounding_box{box_size};
-        mock::ConstantShortRangeForce short_range_force{force_strength, cutoff_distance};
-        engine::CellListParticlePairFilter filter{bounding_box, cutoff_distance};
 
-        engine::ShortRangeForceCalculation force_calculation{short_range_force, filter};
+        engine::ShortRangeForceCalculation force_calculation(
+            std::make_unique<mock::ConstantShortRangeForce>(force_strength, cutoff_distance),
+            std::make_unique<engine::CellListParticlePairFilter>(bounding_box, cutoff_distance)
+        );
 
         WHEN("I put the particles near each other in an L shape")
         {

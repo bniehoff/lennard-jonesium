@@ -37,7 +37,7 @@ namespace mock
             ConstantShortRangeForce(double force, double cutoff_length);
 
             virtual physics::ForceContribution
-            operator() (const Eigen::Ref<const Eigen::Vector4d>& separation) const override;
+            compute(const Eigen::Ref<const Eigen::Vector4d>& separation) const override;
 
             virtual double cutoff_distance() const override;
         

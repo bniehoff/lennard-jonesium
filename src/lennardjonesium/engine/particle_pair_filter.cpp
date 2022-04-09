@@ -65,7 +65,7 @@ namespace engine
     }
 
     tools::aligned_generator<ParticlePair>
-    NaiveParticlePairFilter::operator() (const physics::SystemState& state)
+    NaiveParticlePairFilter::pairs(const physics::SystemState& state)
     {
         /**
          * Naively, we do a double loop over every pair of particles in the system, and return
@@ -129,7 +129,7 @@ namespace engine
     {}
 
     tools::aligned_generator<ParticlePair>
-    CellListParticlePairFilter::operator() (const physics::SystemState& state)
+    CellListParticlePairFilter::pairs(const physics::SystemState& state)
     {
         /**
          * We use a CellListArray to find the pairs of particles which are within the cutoff
