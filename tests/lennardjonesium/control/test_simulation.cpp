@@ -32,7 +32,7 @@ SCENARIO("Simulation correctly interprets commands")
     // Next set up the initial condition
     // Define system parameters
     tools::SystemParameters system_parameters{
-        .temperature {0.5},
+        .temperature {1.5},
         .density {1.0},
         .particle_count {4}
     };
@@ -40,7 +40,7 @@ SCENARIO("Simulation correctly interprets commands")
     // This always uses the default random seed, so the test is repeatable
     engine::InitialCondition initial_condition(system_parameters);
 
-    // Now set up an integrator that imposes no forces
+    // Set up integrator options with no forces
     double time_delta = 0.25;
 
     GIVEN("A two-phase Simulation run with mock phases")
@@ -62,8 +62,8 @@ SCENARIO("Simulation correctly interprets commands")
         control::Simulation::Schedule schedule;
         schedule.push(std::make_unique<mock::SuccessPhase>("SuccessPhase"));
         schedule.push(std::make_unique<mock::FailurePhase>("FailurePhase"));
-        
-        engine::VelocityVerletIntegrator integrator(
+
+        auto integrator = engine::VelocityVerletIntegrator(
             time_delta,
             std::make_unique<engine::PeriodicBoundaryCondition>(initial_condition.bounding_box()),
             std::make_unique<engine::NullForceCalculation>()
