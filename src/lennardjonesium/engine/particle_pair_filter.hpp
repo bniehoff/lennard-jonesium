@@ -64,14 +64,17 @@ namespace engine
 
         public:
             // This constructor should be inherited by derived classes with `using`
-            ParticlePairFilter(const tools::BoundingBox& bounding_box, double cutoff_distance);
+            ParticlePairFilter(tools::BoundingBox bounding_box, double cutoff_distance);
 
             // Generate the ParticlePairs filtered by separation distance
             virtual tools::aligned_generator<ParticlePair>
-            operator() (const physics::SystemState&) = 0;
+            pairs(const physics::SystemState&) = 0;
+
+            // Make sure dynamically allocated derived classes are properly destroyed
+            virtual ~ParticlePairFilter() = default;
         
         protected:
-            const tools::BoundingBox& bounding_box_;
+            const tools::BoundingBox bounding_box_;
             double cutoff_distance_;
     };
 
@@ -84,18 +87,18 @@ namespace engine
 
             // Generate the ParticlePairs filtered by separation distance
             virtual tools::aligned_generator<ParticlePair>
-            operator() (const physics::SystemState&) override;
+            pairs(const physics::SystemState&) override;
     };
 
     class CellListParticlePairFilter : public ParticlePairFilter
     {
         public:
             CellListParticlePairFilter
-                (const tools::BoundingBox& bounding_box, double cutoff_distance);
+                (tools::BoundingBox bounding_box, double cutoff_distance);
             
             // Generate the ParticlePairs filtered by separation distance
             virtual tools::aligned_generator<ParticlePair>
-            operator() (const physics::SystemState&) override;
+            pairs(const physics::SystemState&) override;
         
         protected:
             tools::CellListArray cell_list_array_;

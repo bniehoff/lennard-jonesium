@@ -111,6 +111,8 @@ add_library(engine STATIC
     src/lennardjonesium/engine/integrator.cpp
     src/lennardjonesium/engine/initial_condition.hpp
     src/lennardjonesium/engine/initial_condition.cpp
+    src/lennardjonesium/engine/integrator_factory.hpp
+    src/lennardjonesium/engine/integrator_factory.cpp
 )
 
 add_library(output STATIC

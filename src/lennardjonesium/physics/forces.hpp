@@ -75,10 +75,13 @@ namespace physics
         public:
             // Compute a ForceContribution from a separation vector
             virtual ForceContribution
-            operator() (const Eigen::Ref<const Eigen::Vector4d>& separation) const = 0;
+            compute(const Eigen::Ref<const Eigen::Vector4d>& separation) const = 0;
 
             // Get the cutoff distance
             virtual double cutoff_distance() const = 0;
+
+            // Make sure dynamically allocated derived classes are properly destroyed
+            virtual ~ShortRangeForce() = default;
     };
 
     class BackgroundForce
@@ -91,7 +94,10 @@ namespace physics
 
         public:
             virtual ForceContribution
-            operator() (const Eigen::Ref<const Eigen::Vector4d>& position) const = 0;
+            compute(const Eigen::Ref<const Eigen::Vector4d>& position) const = 0;
+
+            // Make sure dynamically allocated derived classes are properly destroyed
+            virtual ~BackgroundForce() = default;
     };
 } // namespace physics
 

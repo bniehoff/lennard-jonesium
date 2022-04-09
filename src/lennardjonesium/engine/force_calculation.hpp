@@ -23,6 +23,8 @@
 #ifndef LJ_FORCE_CALCULATION_HPP
 #define LJ_FORCE_CALCULATION_HPP
 
+#include <memory>
+
 #include <lennardjonesium/physics/system_state.hpp>
 #include <lennardjonesium/physics/forces.hpp>
 #include <lennardjonesium/engine/particle_pair_filter.hpp>
@@ -51,15 +53,18 @@ namespace engine
         public:
             // Compute the forces resulting from this interaction
             virtual physics::SystemState& operator() (physics::SystemState&) const = 0;
+
+            // Make sure dynamically allocated derived classes are properly destroyed
+            virtual ~ForceCalculation() = default;
     };
 
-    // Single instance of anonymous subclass that calculates no forces
-    inline const class : public ForceCalculation
+    // Create a type that calculates no forces
+    class NullForceCalculation : public ForceCalculation
     {
         public:
             virtual physics::SystemState& operator() (physics::SystemState& s) const override
             {return s;}
-    } null_force_calculation;
+    };
 
     // The following derived classes will also be useful
 
@@ -67,31 +72,31 @@ namespace engine
     {
         public:
             ShortRangeForceCalculation(
-                const physics::ShortRangeForce& short_range_force,
-                engine::ParticlePairFilter& particle_pair_filter
+                std::unique_ptr<const physics::ShortRangeForce> short_range_force,
+                std::unique_ptr<ParticlePairFilter> particle_pair_filter
             );
 
             // Compute the forces resulting from this interaction
             virtual physics::SystemState& operator() (physics::SystemState&) const override;
         
         private:
-            const physics::ShortRangeForce& short_range_force_;
+            std::unique_ptr<const physics::ShortRangeForce> short_range_force_;
 
             // Can't be const, because some types use internal state
-            engine::ParticlePairFilter& particle_pair_filter_;
+            std::unique_ptr<ParticlePairFilter> particle_pair_filter_;
     };
 
     class BackgroundForceCalculation : public ForceCalculation
     {
         public:
-            BackgroundForceCalculation(const physics::BackgroundForce& background_force);
+            BackgroundForceCalculation(std::unique_ptr<const physics::BackgroundForce>);
 
             // Compute the forces resulting from this interaction
             virtual physics::SystemState& operator() (physics::SystemState&) const override;
         
         private:
-            const physics::BackgroundForce& background_force_;
+            std::unique_ptr<const physics::BackgroundForce> background_force_;
     };
-} // namespace physics
+} // namespace engine
 
 #endif

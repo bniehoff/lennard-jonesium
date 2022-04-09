@@ -32,7 +32,7 @@ namespace mock
         : force_{force}, cutoff_distance_{cutoff_length}
     {}
 
-    physics::ForceContribution ConstantShortRangeForce::operator()
+    physics::ForceContribution ConstantShortRangeForce::compute
         (const Eigen::Ref<const Eigen::Vector4d>& separation) const
     {
         // We will use the norm of the separation vector

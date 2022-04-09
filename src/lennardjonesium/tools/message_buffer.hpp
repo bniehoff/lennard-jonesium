@@ -60,7 +60,7 @@ namespace tools
              *      remain in the queue, and then terminate themselves.
              * 
              * Whoever calls close() must of course know when the producers are actually finished.
-             * If there is only one produce, then it could call close() itself.  If there are
+             * If there is only one producer, then it could call close() itself.  If there are
              * multiple producers, then they will need to negotiate amongst themselves.  One
              * possibility is for the ownership of the MessageBuffer to remain held by the process
              * that launches the producer and consumer threads, rather than relinquish ownership

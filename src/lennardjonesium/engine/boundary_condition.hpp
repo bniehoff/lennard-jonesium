@@ -40,16 +40,19 @@ namespace engine
         public:
             // Imposes the boundary conditions on the system state
             virtual physics::SystemState& operator() (physics::SystemState&) const = 0;
+
+            // Make sure dynamically allocated derived classes are properly destroyed
+            virtual ~BoundaryCondition() = default;
             
     };
 
-    // Single instance of anonymous subclass that imposes no boundary conditions
-    inline const class : public BoundaryCondition
+    // Create a type that imposes no boundary conditions
+    class NullBoundaryCondition : public BoundaryCondition
     {
         public:
             virtual physics::SystemState& operator() (physics::SystemState& s) const override
             {return s;}
-    } null_boundary_condition;
+    };
 
     class PeriodicBoundaryCondition : public BoundaryCondition
     {
@@ -63,10 +66,10 @@ namespace engine
             virtual physics::SystemState& operator() (physics::SystemState&) const override;
 
             // Create a PeriodicBoundaryCondition from a BoundingBox
-            explicit PeriodicBoundaryCondition(const tools::BoundingBox&);
+            explicit PeriodicBoundaryCondition(tools::BoundingBox);
         
         private:
-            const tools::BoundingBox& bounding_box_;
+            const tools::BoundingBox bounding_box_;
             
     };
 } // namespace engine
