@@ -19,9 +19,6 @@
 #include <src/lennardjonesium/tools/system_parameters.hpp>
 #include <src/lennardjonesium/physics/system_state.hpp>
 #include <src/lennardjonesium/physics/measurements.hpp>
-// #include <src/lennardjonesium/engine/particle_pair_filter.hpp>
-// #include <src/lennardjonesium/engine/force_calculation.hpp>
-// #include <src/lennardjonesium/engine/boundary_condition.hpp>
 #include <src/lennardjonesium/engine/initial_condition.hpp>
 #include <src/lennardjonesium/engine/integrator.hpp>
 #include <src/lennardjonesium/engine/integrator_factory.hpp>
