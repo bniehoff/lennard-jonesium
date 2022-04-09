@@ -68,7 +68,10 @@ namespace engine
 
             // Generate the ParticlePairs filtered by separation distance
             virtual tools::aligned_generator<ParticlePair>
-            operator() (const physics::SystemState&) = 0;
+            pairs(const physics::SystemState&) = 0;
+
+            // Make sure dynamically allocated derived classes are properly destroyed
+            virtual ~ParticlePairFilter() = default;
         
         protected:
             const tools::BoundingBox& bounding_box_;
@@ -84,7 +87,7 @@ namespace engine
 
             // Generate the ParticlePairs filtered by separation distance
             virtual tools::aligned_generator<ParticlePair>
-            operator() (const physics::SystemState&) override;
+            pairs(const physics::SystemState&) override;
     };
 
     class CellListParticlePairFilter : public ParticlePairFilter
@@ -95,7 +98,7 @@ namespace engine
             
             // Generate the ParticlePairs filtered by separation distance
             virtual tools::aligned_generator<ParticlePair>
-            operator() (const physics::SystemState&) override;
+            pairs(const physics::SystemState&) override;
         
         protected:
             tools::CellListArray cell_list_array_;

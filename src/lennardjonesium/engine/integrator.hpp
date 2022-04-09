@@ -23,6 +23,8 @@
 #ifndef LJ_INTEGRATOR_HPP
 #define LJ_INTEGRATOR_HPP
 
+#include <memory>
+
 #include <lennardjonesium/physics/system_state.hpp>
 #include <lennardjonesium/engine/force_calculation.hpp>
 #include <lennardjonesium/engine/boundary_condition.hpp>
@@ -53,23 +55,30 @@ namespace engine
             virtual physics::SystemState::Operator operator() (int steps) const final;
 
             /**
-             * Create a "default" integrator with the given timestep, and no interactions or
+             * Create a "default" integrator with the given time_delta, and no interactions or
              * boundary conditions.
              */
-            explicit Integrator(double timestep);
+            explicit Integrator(double time_delta);
 
-            // Create an integrator with the given time step, interaction, and boundary condition
-            Integrator(double timestep, const BoundaryCondition&, const ForceCalculation&);
+            // Create an integrator with the given time delta, interaction, and boundary condition
+            Integrator(
+                double time_delta,
+                std::unique_ptr<const BoundaryCondition>,
+                std::unique_ptr<const ForceCalculation>
+            );
+
+            // Make sure dynamically allocated derived classes are properly destroyed
+            virtual ~Integrator() = default;
 
         protected:
             // The time step by which we will increment (assumed fixed)
-            const double timestep_;
+            const double time_delta_;
 
             // A state operator that imposes the boundary condition
-            const BoundaryCondition& boundary_condition_;
+            std::unique_ptr<const BoundaryCondition> boundary_condition_;
 
             // A state operator that computes the forces, potential energy, and virial
-            const ForceCalculation& force_calculation_;
+            std::unique_ptr<const ForceCalculation> force_calculation_;
     };
 
     // We implement specific integration algorithms as derived classes

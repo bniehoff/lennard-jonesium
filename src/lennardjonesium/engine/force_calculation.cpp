@@ -20,6 +20,9 @@
  * <https://www.gnu.org/licenses/>.
  */
 
+#include <cassert>
+#include <memory>
+#include <utility>
 #include <ranges>
 
 #include <lennardjonesium/physics/system_state.hpp>
@@ -30,11 +33,15 @@
 namespace engine
 {
     ShortRangeForceCalculation::ShortRangeForceCalculation(
-        const physics::ShortRangeForce& short_range_force,
-        engine::ParticlePairFilter& particle_pair_filter
+        std::unique_ptr<const physics::ShortRangeForce> short_range_force,
+        std::unique_ptr<ParticlePairFilter> particle_pair_filter
     )
-        : short_range_force_{short_range_force}, particle_pair_filter_{particle_pair_filter}
-    {}
+        : short_range_force_{std::move(short_range_force)},
+          particle_pair_filter_{std::move(particle_pair_filter)}
+    {
+        assert(short_range_force_ != nullptr && "No ShortRangeForce given");
+        assert(particle_pair_filter_ != nullptr && "No ParticlePairFilter given");
+    }
 
     physics::SystemState&
     ShortRangeForceCalculation::operator() (physics::SystemState& state) const
@@ -49,9 +56,9 @@ namespace engine
         state | physics::clear_dynamics;
 
         // Now iterate over the pairs of particles
-        for (const auto& pair : particle_pair_filter_(state))
+        for (const auto& pair : particle_pair_filter_->pairs(state))
         {
-            auto force_contribution = short_range_force_(pair.separation);
+            auto force_contribution = short_range_force_->compute(pair.separation);
 
             state.forces.col(pair.first) += force_contribution.force;
             state.forces.col(pair.second) -= force_contribution.force;
@@ -64,9 +71,11 @@ namespace engine
     }
 
     BackgroundForceCalculation::BackgroundForceCalculation
-        (const physics::BackgroundForce& background_force)
-        : background_force_{background_force}
-    {}
+        (std::unique_ptr<const physics::BackgroundForce> background_force)
+        : background_force_{std::move(background_force)}
+    {
+        assert(background_force_ != nullptr && "No BackgroundForce given");
+    }
 
     physics::SystemState&
     BackgroundForceCalculation::operator() (physics::SystemState& state) const
@@ -81,7 +90,7 @@ namespace engine
         // Now iterate over the particles
         for (int i : std::views::iota(0, state.particle_count()))
         {
-            auto force_contribution = background_force_(state.positions.col(i));
+            auto force_contribution = background_force_->compute(state.positions.col(i));
 
             state.forces.col(i) += force_contribution.force;
             state.potential_energy += force_contribution.potential;

@@ -2,6 +2,8 @@
  * Test Velocity Verlet Integrator
  */
 
+#include <memory>
+
 #include <catch2/catch.hpp>
 #include <Eigen/Dense>
 
@@ -148,12 +150,13 @@ SCENARIO("Inertial motion with boundary conditions")
 
     // Put the particles in a 3x3x3 box
     auto bounding_box = BoundingBox{3.0};
-    auto boundary_condition = PeriodicBoundaryCondition{bounding_box};
 
     // Configure integrator with time step 1
     double time_step{1.0};
     auto integrator = VelocityVerletIntegrator(
-        time_step, boundary_condition, engine::null_force_calculation
+        time_step,
+        std::make_unique<PeriodicBoundaryCondition>(bounding_box),
+        std::make_unique<engine::NullForceCalculation>()
     );
 
     WHEN("I evolve the state by 4 time steps")
@@ -198,12 +201,13 @@ SCENARIO("Motion under a gravitational force with boundary conditions")
 
     // Put the particles in a 3x3x3 box
     auto bounding_box = BoundingBox{3.0};
-    auto boundary_condition = PeriodicBoundaryCondition{bounding_box};
 
     // Configure integrator with time step 1
     double time_step{1.0};
     auto integrator = VelocityVerletIntegrator(
-        time_step, boundary_condition, engine::null_force_calculation
+        time_step,
+        std::make_unique<PeriodicBoundaryCondition>(bounding_box),
+        std::make_unique<engine::NullForceCalculation>()
     );
 
     WHEN("I evolve the state by 4 time steps")

@@ -246,23 +246,23 @@ else()
         PRIVATE control
     )
 
-    add_executable(integration_tests
-        tests/integration/test_system_equilibration.cpp
-    )
+    # add_executable(integration_tests
+    #     tests/integration/test_system_equilibration.cpp
+    # )
 
-    target_link_libraries(integration_tests
-        PRIVATE Eigen3::Eigen
-        PRIVATE Catch2::Catch2WithMain
-        # PRIVATE fmt::fmt
-        # PRIVATE Microsoft.GSL::GSL
-        # PRIVATE ktl::ktl
-        PRIVATE mock
-        PRIVATE tools
-        PRIVATE physics
-        PRIVATE engine
-        PRIVATE output
-        PRIVATE control
-    )
+    # target_link_libraries(integration_tests
+    #     PRIVATE Eigen3::Eigen
+    #     PRIVATE Catch2::Catch2WithMain
+    #     # PRIVATE fmt::fmt
+    #     # PRIVATE Microsoft.GSL::GSL
+    #     # PRIVATE ktl::ktl
+    #     PRIVATE mock
+    #     PRIVATE tools
+    #     PRIVATE physics
+    #     PRIVATE engine
+    #     PRIVATE output
+    #     PRIVATE control
+    # )
 
     include(Catch)
 

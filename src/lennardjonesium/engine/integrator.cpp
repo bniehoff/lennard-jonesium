@@ -20,6 +20,9 @@
  * <https://www.gnu.org/licenses/>.
  */
 
+#include <cassert>
+#include <utility>
+#include <memory>
 #include <ranges>
 
 #include <lennardjonesium/physics/system_state.hpp>
@@ -31,19 +34,24 @@ namespace engine
 {
     // Create an integrator with the given time step, force_calculation, and boundary condition
     Integrator::Integrator(
-        double timestep,
-        const BoundaryCondition& boundary_condition,
-        const ForceCalculation& force_calculation
+        double time_delta,
+        std::unique_ptr<const BoundaryCondition> boundary_condition,
+        std::unique_ptr<const ForceCalculation> force_calculation
     )
-        : timestep_{timestep},
-          boundary_condition_{boundary_condition},
-          force_calculation_{force_calculation}
-    {}
+        : time_delta_{time_delta},
+          boundary_condition_{std::move(boundary_condition)},
+          force_calculation_{std::move(force_calculation)}
+    {
+        assert(boundary_condition_ != nullptr && "No BoundaryCondition given");
+        assert(force_calculation_ != nullptr && "No ForceCalculation given");
+    }
 
     // Delegate to the above constructor with null force calculation and boundary condition
-    Integrator::Integrator(double timestep)
+    Integrator::Integrator(double time_delta)
         : Integrator::Integrator(
-            timestep, engine::null_boundary_condition, engine::null_force_calculation
+            time_delta,
+            std::make_unique<const NullBoundaryCondition>(),
+            std::make_unique<const NullForceCalculation>()
         )
     {}
 
@@ -67,23 +75,23 @@ namespace engine
          */
 
         // First get the half increment to the velocities using the current value of the forces
-        auto velocity_half_step = state.velocities + (1./2.) * state.forces * timestep_;
+        auto velocity_half_step = state.velocities + (1./2.) * state.forces * time_delta_;
 
         // With the half-incremented velocities, give positions and displacements a full
         // increment:
-        auto position_increment = velocity_half_step * timestep_;
+        auto position_increment = velocity_half_step * time_delta_;
         state.positions += position_increment;
         state.displacements += position_increment;
 
         // Next impose boundary conditions and calculate forces
-        state | boundary_condition_ | force_calculation_;
+        state | *boundary_condition_ | *force_calculation_;
 
         // Update the velocities using the first half increment and a second half
         // increment based on the new forces:
-        state.velocities = velocity_half_step + (1./2.) * state.forces * timestep_;
+        state.velocities = velocity_half_step + (1./2.) * state.forces * time_delta_;
 
         // Update the elapsed time
-        state.time += timestep_;
+        state.time += time_delta_;
 
         return state;
     }

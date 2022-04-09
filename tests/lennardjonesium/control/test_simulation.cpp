@@ -42,12 +42,6 @@ SCENARIO("Simulation correctly interprets commands")
 
     // Now set up an integrator that imposes no forces
     double time_delta = 0.25;
-    engine::PeriodicBoundaryCondition boundary_condition{initial_condition.bounding_box()};
-    engine::VelocityVerletIntegrator integrator(
-        time_delta,
-        boundary_condition,
-        engine::null_force_calculation
-    );
 
     GIVEN("A two-phase Simulation run with mock phases")
     {
@@ -68,6 +62,12 @@ SCENARIO("Simulation correctly interprets commands")
         control::Simulation::Schedule schedule;
         schedule.push(std::make_unique<mock::SuccessPhase>("SuccessPhase"));
         schedule.push(std::make_unique<mock::FailurePhase>("FailurePhase"));
+        
+        engine::VelocityVerletIntegrator integrator(
+            time_delta,
+            std::make_unique<engine::PeriodicBoundaryCondition>(initial_condition.bounding_box()),
+            std::make_unique<engine::NullForceCalculation>()
+        );
 
         control::Simulation simulation(integrator, std::move(schedule), logger);
 

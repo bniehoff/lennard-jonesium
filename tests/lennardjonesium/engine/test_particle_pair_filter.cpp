@@ -96,7 +96,7 @@ SCENARIO("Finding ParticlePairs within a cutoff distance")
 
         std::vector<engine::ParticlePair> result_pairs;
 
-        for (engine::ParticlePair pair : filter(state))
+        for (engine::ParticlePair pair : filter.pairs(state))
         {
             result_pairs.push_back(pair);
         }
@@ -113,7 +113,7 @@ SCENARIO("Finding ParticlePairs within a cutoff distance")
 
         std::vector<engine::ParticlePair> result_pairs;
 
-        for (engine::ParticlePair pair : filter(state))
+        for (engine::ParticlePair pair : filter.pairs(state))
         {
             result_pairs.push_back(pair);
         }
