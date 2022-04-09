@@ -66,10 +66,10 @@ namespace engine
             virtual physics::SystemState& operator() (physics::SystemState&) const override;
 
             // Create a PeriodicBoundaryCondition from a BoundingBox
-            explicit PeriodicBoundaryCondition(const tools::BoundingBox&);
+            explicit PeriodicBoundaryCondition(tools::BoundingBox);
         
         private:
-            const tools::BoundingBox& bounding_box_;
+            const tools::BoundingBox bounding_box_;
             
     };
 } // namespace engine

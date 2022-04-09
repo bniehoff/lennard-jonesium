@@ -48,7 +48,7 @@ namespace engine
     }
 
     ParticlePairFilter::ParticlePairFilter
-        (const tools::BoundingBox& bounding_box, double cutoff_distance)
+        (tools::BoundingBox bounding_box, double cutoff_distance)
         : bounding_box_{bounding_box}, cutoff_distance_{cutoff_distance}
     {
         /**
@@ -123,7 +123,7 @@ namespace engine
     }
 
     CellListParticlePairFilter::CellListParticlePairFilter
-        (const tools::BoundingBox& bounding_box, double cutoff_distance)
+        (tools::BoundingBox bounding_box, double cutoff_distance)
         : ParticlePairFilter::ParticlePairFilter{bounding_box, cutoff_distance},
           cell_list_array_{bounding_box, cutoff_distance}
     {}

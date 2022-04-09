@@ -30,7 +30,7 @@ using physics::SystemState;
 
 namespace engine
 {
-    PeriodicBoundaryCondition::PeriodicBoundaryCondition(const tools::BoundingBox& bounding_box)
+    PeriodicBoundaryCondition::PeriodicBoundaryCondition(tools::BoundingBox bounding_box)
         : bounding_box_{bounding_box}
     {}
 
