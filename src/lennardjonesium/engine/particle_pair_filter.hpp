@@ -64,7 +64,7 @@ namespace engine
 
         public:
             // This constructor should be inherited by derived classes with `using`
-            ParticlePairFilter(const tools::BoundingBox& bounding_box, double cutoff_distance);
+            ParticlePairFilter(tools::BoundingBox bounding_box, double cutoff_distance);
 
             // Generate the ParticlePairs filtered by separation distance
             virtual tools::aligned_generator<ParticlePair>
@@ -74,7 +74,7 @@ namespace engine
             virtual ~ParticlePairFilter() = default;
         
         protected:
-            const tools::BoundingBox& bounding_box_;
+            const tools::BoundingBox bounding_box_;
             double cutoff_distance_;
     };
 
@@ -94,7 +94,7 @@ namespace engine
     {
         public:
             CellListParticlePairFilter
-                (const tools::BoundingBox& bounding_box, double cutoff_distance);
+                (tools::BoundingBox bounding_box, double cutoff_distance);
             
             // Generate the ParticlePairs filtered by separation distance
             virtual tools::aligned_generator<ParticlePair>
