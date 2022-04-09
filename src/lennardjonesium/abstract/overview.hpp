@@ -35,6 +35,7 @@
  * TODO: Turn this into a Markdown file once we have a better idea of everything.
  */
 
+#include <iostream>
 #include <functional>
 #include <concepts>
 #include <type_traits>
@@ -204,18 +205,26 @@ namespace tools
 
         public:
             /**
-             * We hide the locking mechanisms behind this interface.  The Producer should use
-             * put(T) to place an item in the buffer, and call end() when it has no more items to
-             * place (this allows the Consumer to know when the Producer is finished).  The Consumer
-             * should get() to obtain an item from the buffer.  The call to get() will block until
-             * an item is obtained; or, if the Producer has called end(), then get() will return
-             * std::nullopt.  In this way, the Consumer can deduce that the buffer is empty and will
-             * receive no further input, so that the Consumer can terminate.
+             * We hide the locking mechanisms behind the following interface:
+             * 
+             *  1. put(T): A producer calls put(T) to add an item to the buffer.
+             * 
+             *  2. std::optional<T> get(): A consumer should call get() to obtain an item from the
+             *      buffer.  This call is blocking until either an item exists on the buffer, or
+             *      the buffer has been closed.  If close() has been called and the buffer is
+             *      empty, then get() returns std::nullopt.  Then the consumer knows that it can
+             *      terminate.
+             * 
+             *  3. close(): The owner of the MessageBuffer should call close() after all the
+             *      producers have finished.  This allows the consumers to get whatever items
+             *      remain in the queue, and then terminate themselves.
+             * 
+             * Whoever calls close() must of course know when the producers are actually finished.
              */
-            
+
             void put(T);
-            void end();
             std::optional<T> get();
+            void close();
     };
 } // namespace tools
 
@@ -451,8 +460,6 @@ namespace engine
          */
 
         public:
-            ForceCalculation(const tools::BoundingBox&, const physics::ShortRangeForce&);
-
             // The ForceCalculation is an Operator that acts on the SystemState
             virtual physics::SystemState& operator() (physics::SystemState&) const = 0;
 
@@ -517,37 +524,158 @@ namespace engine
 namespace output
 {
     /**
-     * We first define the format we expect to use for Messages which will be logged to various
-     * files.  They will be combined into a std::variant so that we can switch on the type of
-     * message.
+     * There are several types of LogMessages which will be combined into a std::variant.  The
+     * Dispatcher will be responsible for taking these messages from the message buffer and sending
+     * them to the appropriate destination.
      */
 
-    struct EventMessage
+    struct PhaseStartEvent
     {
-        int time_step;
-        std::string description;
+        std::string name;
     };
 
-    struct ObservationMessage
+    struct AdjustTemperatureEvent
     {
-        int time_step;
-        physics::Observation observation;
+        double temperature;
     };
 
-    struct ThermodynamicMessage
+    struct RecordObservationEvent {};
+
+    struct PhaseCompleteEvent
     {
-        int time_step;
-        physics::ThermodynamicMeasurement::Result result;
+        std::string name;
     };
 
-    using Message = std::variant<
-        EventMessage,
-        ObservationMessage,
-        ThermodynamicMessage
+    struct AbortSimulationEvent
+    {
+        std::string reason;
+    };
+
+    struct ThermodynamicData
+    {
+        physics::ThermodynamicMeasurement::Result data;
+    };
+
+    struct ObservationData
+    {
+        physics::Observation data;
+    };
+
+    using LogMessage = std::variant<
+        PhaseStartEvent,
+        AdjustTemperatureEvent,
+        RecordObservationEvent,
+        PhaseCompleteEvent,
+        AbortSimulationEvent,
+        ThermodynamicData,
+        ObservationData
     >;
+    
+    /**
+     * A Sink represents some logging destination.  It could be a file, or the console, or in
+     * principle anything.  Sink is a thin wrapper around some actual IO object; its main
+     * responsibility is to actually format log messages into strings before they are sent
+     * to their final destination.
+     * 
+     * There are three types of Sinks which record different types of LogMessages to different
+     * destinations:
+     * 
+     *  EventSink
+     *  ThermodynamicSink
+     *  ObservationSink
+     */
 
-    // The Buffer class itself is just a type alias
-    using Buffer = tools::MessageBuffer<Message>;
+    /**
+     * EventSink will handle writing event messages to the events file, which gives a rough
+     * summary of what happened during the simulation.
+     */
+    class EventSink
+    {
+        public:
+            virtual void write_header() override;
+
+            virtual void write(int time_step, PhaseStartEvent message) override;
+            virtual void write(int time_step, AdjustTemperatureEvent message) override;
+            virtual void write(int time_step, RecordObservationEvent message) override;
+            virtual void write(int time_step, PhaseCompleteEvent message) override;
+            virtual void write(int time_step, AbortSimulationEvent message) override;
+    };
+
+    /**
+     * ThermodynamicSink will record the raw (instantaneous) thermodynamic measurements to a file,
+     * which will allow us to re-analyze them later, if desired.
+     */
+    class ThermodynamicSink
+    {
+        public:
+            virtual void write_header() override;
+
+            virtual void write(int time_step, ThermodynamicData message) override;
+    };
+
+    /**
+     * ObservationSink will record the statistical-mechanical Observation results to a file.
+     */
+    class ObservationSink
+    {
+        public:
+            virtual void write_header() override;
+
+            virtual void write(int time_step, ObservationData message) override;
+    };
+    
+    class Dispatcher
+    {
+        /**
+         * The Dispatcher takes a message from the message queue and sends it to the appropriate
+         * Sink, based on the type of message.
+         */
+
+        public:
+            void send(int time_step, LogMessage message);
+
+            void flush_all();
+
+            Dispatcher(
+                EventSink& event_sink,
+                ThermodynamicSink& thermodynamic_sink,
+                ObservationSink& observation_sink
+            );
+    };
+    
+    class Logger
+    {
+        /**
+         * The Logger prints the relevant simulation data to output streams.  It is not a flexible
+         * and generic logging system like the Boost logging library, nor is it intended for
+         * diagnostic output.  Its main purpose is to record the actual physics data that is
+         * produced in the course of simulation.
+         * 
+         * NOTE: The files it produces are meant to be permanent (not rotated like system logs).
+         * The Logger accepts std::ostream& arguments to its constructor; the caller is responsible
+         * for configuring these streams and making sure they point to opened files.  The caller
+         * is also responsible for closing the streams afterward.
+         */
+
+        public:
+            Logger(
+                std::ostream& event_log,
+                std::ostream& thermodynamic_log,
+                std::ostream& observation_log
+            );
+
+            // Used by producer thread to send log messages, which will be dispatched to the
+            // appropriate destination
+            void log(int time_step, LogMessage message);
+
+            // Call close() after producer threads are finished, this clears the message buffer
+            // and terminates consumer thread (optional)
+            // Note that there is no way to reopen logging
+            void close();
+
+            // If close() was not called, perform the same operations when we go out of scope
+            ~Logger() noexcept;
+    };
 } // namespace output
 
 
@@ -623,7 +751,11 @@ namespace control
 
             physics::SystemState& operator() (physics::SystemState&);
 
-            Simulation(const engine::Integrator&, Schedule);
+            Simulation(
+                const engine::Integrator& integrator,
+                Schedule schedule,
+                output::Logger& logger
+            );
     };
 } // namespace control
 
