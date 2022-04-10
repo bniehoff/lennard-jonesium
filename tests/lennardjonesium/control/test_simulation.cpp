@@ -66,7 +66,7 @@ SCENARIO("Simulation correctly interprets commands")
         auto integrator = engine::VelocityVerletIntegrator(
             time_delta,
             std::make_unique<engine::PeriodicBoundaryCondition>(initial_condition.bounding_box()),
-            std::make_unique<engine::NullForceCalculation>()
+            nullptr
         );
 
         control::Simulation simulation(integrator, std::move(schedule), logger);
