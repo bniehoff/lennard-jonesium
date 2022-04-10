@@ -20,7 +20,6 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include <cassert>
 #include <utility>
 #include <memory>
 #include <ranges>
@@ -41,18 +40,11 @@ namespace engine
         : time_delta_{time_delta},
           boundary_condition_{std::move(boundary_condition)},
           force_calculation_{std::move(force_calculation)}
-    {
-        assert(boundary_condition_ != nullptr && "No BoundaryCondition given");
-        assert(force_calculation_ != nullptr && "No ForceCalculation given");
-    }
+    {}
 
     // Delegate to the above constructor with null force calculation and boundary condition
     Integrator::Integrator(double time_delta)
-        : Integrator::Integrator(
-            time_delta,
-            std::make_unique<const NullBoundaryCondition>(),
-            std::make_unique<const NullForceCalculation>()
-        )
+        : Integrator::Integrator(time_delta, nullptr, nullptr)
     {}
 
     // Returns an Operator which integrates by count time steps
@@ -84,7 +76,8 @@ namespace engine
         state.displacements += position_increment;
 
         // Next impose boundary conditions and calculate forces
-        state | *boundary_condition_ | *force_calculation_;
+        if (boundary_condition_) [[likely]] {state | *boundary_condition_;}
+        if (force_calculation_) [[likely]] {state | *force_calculation_;}
 
         // Update the velocities using the first half increment and a second half
         // increment based on the new forces:

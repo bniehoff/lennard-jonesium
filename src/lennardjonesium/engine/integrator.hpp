@@ -67,12 +67,20 @@ namespace engine
                 std::unique_ptr<const ForceCalculation>
             );
 
+            /**
+             * Although the constructor is rather simple, the process of putting together a
+             * BoundaryCondition and a ForceCalculation requires multiple steps of creating various
+             * internal components, so we define a builder class which can take care of this.  Its
+             * definition will be given in a separate header.
+             */
+            class Builder;
+
             // Make sure dynamically allocated derived classes are properly destroyed
             virtual ~Integrator() = default;
 
         protected:
             // The time step by which we will increment (assumed fixed)
-            const double time_delta_;
+            double time_delta_;
 
             // A state operator that imposes the boundary condition
             std::unique_ptr<const BoundaryCondition> boundary_condition_;

@@ -156,7 +156,7 @@ SCENARIO("Inertial motion with boundary conditions")
     auto integrator = VelocityVerletIntegrator(
         time_step,
         std::make_unique<PeriodicBoundaryCondition>(bounding_box),
-        std::make_unique<engine::NullForceCalculation>()
+        nullptr
     );
 
     WHEN("I evolve the state by 4 time steps")
@@ -207,7 +207,7 @@ SCENARIO("Motion under a gravitational force with boundary conditions")
     auto integrator = VelocityVerletIntegrator(
         time_step,
         std::make_unique<PeriodicBoundaryCondition>(bounding_box),
-        std::make_unique<engine::NullForceCalculation>()
+        nullptr
     );
 
     WHEN("I evolve the state by 4 time steps")

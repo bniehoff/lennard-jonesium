@@ -46,14 +46,6 @@ namespace engine
             
     };
 
-    // Create a type that imposes no boundary conditions
-    class NullBoundaryCondition : public BoundaryCondition
-    {
-        public:
-            virtual physics::SystemState& operator() (physics::SystemState& s) const override
-            {return s;}
-    };
-
     class PeriodicBoundaryCondition : public BoundaryCondition
     {
         /**
