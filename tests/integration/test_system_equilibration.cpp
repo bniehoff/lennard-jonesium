@@ -21,7 +21,7 @@
 #include <src/lennardjonesium/physics/measurements.hpp>
 #include <src/lennardjonesium/engine/initial_condition.hpp>
 #include <src/lennardjonesium/engine/integrator.hpp>
-#include <src/lennardjonesium/engine/integrator_factory.hpp>
+#include <src/lennardjonesium/engine/integrator_builder.hpp>
 #include <src/lennardjonesium/output/logger.hpp>
 #include <src/lennardjonesium/control/simulation_phase.hpp>
 #include <src/lennardjonesium/control/simulation.hpp>
@@ -90,17 +90,11 @@ SCENARIO("Equilibrating the system")
         force, cutoff_distance
     );
 
-    engine::IntegratorFactory::TypeSelections type_selections{
-        // Don't try this, it actually takes forever!
-        // .particle_pair_filter = engine::ParticlePairFilterType::naive
-    };
-
-    auto integrator = engine::IntegratorFactory::make_integrator(
-        time_delta,
-        initial_condition.bounding_box(),
-        std::move(short_range_force),
-        type_selections
-    );
+    engine::Integrator::Builder builder{time_delta};
+    auto integrator = builder
+        .bounding_box(initial_condition.bounding_box())
+        .short_range_force(std::move(short_range_force))
+        .build();
 
     GIVEN("An EquilibrationPhase with a large tolerance")
     {

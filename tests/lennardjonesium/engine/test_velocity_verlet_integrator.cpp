@@ -10,6 +10,7 @@
 #include <src/lennardjonesium/tools/bounding_box.hpp>
 #include <src/lennardjonesium/physics/system_state.hpp>
 #include <src/lennardjonesium/engine/integrator.hpp>
+#include <src/lennardjonesium/engine/integrator_builder.hpp>
 #include <src/lennardjonesium/engine/boundary_condition.hpp>
 
 using Eigen::Matrix4Xd;
@@ -153,15 +154,12 @@ SCENARIO("Inertial motion with boundary conditions")
 
     // Configure integrator with time step 1
     double time_step{1.0};
-    auto integrator = VelocityVerletIntegrator(
-        time_step,
-        std::make_unique<PeriodicBoundaryCondition>(bounding_box),
-        std::make_unique<engine::NullForceCalculation>()
-    );
+    engine::Integrator::Builder builder{time_step};
+    auto integrator = builder.bounding_box(bounding_box).build();
 
     WHEN("I evolve the state by 4 time steps")
     {
-        state | integrator | integrator | integrator | integrator;
+        state | *integrator | *integrator | *integrator | *integrator;
 
         THEN("The positions move in the expected way")
         {
@@ -204,15 +202,12 @@ SCENARIO("Motion under a gravitational force with boundary conditions")
 
     // Configure integrator with time step 1
     double time_step{1.0};
-    auto integrator = VelocityVerletIntegrator(
-        time_step,
-        std::make_unique<PeriodicBoundaryCondition>(bounding_box),
-        std::make_unique<engine::NullForceCalculation>()
-    );
+    engine::Integrator::Builder builder{time_step};
+    auto integrator = builder.bounding_box(bounding_box).build();
 
     WHEN("I evolve the state by 4 time steps")
     {
-        state | integrator | integrator | integrator | integrator;
+        state | *integrator | *integrator | *integrator | *integrator;
 
         // Expected result from four iterations of Velocity Verlet with timestep 1.0
         const double expected_z_coordinate = 1.0;

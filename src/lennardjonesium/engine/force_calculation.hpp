@@ -58,14 +58,6 @@ namespace engine
             virtual ~ForceCalculation() = default;
     };
 
-    // Create a type that calculates no forces
-    class NullForceCalculation : public ForceCalculation
-    {
-        public:
-            virtual physics::SystemState& operator() (physics::SystemState& s) const override
-            {return s;}
-    };
-
     // The following derived classes will also be useful
 
     class ShortRangeForceCalculation : public ForceCalculation
