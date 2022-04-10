@@ -15,6 +15,7 @@
 #include <src/lennardjonesium/engine/boundary_condition.hpp>
 #include <src/lennardjonesium/engine/initial_condition.hpp>
 #include <src/lennardjonesium/engine/integrator.hpp>
+#include <src/lennardjonesium/engine/integrator_builder.hpp>
 #include <src/lennardjonesium/output/logger.hpp>
 #include <src/lennardjonesium/control/simulation_phase.hpp>
 #include <src/lennardjonesium/control/simulation.hpp>
@@ -40,8 +41,11 @@ SCENARIO("Simulation correctly interprets commands")
     // This always uses the default random seed, so the test is repeatable
     engine::InitialCondition initial_condition(system_parameters);
 
-    // Set up integrator options with no forces
+    // Set up integrator with no forces
     double time_delta = 0.25;
+    engine::Integrator::Builder builder{time_delta};
+
+    auto integrator = builder.bounding_box(initial_condition.bounding_box()).build();
 
     GIVEN("A two-phase Simulation run with mock phases")
     {
@@ -63,13 +67,7 @@ SCENARIO("Simulation correctly interprets commands")
         schedule.push(std::make_unique<mock::SuccessPhase>("SuccessPhase"));
         schedule.push(std::make_unique<mock::FailurePhase>("FailurePhase"));
 
-        auto integrator = engine::VelocityVerletIntegrator(
-            time_delta,
-            std::make_unique<engine::PeriodicBoundaryCondition>(initial_condition.bounding_box()),
-            nullptr
-        );
-
-        control::Simulation simulation(integrator, std::move(schedule), logger);
+        control::Simulation simulation(*integrator, std::move(schedule), logger);
 
         // Run the simulation
         physics::SystemState state = initial_condition.system_state();
