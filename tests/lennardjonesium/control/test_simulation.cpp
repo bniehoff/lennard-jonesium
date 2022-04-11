@@ -41,11 +41,9 @@ SCENARIO("Simulation correctly interprets commands")
     // This always uses the default random seed, so the test is repeatable
     engine::InitialCondition initial_condition(system_parameters);
 
-    // Set up integrator with no forces
+    // Set up integrator builder with time delta that prints nicely
     double time_delta = 0.25;
     engine::Integrator::Builder builder{time_delta};
-
-    auto integrator = builder.bounding_box(initial_condition.bounding_box()).build();
 
     GIVEN("A two-phase Simulation run with mock phases")
     {
@@ -67,7 +65,11 @@ SCENARIO("Simulation correctly interprets commands")
         schedule.push(std::make_unique<mock::SuccessPhase>("SuccessPhase"));
         schedule.push(std::make_unique<mock::FailurePhase>("FailurePhase"));
 
-        control::Simulation simulation(*integrator, std::move(schedule), logger);
+        // Set up integrator with no forces
+        auto integrator = builder.bounding_box(initial_condition.bounding_box()).build();
+
+        // Create simulation
+        control::Simulation simulation(std::move(integrator), std::move(schedule), logger);
 
         // Run the simulation
         physics::SystemState state = initial_condition.system_state();
@@ -76,6 +78,11 @@ SCENARIO("Simulation correctly interprets commands")
 
         // Close the logger
         logger.close();
+
+        // Close the files
+        event_log.close();
+        thermodynamic_log.close();
+        observation_log.close();
 
         WHEN("I read the events log back in")
         {

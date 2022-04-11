@@ -59,7 +59,7 @@ namespace control
         {
             [&](const AdvanceTime& command)
             {
-                state | this->integrator_(command.time_steps) | measurement;
+                state | (*this->integrator_)(command.time_steps) | measurement;
 
                 // Log the measurement
                 this->logger_.log(time_step, output::ThermodynamicData{measurement.result()});

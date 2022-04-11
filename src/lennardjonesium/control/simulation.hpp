@@ -23,6 +23,7 @@
 #ifndef LJ_SIMULATION_HPP
 #define LJ_SIMULATION_HPP
 
+#include <cassert>
 #include <queue>
 #include <utility>
 #include <memory>
@@ -55,17 +56,19 @@ namespace control
             physics::SystemState& operator() (physics::SystemState&);
 
             Simulation(
-                const engine::Integrator& integrator,
+                std::unique_ptr<const engine::Integrator> integrator,
                 Schedule schedule,
                 output::Logger& logger
             )
-                : integrator_{integrator},
+                : integrator_{std::move(integrator)},
                   simulation_phases_{std::move(schedule)},
                   logger_{logger}
-            {}
+            {
+                assert(integrator_ != nullptr && "No Integrator instance given");
+            }
         
         private:
-            const engine::Integrator& integrator_;
+            std::unique_ptr<const engine::Integrator> integrator_;
             Schedule simulation_phases_;
             output::Logger& logger_;
     };
