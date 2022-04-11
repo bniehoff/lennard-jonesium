@@ -109,11 +109,9 @@ add_library(engine STATIC
     src/lennardjonesium/engine/force_calculation.cpp
     src/lennardjonesium/engine/integrator.hpp
     src/lennardjonesium/engine/integrator.cpp
+    src/lennardjonesium/engine/integrator_builder.hpp
     src/lennardjonesium/engine/initial_condition.hpp
     src/lennardjonesium/engine/initial_condition.cpp
-    src/lennardjonesium/engine/integrator_builder.hpp
-    # src/lennardjonesium/engine/integrator_factory.hpp
-    # src/lennardjonesium/engine/integrator_factory.cpp
 )
 
 add_library(output STATIC
@@ -132,6 +130,7 @@ add_library(control STATIC
     src/lennardjonesium/control/simulation_phase.cpp
     src/lennardjonesium/control/simulation.hpp
     src/lennardjonesium/control/simulation.cpp
+    src/lennardjonesium/control/simulation_job.hpp
 )
 
 # Link the various dependencies

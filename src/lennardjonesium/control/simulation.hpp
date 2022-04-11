@@ -55,6 +55,10 @@ namespace control
 
             physics::SystemState& operator() (physics::SystemState&);
 
+            // This allows us to operate on the return value of a function rather than a
+            // pre-existing SystemState object
+            physics::SystemState operator() (physics::SystemState&& s) {return operator()(s);}
+
             Simulation(
                 std::unique_ptr<const engine::Integrator> integrator,
                 Schedule schedule,
