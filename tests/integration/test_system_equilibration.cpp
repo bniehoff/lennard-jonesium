@@ -81,19 +81,23 @@ SCENARIO("Equilibrating the system")
     // This always uses the default random seed, so the test is repeatable
     engine::InitialCondition initial_condition(system_parameters);
 
-    // Now set up the Integrator (could really use a factory method for this)
+    // Now set up the IntegratorBuilder
     double force = 4.0;
     double cutoff_distance = 2.0;
     double time_delta = 0.005;
 
-    auto short_range_force = std::make_unique<mock::ConstantShortRangeForce>(
+    engine::Integrator::Builder builder{time_delta};
+
+    // Build one integrator to use for temperature measurement
+    // (Since the unique_ptr is passed to the simulation, we cannot reuse the same integrator)
+    // TODO: Need Simulation builder to make this more convenient
+    auto measurement_force = std::make_unique<mock::ConstantShortRangeForce>(
         force, cutoff_distance
     );
 
-    engine::Integrator::Builder builder{time_delta};
-    auto integrator = builder
+    auto measurement_integrator = builder
         .bounding_box(initial_condition.bounding_box())
-        .short_range_force(std::move(short_range_force))
+        .short_range_force(std::move(measurement_force))
         .build();
 
     GIVEN("An EquilibrationPhase with a large tolerance")
@@ -133,7 +137,16 @@ SCENARIO("Equilibrating the system")
             )
         );
 
-        control::Simulation simulation(*integrator, std::move(schedule), logger);
+        auto short_range_force = std::make_unique<mock::ConstantShortRangeForce>(
+            force, cutoff_distance
+        );
+        
+        auto integrator = builder
+            .bounding_box(initial_condition.bounding_box())
+            .short_range_force(std::move(short_range_force))
+            .build();
+
+        control::Simulation simulation(std::move(integrator), std::move(schedule), logger);
 
         THEN("The system equilibrates to the desired temperature")
         {
@@ -143,7 +156,7 @@ SCENARIO("Equilibrating the system")
 
             REQUIRE(
                 tools::relative_error(
-                    measure_temperature(state, *integrator),
+                    measure_temperature(state, *measurement_integrator),
                     target_system_parameters.temperature
                 ) < equilibration_parameters.tolerance
             );
@@ -187,7 +200,16 @@ SCENARIO("Equilibrating the system")
             )
         );
 
-        control::Simulation simulation(*integrator, std::move(schedule), logger);
+        auto short_range_force = std::make_unique<mock::ConstantShortRangeForce>(
+            force, cutoff_distance
+        );
+        
+        auto integrator = builder
+            .bounding_box(initial_condition.bounding_box())
+            .short_range_force(std::move(short_range_force))
+            .build();
+
+        control::Simulation simulation(std::move(integrator), std::move(schedule), logger);
 
         THEN("The system fails to equilibrate")
         {
@@ -197,7 +219,7 @@ SCENARIO("Equilibrating the system")
 
             REQUIRE(
                 tools::relative_error(
-                    measure_temperature(state, *integrator),
+                    measure_temperature(state, *measurement_integrator),
                     target_system_parameters.temperature
                 ) > equilibration_parameters.tolerance
             );
