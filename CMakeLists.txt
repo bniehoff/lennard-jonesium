@@ -130,7 +130,6 @@ add_library(control STATIC
     src/lennardjonesium/control/simulation_phase.cpp
     src/lennardjonesium/control/simulation.hpp
     src/lennardjonesium/control/simulation.cpp
-    src/lennardjonesium/control/simulation_job.hpp
 )
 
 # Link the various dependencies
@@ -205,6 +204,7 @@ else()
     add_executable(unit_tests
         tests/other/test_eigen.cpp
         tests/other/test_modulo.cpp
+        tests/other/test_reference_unique_ptr.cpp
         tests/other/test_constant_short_range_force.cpp
 
         tests/lennardjonesium/greeter/test_greeter.cpp
