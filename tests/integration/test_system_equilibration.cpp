@@ -24,7 +24,7 @@
 #include <src/lennardjonesium/engine/integrator_builder.hpp>
 #include <src/lennardjonesium/output/logger.hpp>
 #include <src/lennardjonesium/control/simulation_phase.hpp>
-#include <src/lennardjonesium/control/simulation.hpp>
+#include <src/lennardjonesium/control/simulation_controller.hpp>
 
 #include <tests/mock/constant_short_range_force.hpp>
 
@@ -118,7 +118,7 @@ SCENARIO("Equilibrating the system")
         // Set up the logger
         output::Logger logger{event_log, thermodynamic_log, observation_log};
 
-        // Set up the Simulation
+        // Set up the SimulationController
         control::EquilibrationPhase::Parameters equilibration_parameters{
             .tolerance {0.10},
             .sample_size {50},
@@ -127,7 +127,7 @@ SCENARIO("Equilibrating the system")
             .timeout {50000}
         };
 
-        control::Simulation::Schedule schedule;
+        control::SimulationController::Schedule schedule;
 
         schedule.push(
             std::make_unique<control::EquilibrationPhase>(
@@ -146,7 +146,7 @@ SCENARIO("Equilibrating the system")
             .short_range_force(std::move(short_range_force))
             .build();
 
-        control::Simulation simulation(std::move(integrator), std::move(schedule), logger);
+        control::SimulationController simulation(std::move(integrator), std::move(schedule), logger);
 
         THEN("The system equilibrates to the desired temperature")
         {
@@ -181,7 +181,7 @@ SCENARIO("Equilibrating the system")
         // Set up the logger
         output::Logger logger{event_log, thermodynamic_log, observation_log};
 
-        // Set up the Simulation
+        // Set up the SimulationController
         control::EquilibrationPhase::Parameters equilibration_parameters{
             .tolerance {0.000001},
             .sample_size {50},
@@ -190,7 +190,7 @@ SCENARIO("Equilibrating the system")
             .timeout {20000}
         };
 
-        control::Simulation::Schedule schedule;
+        control::SimulationController::Schedule schedule;
 
         schedule.push(
             std::make_unique<control::EquilibrationPhase>(
@@ -209,7 +209,7 @@ SCENARIO("Equilibrating the system")
             .short_range_force(std::move(short_range_force))
             .build();
 
-        control::Simulation simulation(std::move(integrator), std::move(schedule), logger);
+        control::SimulationController simulation(std::move(integrator), std::move(schedule), logger);
 
         THEN("The system fails to equilibrate")
         {

@@ -33,12 +33,12 @@ namespace control
 {
     /**
      * We use the Command pattern to implement communication between the SimulationPhase and the
-     * Simulation.  A Command is a std::variant among the following types.  When the Simulation
-     * receives a Command, it will execute the appropriate action.
+     * SimulationController.  A Command is a std::variant among the following types.  When the
+     * SimulationController receives a Command, it will execute the appropriate action.
      * 
-     * We use std::variant and delegate the interpretation of these commands to the Simulation, so
-     * that SimulationPhase does not acquire a dependency on Simulation in order to effectively
-     * control it.
+     * We use std::variant and delegate the interpretation of these commands to the
+     * SimulationController, so that SimulationPhase does not acquire a dependency on
+     * SimulationController in order to effectively control it.
      */
 
     // Use the integrator to advance by some number of time steps

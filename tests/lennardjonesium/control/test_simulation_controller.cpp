@@ -1,5 +1,5 @@
 /**
- * Test the Simulation class
+ * Test the SimulationController class
  */
 
 #include <filesystem>
@@ -18,11 +18,11 @@
 #include <src/lennardjonesium/engine/integrator_builder.hpp>
 #include <src/lennardjonesium/output/logger.hpp>
 #include <src/lennardjonesium/control/simulation_phase.hpp>
-#include <src/lennardjonesium/control/simulation.hpp>
+#include <src/lennardjonesium/control/simulation_controller.hpp>
 
 #include <tests/mock/fixed_phases.hpp>
 
-SCENARIO("Simulation correctly interprets commands")
+SCENARIO("SimulationController correctly interprets commands")
 {
     // First set up the directory for writing simulation data files
     namespace fs = std::filesystem;
@@ -45,7 +45,7 @@ SCENARIO("Simulation correctly interprets commands")
     double time_delta = 0.25;
     engine::Integrator::Builder builder{time_delta};
 
-    GIVEN("A two-phase Simulation run with mock phases")
+    GIVEN("A two-phase SimulationController run with mock phases")
     {
         // Set up files for logging
         fs::path event_log_path = test_dir / "events.txt";
@@ -60,8 +60,8 @@ SCENARIO("Simulation correctly interprets commands")
         // Set up the logger
         output::Logger logger{event_log, thermodynamic_log, observation_log};
 
-        // Set up the Simulation
-        control::Simulation::Schedule schedule;
+        // Set up the SimulationController
+        control::SimulationController::Schedule schedule;
         schedule.push(std::make_unique<mock::SuccessPhase>("SuccessPhase"));
         schedule.push(std::make_unique<mock::FailurePhase>("FailurePhase"));
 
@@ -69,7 +69,7 @@ SCENARIO("Simulation correctly interprets commands")
         auto integrator = builder.bounding_box(initial_condition.bounding_box()).build();
 
         // Create simulation
-        control::Simulation simulation(std::move(integrator), std::move(schedule), logger);
+        control::SimulationController simulation(std::move(integrator), std::move(schedule), logger);
 
         // Run the simulation
         physics::SystemState state = initial_condition.system_state();

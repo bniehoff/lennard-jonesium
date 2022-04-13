@@ -128,8 +128,8 @@ add_library(control STATIC
     src/lennardjonesium/control/command_queue.hpp
     src/lennardjonesium/control/simulation_phase.hpp
     src/lennardjonesium/control/simulation_phase.cpp
-    src/lennardjonesium/control/simulation.hpp
-    src/lennardjonesium/control/simulation.cpp
+    src/lennardjonesium/control/simulation_controller.hpp
+    src/lennardjonesium/control/simulation_controller.cpp
 )
 
 # Link the various dependencies
@@ -230,7 +230,7 @@ else()
 
         tests/lennardjonesium/control/test_equilibration_phase.cpp
         tests/lennardjonesium/control/test_observation_phase.cpp
-        tests/lennardjonesium/control/test_simulation.cpp
+        tests/lennardjonesium/control/test_simulation_controller.cpp
     )
 
     target_link_libraries(unit_tests
