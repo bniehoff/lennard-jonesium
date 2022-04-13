@@ -1,5 +1,5 @@
 /**
- * simulation.hpp
+ * simulation_controller.hpp
  * 
  * Copyright (c) 2021-2022 Benjamin E. Niehoff
  * 
@@ -20,8 +20,8 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LJ_SIMULATION_HPP
-#define LJ_SIMULATION_HPP
+#ifndef LJ_SIMULATION_CONTROLLER_HPP
+#define LJ_SIMULATION_CONTROLLER_HPP
 
 #include <cassert>
 #include <queue>
@@ -35,14 +35,14 @@
 
 namespace control
 {
-    class Simulation
+    class SimulationController
     {
         /**
-         * The Simulation encapsulates the main loop, and runs the entire simulation on a given
-         * initial state.  It follows a schedule of SimulationPhases which make the decisions
-         * regarding what to do at each time step.  The Simulation itself is responsible for
-         * keeping track of the time step count, as well as pushing relevant data to various
-         * message queues.
+         * The SimulationController encapsulates the main loop, and runs the entire simulation on
+         * a given initial state.  It follows a schedule of SimulationPhases which make the
+         * decisions regarding what to do at each time step.  The SimulationController itself is
+         * responsible for keeping track of the time step count, as well as pushing relevant data
+         * to various message queues.
          * 
          * TODO: We have implemented the main message queue, however one thing we'd like to add is
          * some output of the full system trajectory.  This could be used to draw to the screen,
@@ -55,11 +55,7 @@ namespace control
 
             physics::SystemState& operator() (physics::SystemState&);
 
-            // This allows us to operate on the return value of a function rather than a
-            // pre-existing SystemState object
-            physics::SystemState operator() (physics::SystemState&& s) {return operator()(s);}
-
-            Simulation(
+            SimulationController(
                 std::unique_ptr<const engine::Integrator> integrator,
                 Schedule schedule,
                 output::Logger& logger

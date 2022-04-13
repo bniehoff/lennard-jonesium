@@ -683,12 +683,12 @@ namespace control
 {
     /**
      * We use the Command pattern to implement communication between the SimulationPhase and the
-     * Simulation.  A Command is a std::variant among the following types.  When the Simulation
-     * receives a Command, it will execute the appropriate action.
+     * SimulationController.  A Command is a std::variant among the following types.  When the
+     * SimulationController receives a Command, it will execute the appropriate action.
      * 
-     * We use std::variant and delegate the interpretation of these commands to the Simulation, so
-     * that SimulationPhase does not acquire a dependency on Simulation in order to effectively
-     * control it.
+     * We use std::variant and delegate the interpretation of these commands to the
+     * SimulationController, so that SimulationPhase does not acquire a dependency on
+     * SimulationController in order to effectively control it.
      */
 
     // Record an observation result computed from statistical data
@@ -737,13 +737,14 @@ namespace control
     class ObservationPhase : public SimulationPhase;
 
     // Runs the main loop, interprets commands, and creates log entries
-    class Simulation
+    class SimulationController
     {
         /**
-         * The Simulation encapsulates the main loop, and runs the entire simulation on a given
-         * initial state.  It follows a schedule of SimulationPhases which make the decisions
-         * regarding what to do at each time step.  The Simulation itself is responsible for keeping
-         * track of the time step count, as well as pushing relevant data to various message queues.
+         * The SimulationController encapsulates the main loop, and runs the entire simulation on
+         * a given initial state.  It follows a schedule of SimulationPhases which make the
+         * decisions regarding what to do at each time step.  The SimulationController itself is
+         * responsible for keeping track of the time step count, as well as pushing relevant data
+         * to various message queues.
          */
 
         public:
@@ -751,7 +752,7 @@ namespace control
 
             physics::SystemState& operator() (physics::SystemState&);
 
-            Simulation(
+            SimulationController(
                 const engine::Integrator& integrator,
                 Schedule schedule,
                 output::Logger& logger
