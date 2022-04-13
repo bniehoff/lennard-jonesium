@@ -1,5 +1,5 @@
 /**
- * simulation.cpp
+ * simulation_controller.cpp
  * 
  * Copyright (c) 2021-2022 Benjamin E. Niehoff
  * 
@@ -32,11 +32,11 @@
 #include <lennardjonesium/output/logger.hpp>
 #include <lennardjonesium/control/command_queue.hpp>
 #include <lennardjonesium/control/simulation_phase.hpp>
-#include <lennardjonesium/control/simulation.hpp>
+#include <lennardjonesium/control/simulation_controller.hpp>
 
 namespace control
 {
-    physics::SystemState& Simulation::operator() (physics::SystemState& state)
+    physics::SystemState& SimulationController::operator() (physics::SystemState& state)
     {
         // Clock for counting the global time
         int time_step = 0;
@@ -59,7 +59,7 @@ namespace control
         {
             [&](const AdvanceTime& command)
             {
-                state | this->integrator_(command.time_steps) | measurement;
+                state | (*this->integrator_)(command.time_steps) | measurement;
 
                 // Log the measurement
                 this->logger_.log(time_step, output::ThermodynamicData{measurement.result()});
