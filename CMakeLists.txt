@@ -130,6 +130,7 @@ add_library(control STATIC
     src/lennardjonesium/control/simulation_phase.cpp
     src/lennardjonesium/control/simulation_controller.hpp
     src/lennardjonesium/control/simulation_controller.cpp
+    src/lennardjonesium/control/simulation.hpp
 )
 
 # Link the various dependencies
