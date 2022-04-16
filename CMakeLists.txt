@@ -18,7 +18,7 @@ find_package(fmt REQUIRED)
 
 # TODO: Make these more portable for different compilers
 add_compile_options(
-    -Wall -Wextra -Wpedantic -Werror
+    -Wall -Werror -Wextra -Wpedantic
     # -fsanitize=undefined
     -O3                 # Enable optimization level 3
     -march=native       # Enables vectorization for Eigen in GCC and Clang
@@ -90,6 +90,8 @@ add_library(physics STATIC
     src/lennardjonesium/physics/system_state.hpp
     src/lennardjonesium/physics/system_state.cpp
     src/lennardjonesium/physics/forces.hpp
+    src/lennardjonesium/physics/lennard_jones_force.hpp
+    src/lennardjonesium/physics/lennard_jones_force.cpp
     src/lennardjonesium/physics/derived_properties.hpp
     src/lennardjonesium/physics/derived_properties.cpp
     src/lennardjonesium/physics/measurements.hpp
@@ -218,6 +220,7 @@ else()
 
         tests/lennardjonesium/physics/test_system_state.cpp
         tests/lennardjonesium/physics/test_measurements.cpp
+        tests/lennardjonesium/physics/test_lennard_jones_force.cpp
 
         tests/lennardjonesium/engine/test_periodic_boundary_condition.cpp
         tests/lennardjonesium/engine/test_particle_pair_filter.cpp
