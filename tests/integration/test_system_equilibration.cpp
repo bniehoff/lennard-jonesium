@@ -109,7 +109,7 @@ SCENARIO("Equilibrating the system")
         fs::path local_dir = test_dir / "good_run";
         fs::create_directory(local_dir);
 
-        fs::path event_log_path = local_dir / "events.txt";
+        fs::path event_log_path = local_dir / "events.log";
         std::ofstream event_log{event_log_path};
 
         fs::path thermodynamic_log_path = local_dir / "thermodynamics.csv";
@@ -172,7 +172,7 @@ SCENARIO("Equilibrating the system")
         fs::path local_dir = test_dir / "bad_run";
         fs::create_directory(local_dir);
 
-        fs::path event_log_path = local_dir / "events.txt";
+        fs::path event_log_path = local_dir / "events.log";
         std::ofstream event_log{event_log_path};
 
         fs::path thermodynamic_log_path = local_dir / "thermodynamics.csv";
