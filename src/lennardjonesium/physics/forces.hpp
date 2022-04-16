@@ -73,6 +73,9 @@ namespace physics
          */
 
         public:
+            // Parameters used to create this type of force
+            struct Parameters {};
+
             // Compute a ForceContribution from a separation vector
             virtual ForceContribution
             compute(const Eigen::Ref<const Eigen::Vector4d>& separation) const = 0;
