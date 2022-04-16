@@ -28,44 +28,33 @@
 
 namespace mock
 {
-    ConstantShortRangeForce::ConstantShortRangeForce(double force, double cutoff_length)
-        : force_{force}, cutoff_distance_{cutoff_length}
-    {}
-
     physics::ForceContribution ConstantShortRangeForce::compute
         (const Eigen::Ref<const Eigen::Vector4d>& separation) const
     {
         // We will use the norm of the separation vector
         double norm = separation.norm();
 
-        physics::ForceContribution force_contribution;
-
         // The result depends on whether we are inside the cutoff distance or not
-        if (norm < cutoff_distance_)
+        if (norm < parameters_.cutoff_distance)
         {
             /**
              * The potential changes linearly with distance.  The potential well shape is \/ for an
              * attractive (negative) force, or /\ for a repulsive (positive) force.
              */
-            force_contribution.potential = force_ * (cutoff_distance_ - norm);
+            double potential = parameters_.strength * (parameters_.cutoff_distance - norm);
 
             // The virial is -r times the derivative of the potential with respect to r:
-            force_contribution.virial = force_ * norm;
+            double virial = parameters_.strength * norm;
 
             // The force is the virial times (\vec r)/r^2, which should be constant magnitude:
-            force_contribution.force = force_contribution.virial * separation / (norm * norm);
+            auto force = virial * separation / (norm * norm);
+
+            return {force, potential, virial};
         }
         else
         {
             // All contributions are zero
-            force_contribution.potential = 0;
-            force_contribution.virial = 0;
-            force_contribution.force = Eigen::Vector4d::Zero();
+            return {Eigen::Vector4d::Zero(), 0.0, 0.0};
         }
-
-        return force_contribution;
     }
-
-    double ConstantShortRangeForce::cutoff_distance() const
-    {return cutoff_distance_;}
 } // namespace mock

@@ -31,7 +31,7 @@ SCENARIO("Lennard-Jones force with cutoff distance")
     double displacement = 0.025;
     double tolerance = 0.002;
 
-    physics::LennardJonesForce lj_force{strength, cutoff_distance};
+    physics::LennardJonesForce lj_force{{strength, cutoff_distance}};
 
     auto z_vector = Eigen::Vector4d{0, 0, 1, 0};
 

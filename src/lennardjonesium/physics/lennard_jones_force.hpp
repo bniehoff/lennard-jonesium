@@ -52,18 +52,25 @@ namespace physics
          */
 
         public:
-            LennardJonesForce(double strength, double cutoff_distance);
+            struct Parameters
+            {
+                double strength = 1.0;
+                double cutoff_distance = 2.5;
+            };
+
+            explicit LennardJonesForce(Parameters parameters);
+            
+            LennardJonesForce() : LennardJonesForce(Parameters{}) {}
 
             // Compute a ForceContribution from a separation vector
             virtual ForceContribution
             compute(const Eigen::Ref<const Eigen::Vector4d>& separation) const override;
 
             // Get the cutoff distance
-            virtual double cutoff_distance() const override {return cutoff_distance_;}
+            virtual double cutoff_distance() const override {return parameters_.cutoff_distance;}
         
         private:
-            double strength_;
-            double cutoff_distance_;
+            Parameters parameters_;
             double square_cutoff_distance_;
             double spline_alpha_;
             double spline_beta_;

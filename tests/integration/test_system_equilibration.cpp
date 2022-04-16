@@ -96,7 +96,7 @@ SCENARIO("Equilibrating the system")
     // using short_range_force_type = mock::ConstantShortRangeForce;
     using short_range_force_type = physics::LennardJonesForce;
 
-    short_range_force_type short_range_force(strength, cutoff_distance);
+    short_range_force_type short_range_force({strength, cutoff_distance});
 
     auto measurement_integrator = builder
         .bounding_box(initial_condition.bounding_box())

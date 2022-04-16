@@ -29,7 +29,7 @@ SCENARIO("Computing forces between particles")
 
         tools::BoundingBox bounding_box{box_size};
 
-        mock::ConstantShortRangeForce short_range_force(force_strength, cutoff_distance);
+        mock::ConstantShortRangeForce short_range_force({force_strength, cutoff_distance});
 
         engine::ShortRangeForceCalculation force_calculation(
             short_range_force,
@@ -121,7 +121,7 @@ SCENARIO("Computing forces between particles")
 
         tools::BoundingBox bounding_box{box_size};
 
-        mock::ConstantShortRangeForce short_range_force(force_strength, cutoff_distance);
+        mock::ConstantShortRangeForce short_range_force({force_strength, cutoff_distance});
 
         engine::ShortRangeForceCalculation force_calculation(
             short_range_force,
