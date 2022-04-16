@@ -64,7 +64,7 @@ namespace engine
     {
         public:
             ShortRangeForceCalculation(
-                std::unique_ptr<const physics::ShortRangeForce> short_range_force,
+                const physics::ShortRangeForce& short_range_force,
                 std::unique_ptr<ParticlePairFilter> particle_pair_filter
             );
 
@@ -72,7 +72,7 @@ namespace engine
             virtual physics::SystemState& operator() (physics::SystemState&) const override;
         
         private:
-            std::unique_ptr<const physics::ShortRangeForce> short_range_force_;
+            const physics::ShortRangeForce& short_range_force_;
 
             // Can't be const, because some types use internal state
             std::unique_ptr<ParticlePairFilter> particle_pair_filter_;
@@ -81,13 +81,13 @@ namespace engine
     class BackgroundForceCalculation : public ForceCalculation
     {
         public:
-            BackgroundForceCalculation(std::unique_ptr<const physics::BackgroundForce>);
+            BackgroundForceCalculation(const physics::BackgroundForce&);
 
             // Compute the forces resulting from this interaction
             virtual physics::SystemState& operator() (physics::SystemState&) const override;
         
         private:
-            std::unique_ptr<const physics::BackgroundForce> background_force_;
+            const physics::BackgroundForce& background_force_;
     };
 } // namespace engine
 

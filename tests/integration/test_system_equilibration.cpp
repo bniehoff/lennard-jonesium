@@ -83,7 +83,7 @@ SCENARIO("Equilibrating the system")
     engine::InitialCondition initial_condition(system_parameters);
 
     // Now set up the IntegratorBuilder
-    double force = 4.0;
+    double strength = 4.0;
     double cutoff_distance = 2.0;
     double time_delta = 0.005;
 
@@ -93,16 +93,14 @@ SCENARIO("Equilibrating the system")
     // (Since the unique_ptr is passed to the simulation, we cannot reuse the same integrator)
     // TODO: Need Simulation builder to make this more convenient
 
-    // using integrator_type = mock::ConstantShortRangeForce;
-    using integrator_type = physics::LennardJonesForce;
+    // using short_range_force_type = mock::ConstantShortRangeForce;
+    using short_range_force_type = physics::LennardJonesForce;
 
-    auto measurement_force = std::make_unique<integrator_type>(
-        force, cutoff_distance
-    );
+    short_range_force_type short_range_force({strength, cutoff_distance});
 
     auto measurement_integrator = builder
         .bounding_box(initial_condition.bounding_box())
-        .short_range_force(std::move(measurement_force))
+        .short_range_force(short_range_force)
         .build();
 
     GIVEN("An EquilibrationPhase with a large tolerance")
@@ -111,7 +109,7 @@ SCENARIO("Equilibrating the system")
         fs::path local_dir = test_dir / "good_run";
         fs::create_directory(local_dir);
 
-        fs::path event_log_path = local_dir / "events.txt";
+        fs::path event_log_path = local_dir / "events.log";
         std::ofstream event_log{event_log_path};
 
         fs::path thermodynamic_log_path = local_dir / "thermodynamics.csv";
@@ -141,14 +139,10 @@ SCENARIO("Equilibrating the system")
                 equilibration_parameters
             )
         );
-
-        auto short_range_force = std::make_unique<integrator_type>(
-            force, cutoff_distance
-        );
         
         auto integrator = builder
             .bounding_box(initial_condition.bounding_box())
-            .short_range_force(std::move(short_range_force))
+            .short_range_force(short_range_force)
             .build();
 
         control::SimulationController simulation(
@@ -178,7 +172,7 @@ SCENARIO("Equilibrating the system")
         fs::path local_dir = test_dir / "bad_run";
         fs::create_directory(local_dir);
 
-        fs::path event_log_path = local_dir / "events.txt";
+        fs::path event_log_path = local_dir / "events.log";
         std::ofstream event_log{event_log_path};
 
         fs::path thermodynamic_log_path = local_dir / "thermodynamics.csv";
@@ -208,14 +202,10 @@ SCENARIO("Equilibrating the system")
                 equilibration_parameters
             )
         );
-
-        auto short_range_force = std::make_unique<integrator_type>(
-            force, cutoff_distance
-        );
         
         auto integrator = builder
             .bounding_box(initial_condition.bounding_box())
-            .short_range_force(std::move(short_range_force))
+            .short_range_force(short_range_force)
             .build();
 
         control::SimulationController simulation(

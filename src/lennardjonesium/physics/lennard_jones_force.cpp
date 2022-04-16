@@ -30,10 +30,9 @@
 
 namespace physics
 {
-    LennardJonesForce::LennardJonesForce(double strength, double cutoff_distance)
-        : strength_{strength},
-          cutoff_distance_{cutoff_distance},
-          square_cutoff_distance_{cutoff_distance * cutoff_distance}
+    LennardJonesForce::LennardJonesForce(LennardJonesForce::Parameters parameters)
+        : parameters_{parameters},
+          square_cutoff_distance_{parameters.cutoff_distance * parameters.cutoff_distance}
     {
         /**
          * The minimum of the unmodified potential sits at
@@ -67,8 +66,8 @@ namespace physics
             square_cutoff_distance_ * square_cutoff_distance_ * square_cutoff_distance_
         );
 
-        spline_alpha_ = -4.0 * strength * r_c_to_minus_6 * (r_c_to_minus_6 - 1.0);
-        spline_beta_ = 12.0 * strength * r_c_to_minus_6 * (2.0 * r_c_to_minus_6 - 1.0);
+        spline_alpha_ = -4.0 * parameters.strength * r_c_to_minus_6 * (r_c_to_minus_6 - 1.0);
+        spline_beta_ = 12.0 * parameters.strength * r_c_to_minus_6 * (2.0 * r_c_to_minus_6 - 1.0);
     }
 
     ForceContribution
@@ -103,12 +102,12 @@ namespace physics
             double r_to_minus_6 = 1.0 / (r_squared * r_squared * r_squared);
 
             double potential = (
-                4.0 * strength_ * r_to_minus_6 * (r_to_minus_6 - 1.0)
+                4.0 * parameters_.strength * r_to_minus_6 * (r_to_minus_6 - 1.0)
                 + spline_alpha_ + spline_beta_ * (r_squared / square_cutoff_distance_ - 1.0)
             );
 
             double virial = (
-                24.0 * strength_ * r_to_minus_6 * (2.0 * r_to_minus_6 - 1.0)
+                24.0 * parameters_.strength * r_to_minus_6 * (2.0 * r_to_minus_6 - 1.0)
                 - 2.0 * spline_beta_ * (r_squared / square_cutoff_distance_)
             );
 

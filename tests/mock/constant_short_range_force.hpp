@@ -33,19 +33,26 @@ namespace mock
     class ConstantShortRangeForce : public physics::ShortRangeForce
     {
         public:
+            struct Parameters
+            {
+                double strength = 1.0;
+                double cutoff_distance = 2.5;
+            };
+
             /**
              * A negative force value is an attractive force, and a positive value is repulsive.
              */
-            ConstantShortRangeForce(double force, double cutoff_length);
+            explicit ConstantShortRangeForce(Parameters parameters) : parameters_{parameters} {}
+
+            ConstantShortRangeForce() : ConstantShortRangeForce(Parameters{}) {}
 
             virtual physics::ForceContribution
             compute(const Eigen::Ref<const Eigen::Vector4d>& separation) const override;
 
-            virtual double cutoff_distance() const override;
+            virtual double cutoff_distance() const override {return parameters_.cutoff_distance;}
         
         protected:
-            const double force_;
-            const double cutoff_distance_;
+            Parameters parameters_;
     };
 } // namespace mock
 

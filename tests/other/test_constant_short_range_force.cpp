@@ -13,10 +13,11 @@ SCENARIO("Constant forces with cutoff distance")
 {
     GIVEN("A constant attractive force with strength 3.0 and cutoff distance 5.0")
     {
-        double force = -3.0;
-        double cutoff_distance = 5.0;
+        mock::ConstantShortRangeForce::Parameters parameters = {
+            .strength{-3.0}, .cutoff_distance{5.0}
+        };
 
-        mock::ConstantShortRangeForce short_range_force{force, cutoff_distance};
+        mock::ConstantShortRangeForce short_range_force{parameters};
 
         WHEN("I ask for the force at separation distance 2.0")
         {
@@ -27,10 +28,11 @@ SCENARIO("Constant forces with cutoff distance")
 
             THEN("I get the expected values")
             {
-                double expected_potential = force * (cutoff_distance - distance);
-                double expected_virial = force * distance;
+                double expected_potential =
+                    parameters.strength * (parameters.cutoff_distance - distance);
+                double expected_virial = parameters.strength * distance;
 
-                REQUIRE(Eigen::Vector4d{0, 0, force, 0} == fc.force);
+                REQUIRE(Eigen::Vector4d{0, 0, parameters.strength, 0} == fc.force);
                 REQUIRE(expected_potential == fc.potential);
                 REQUIRE(expected_virial == fc.virial);
             }
@@ -45,10 +47,11 @@ SCENARIO("Constant forces with cutoff distance")
 
             THEN("I get the expected values")
             {
-                double expected_potential = force * (cutoff_distance - distance);
-                double expected_virial = force * distance;
+                double expected_potential =
+                    parameters.strength * (parameters.cutoff_distance - distance);
+                double expected_virial = parameters.strength * distance;
 
-                REQUIRE(Eigen::Vector4d{0, 0, force, 0} == fc.force);
+                REQUIRE(Eigen::Vector4d{0, 0, parameters.strength, 0} == fc.force);
                 REQUIRE(expected_potential == fc.potential);
                 REQUIRE(expected_virial == fc.virial);
             }

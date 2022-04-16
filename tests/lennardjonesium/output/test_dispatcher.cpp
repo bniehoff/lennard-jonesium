@@ -23,7 +23,7 @@ SCENARIO("Dispatcher sends to correct files")
     fs::create_directory(test_dir);
 
     // Set up the sinks
-    fs::path event_log_path = test_dir / "events.txt";
+    fs::path event_log_path = test_dir / "events.log";
     std::ofstream event_log{event_log_path};
     output::EventSink event_sink{event_log};
 
