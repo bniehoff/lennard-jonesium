@@ -29,8 +29,10 @@ SCENARIO("Computing forces between particles")
 
         tools::BoundingBox bounding_box{box_size};
 
+        mock::ConstantShortRangeForce short_range_force(force_strength, cutoff_distance);
+
         engine::ShortRangeForceCalculation force_calculation(
-            std::make_unique<mock::ConstantShortRangeForce>(force_strength, cutoff_distance),
+            short_range_force,
             std::make_unique<engine::CellListParticlePairFilter>(bounding_box, cutoff_distance)
         );
 
@@ -119,8 +121,10 @@ SCENARIO("Computing forces between particles")
 
         tools::BoundingBox bounding_box{box_size};
 
+        mock::ConstantShortRangeForce short_range_force(force_strength, cutoff_distance);
+
         engine::ShortRangeForceCalculation force_calculation(
-            std::make_unique<mock::ConstantShortRangeForce>(force_strength, cutoff_distance),
+            short_range_force,
             std::make_unique<engine::CellListParticlePairFilter>(bounding_box, cutoff_distance)
         );
 

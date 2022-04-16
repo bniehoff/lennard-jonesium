@@ -277,5 +277,5 @@ else()
     file(MAKE_DIRECTORY ${lj_temp_dir})
 
     catch_discover_tests(unit_tests WORKING_DIRECTORY ${lj_temp_dir})
-    # catch_discover_tests(integration_tests WORKING_DIRECTORY ${lj_temp_dir})
+    catch_discover_tests(integration_tests WORKING_DIRECTORY ${lj_temp_dir})
 endif()

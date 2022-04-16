@@ -36,7 +36,7 @@
 namespace detail
 {
     // Mixin interface that provides common code to all build steps
-    class BuildReady
+    class Buildable
     {
         public:
             template<class IntegratorType = engine::VelocityVerletIntegrator>
@@ -52,7 +52,7 @@ namespace detail
             std::unique_ptr<const engine::BoundaryCondition> boundary_condition_;
             std::unique_ptr<const engine::ForceCalculation> force_calculation_;
 
-            BuildReady(
+            Buildable(
                 double time_delta,
                 std::unique_ptr<const engine::BoundaryCondition> boundary_condition,
                 std::unique_ptr<const engine::ForceCalculation> force_calculation
@@ -67,7 +67,7 @@ namespace detail
 
 namespace engine
 {
-    class Integrator::Builder : public detail::BuildReady
+    class Integrator::Builder : public detail::Buildable
     {
         /**
          * Integrator::Builder is responsible for building an Integrator from its most basic
@@ -92,13 +92,13 @@ namespace engine
 
         public:
             // The constructor begins with the only required parameter, the time delta.
-            Builder(double time_delta) : detail::BuildReady{time_delta, nullptr, nullptr} {}
+            Builder(double time_delta) : detail::Buildable{time_delta, nullptr, nullptr} {}
 
             template<class BoundaryConditionType = PeriodicBoundaryCondition>
             WithBoundingBox bounding_box(tools::BoundingBox);
     };
 
-    class Integrator::Builder::WithBoundingBox : public detail::BuildReady
+    class Integrator::Builder::WithBoundingBox : public detail::Buildable
     {
         private:
             // Next possible steps in the build process will provide new methods
@@ -110,19 +110,19 @@ namespace engine
                 std::unique_ptr<const BoundaryCondition> boundary_condition,
                 tools::BoundingBox bounding_box
             )
-                : detail::BuildReady(time_delta, std::move(boundary_condition), nullptr),
+                : detail::Buildable(time_delta, std::move(boundary_condition), nullptr),
                   bounding_box_{bounding_box}
             {}
 
             template <class ParticlePairFilterType = CellListParticlePairFilter>
-            WithShortRangeForce short_range_force(std::unique_ptr<const physics::ShortRangeForce>);
+            WithShortRangeForce short_range_force(const physics::ShortRangeForce&);
         
         private:
             // Need to store the bounding box because it might be passed on to the next stage
             tools::BoundingBox bounding_box_;
     };
 
-    class Integrator::Builder::WithBoundingBox::WithShortRangeForce : public detail::BuildReady
+    class Integrator::Builder::WithBoundingBox::WithShortRangeForce : public detail::Buildable
     {
         public:
             WithShortRangeForce(
@@ -130,7 +130,7 @@ namespace engine
                 std::unique_ptr<const engine::BoundaryCondition> boundary_condition,
                 std::unique_ptr<const engine::ForceCalculation> force_calculation
             )
-                : detail::BuildReady(
+                : detail::Buildable(
                     time_delta, std::move(boundary_condition), std::move(force_calculation)
                 )
             {}
@@ -154,15 +154,15 @@ namespace engine
     template <class ParticlePairFilterType>
     inline Integrator::Builder::WithBoundingBox::WithShortRangeForce
     Integrator::Builder::WithBoundingBox::short_range_force
-        (std::unique_ptr<const physics::ShortRangeForce> force)
+        (const physics::ShortRangeForce& short_range_force)
     {
-        double cutoff_distance = force->cutoff_distance();
+        double cutoff_distance = short_range_force.cutoff_distance();
 
         return Integrator::Builder::WithBoundingBox::WithShortRangeForce(
             time_delta_,
             std::move(boundary_condition_),
             std::make_unique<const ShortRangeForceCalculation>(
-                std::move(force),
+                short_range_force,
                 std::make_unique<ParticlePairFilterType>(bounding_box_, cutoff_distance)
             )
         );
