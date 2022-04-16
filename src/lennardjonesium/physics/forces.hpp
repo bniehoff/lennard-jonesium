@@ -83,6 +83,16 @@ namespace physics
             // Get the cutoff distance
             virtual double cutoff_distance() const = 0;
 
+            // Compute individual values from just a scalar distance.  Useful for plotting.
+            double potential(double distance) const
+                {return compute(distance * Eigen::Vector4d::UnitZ()).potential;}
+
+            double virial(double distance) const
+                {return compute(distance * Eigen::Vector4d::UnitZ()).virial;}
+
+            double force(double distance) const
+                {return compute(distance * Eigen::Vector4d::UnitZ()).force.z();}
+
             // Make sure dynamically allocated derived classes are properly destroyed
             virtual ~ShortRangeForce() = default;
     };
