@@ -52,7 +52,7 @@ namespace mock
             // The virial is -r times the derivative of the potential with respect to r:
             force_contribution.virial = force_ * norm;
 
-            // The force is the virial times (/vec r)/r^2, which should be constant magnitude:
+            // The force is the virial times (\vec r)/r^2, which should be constant magnitude:
             force_contribution.force = force_contribution.virial * separation / (norm * norm);
         }
         else

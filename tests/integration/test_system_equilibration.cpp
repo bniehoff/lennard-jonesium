@@ -18,6 +18,7 @@
 #include <src/lennardjonesium/tools/bounding_box.hpp>
 #include <src/lennardjonesium/tools/system_parameters.hpp>
 #include <src/lennardjonesium/physics/system_state.hpp>
+#include <src/lennardjonesium/physics/lennard_jones_force.hpp>
 #include <src/lennardjonesium/physics/measurements.hpp>
 #include <src/lennardjonesium/engine/initial_condition.hpp>
 #include <src/lennardjonesium/engine/integrator.hpp>
@@ -91,7 +92,11 @@ SCENARIO("Equilibrating the system")
     // Build one integrator to use for temperature measurement
     // (Since the unique_ptr is passed to the simulation, we cannot reuse the same integrator)
     // TODO: Need Simulation builder to make this more convenient
-    auto measurement_force = std::make_unique<mock::ConstantShortRangeForce>(
+
+    // using integrator_type = mock::ConstantShortRangeForce;
+    using integrator_type = physics::LennardJonesForce;
+
+    auto measurement_force = std::make_unique<integrator_type>(
         force, cutoff_distance
     );
 
@@ -137,7 +142,7 @@ SCENARIO("Equilibrating the system")
             )
         );
 
-        auto short_range_force = std::make_unique<mock::ConstantShortRangeForce>(
+        auto short_range_force = std::make_unique<integrator_type>(
             force, cutoff_distance
         );
         
@@ -146,7 +151,11 @@ SCENARIO("Equilibrating the system")
             .short_range_force(std::move(short_range_force))
             .build();
 
-        control::SimulationController simulation(std::move(integrator), std::move(schedule), logger);
+        control::SimulationController simulation(
+            std::move(integrator),
+            std::move(schedule),
+            logger
+        );
 
         THEN("The system equilibrates to the desired temperature")
         {
@@ -200,7 +209,7 @@ SCENARIO("Equilibrating the system")
             )
         );
 
-        auto short_range_force = std::make_unique<mock::ConstantShortRangeForce>(
+        auto short_range_force = std::make_unique<integrator_type>(
             force, cutoff_distance
         );
         
@@ -209,7 +218,11 @@ SCENARIO("Equilibrating the system")
             .short_range_force(std::move(short_range_force))
             .build();
 
-        control::SimulationController simulation(std::move(integrator), std::move(schedule), logger);
+        control::SimulationController simulation(
+            std::move(integrator),
+            std::move(schedule),
+            logger
+        );
 
         THEN("The system fails to equilibrate")
         {
