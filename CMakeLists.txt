@@ -133,6 +133,7 @@ add_library(control STATIC
     src/lennardjonesium/control/simulation_controller.hpp
     src/lennardjonesium/control/simulation_controller.cpp
     src/lennardjonesium/control/simulation.hpp
+    src/lennardjonesium/control/simulation.cpp
 )
 
 # Link the various dependencies
@@ -208,6 +209,7 @@ else()
         tests/other/test_eigen.cpp
         tests/other/test_modulo.cpp
         tests/other/test_reference_unique_ptr.cpp
+        tests/other/test_tee_device.cpp
         tests/other/test_constant_short_range_force.cpp
 
         tests/lennardjonesium/greeter/test_greeter.cpp
@@ -277,5 +279,5 @@ else()
     file(MAKE_DIRECTORY ${lj_temp_dir})
 
     catch_discover_tests(unit_tests WORKING_DIRECTORY ${lj_temp_dir})
-    catch_discover_tests(integration_tests WORKING_DIRECTORY ${lj_temp_dir})
+    # catch_discover_tests(integration_tests WORKING_DIRECTORY ${lj_temp_dir})
 endif()
