@@ -22,7 +22,7 @@ SCENARIO("Logger sends to correct files")
     fs::create_directory(test_dir);
 
     // Set up the output files
-    fs::path event_log_path = test_dir / "events.txt";
+    fs::path event_log_path = test_dir / "events.log";
     std::ofstream event_log{event_log_path};
 
     fs::path thermodynamic_log_path = test_dir / "thermodynamics.csv";

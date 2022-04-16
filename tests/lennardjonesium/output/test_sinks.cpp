@@ -55,7 +55,7 @@ SCENARIO("Sinks write correct output to files")
 
     GIVEN("An Eventsink has written a file")
     {
-        fs::path event_log_path = test_dir / "events.txt";
+        fs::path event_log_path = test_dir / "events.log";
         std::ofstream event_log{event_log_path};
         output::EventSink event_sink{event_log};
 
