@@ -19,7 +19,7 @@ SCENARIO("Creating initial conditions with specified properties")
     tools::SystemParameters system_parameters{
         .temperature{0.5},
         .density{0.8},
-        .particle_count{50}
+        .particle_count{100}
     };
 
     std::random_device rd{};

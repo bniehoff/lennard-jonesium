@@ -23,6 +23,8 @@
 #ifndef LJ_CONSTANT_SHORT_RANGE_FORCE_HPP
 #define LJ_CONSTANT_SHORT_RANGE_FORCE_HPP
 
+#include <Eigen/Dense>
+
 #include <src/lennardjonesium/physics/forces.hpp>
 
 namespace mock
