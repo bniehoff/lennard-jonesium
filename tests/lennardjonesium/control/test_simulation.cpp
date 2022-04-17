@@ -73,7 +73,8 @@ SCENARIO("Running a simulation from a Simulation object")
 
         .event_log_path = test_dir / "events.log",
         .thermodynamic_log_path = test_dir / "thermodynamics.csv",
-        .observation_log_path = test_dir / "observations.csv"
+        .observation_log_path = test_dir / "observations.csv",
+        .snapshot_log_path = test_dir / "snapshots.csv"
     };
 
     // Finally, create the Simulation object
