@@ -175,7 +175,7 @@ SCENARIO("Logger sends to correct files")
                 std::string expected = 
                     "TimeStep,ParticleID,Position,Position,Position,"
                     "Velocity,Velocity,Velocity,Force,Force,Force\n"
-                    ",,X,Y,Z,X,Y,Z,X,Y,Z\n"
+                    "TimeStep,ParticleID,X,Y,Z,X,Y,Z,X,Y,Z\n"
                     "9,0,0,1,2,3,2,1,2,0,0\n"
                     "9,1,3,4,5,6,5,4,0,4,0\n"
                     "9,2,6,7,8,9,8,7,0,0,1\n";
