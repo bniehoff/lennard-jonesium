@@ -31,7 +31,7 @@
 namespace physics
 {
     LennardJonesForce::LennardJonesForce(LennardJonesForce::Parameters parameters)
-        : parameters_{parameters},
+        : cutoff_distance_{parameters.cutoff_distance},
           square_cutoff_distance_{parameters.cutoff_distance * parameters.cutoff_distance}
     {
         /**
@@ -48,26 +48,29 @@ namespace physics
          * Now we need to compute the spline parameters.  Refer to the comments for the compute()
          * method below.  The spline parameters must be chosen so that the potential
          * 
-         *      V(r) = 4 * strength * r^(-6) (r^(-6) - 1) + S(r)
+         *      V(r) = 4 * r^(-6) (r^(-6) - 1) + S(r)
+         * 
          *      S(r) = alpha + beta * ((r/r_c)^2 - 1)
          * 
          * and virial
          * 
-         *      W(r) = -r V'(r) = 24 * strength * r^(-6) (2 * r^(-6) - 1) - r S'(r)
+         *      W(r) = -r V'(r) = 24 * r^(-6) (2 * r^(-6) - 1) - r S'(r)
+         * 
          *      r S'(r) = 2 * beta * (r/r_c)^2
          * 
          * both vanish at r = r_c.  This means we must have
          * 
-         *      alpha = -4 * strength * r_c^(-6) (r_c^(-6) - 1)
-         *      beta = 12 * strength * r_c^(-6) (2 * r_c^(-6) - 1)
+         *      alpha = -4 * r_c^(-6) (r_c^(-6) - 1)
+         * 
+         *      beta = 12 * r_c^(-6) (2 * r_c^(-6) - 1)
          */
 
         double r_c_to_minus_6 = 1 / (
             square_cutoff_distance_ * square_cutoff_distance_ * square_cutoff_distance_
         );
 
-        spline_alpha_ = -4.0 * parameters.strength * r_c_to_minus_6 * (r_c_to_minus_6 - 1.0);
-        spline_beta_ = 12.0 * parameters.strength * r_c_to_minus_6 * (2.0 * r_c_to_minus_6 - 1.0);
+        spline_alpha_ = -4.0 * r_c_to_minus_6 * (r_c_to_minus_6 - 1.0);
+        spline_beta_ = 12.0 * r_c_to_minus_6 * (2.0 * r_c_to_minus_6 - 1.0);
     }
 
     ForceContribution
@@ -82,12 +85,14 @@ namespace physics
              * The potential is given by
              * 
              *      V(r) = 4 * strength * r^(-6) (r^(-6) - 1) + S(r)
+             * 
              *      S(r) = alpha + beta * ((r/r_c)^2 - 1)
              * 
              * which we can compute from the square distance.  The virial is given by -r times the
              * derivative of the potential:
              * 
              *      W(r) = -r V'(r) = 24 * strength * r^(-6) (2 * r^(-6) - 1) - r S'(r)
+             * 
              *      r S'(r) = 2 * beta * (r/r_c)^2
              * 
              * which also only requires the square distance.  Finally, the force is just the virial
@@ -102,12 +107,12 @@ namespace physics
             double r_to_minus_6 = 1.0 / (r_squared * r_squared * r_squared);
 
             double potential = (
-                4.0 * parameters_.strength * r_to_minus_6 * (r_to_minus_6 - 1.0)
+                4.0 * r_to_minus_6 * (r_to_minus_6 - 1.0)
                 + spline_alpha_ + spline_beta_ * (r_squared / square_cutoff_distance_ - 1.0)
             );
 
             double virial = (
-                24.0 * parameters_.strength * r_to_minus_6 * (2.0 * r_to_minus_6 - 1.0)
+                24.0 * r_to_minus_6 * (2.0 * r_to_minus_6 - 1.0)
                 - 2.0 * spline_beta_ * (r_squared / square_cutoff_distance_)
             );
 

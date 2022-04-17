@@ -23,7 +23,7 @@ SCENARIO("Lennard-Jones force with cutoff distance")
      * This allows us to test that the main features of the potential are behaving correctly.
      */
 
-    double strength = 1.0;
+    double epsilon = 1.0;
     double cutoff_distance = 4.5;
 
     double nominal_well_loc = std::pow(2.0, 1.0/6.0);
@@ -31,7 +31,7 @@ SCENARIO("Lennard-Jones force with cutoff distance")
     double displacement = 0.025;
     double tolerance = 0.002;
 
-    physics::LennardJonesForce lj_force{{strength, cutoff_distance}};
+    physics::LennardJonesForce lj_force{{cutoff_distance}};
 
     auto z_vector = Eigen::Vector4d{0, 0, 1, 0};
 
@@ -79,9 +79,9 @@ SCENARIO("Lennard-Jones force with cutoff distance")
     {
         auto fc = lj_force.compute((nominal_well_loc) * z_vector);
 
-        THEN("The potential is close to (minus) the strength value")
+        THEN("The potential is close to minus epsilon (or -1)")
         {
-            REQUIRE(std::abs(fc.potential + strength) < tolerance);
+            REQUIRE(std::abs(fc.potential + epsilon) < tolerance);
         }
 
         THEN("The virial is close to zero")
