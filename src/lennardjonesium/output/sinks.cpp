@@ -140,12 +140,16 @@ namespace output
 
     void SystemSnapshotSink::write_header()
     {
+        /**
+         * TODO: Fix formatting for this CSV file so that the multi-index headers/index_cols are
+         * imported correctly.
+         */
+
         // We set up two header rows for a multi-index Pandas dataframe
         fmt::print(
             destination_,
             "{},{},{},{},{},{},{},{},{},{},{}\n",
-            "TimeStep",
-            "ParticleID",
+            "TimeStep", "ParticleID",
             "Position", "Position", "Position",
             "Velocity", "Velocity", "Velocity",
             "Force", "Force", "Force"
@@ -153,7 +157,8 @@ namespace output
 
         fmt::print(
             destination_,
-            ",,{},{},{},{},{},{},{},{},{}\n",
+            "{},{},{},{},{},{},{},{},{},{},{}\n",
+            "TimeStep", "ParticleID",
             "X", "Y", "Z",
             "X", "Y", "Z",
             "X", "Y", "Z"
