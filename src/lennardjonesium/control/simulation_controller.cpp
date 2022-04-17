@@ -94,9 +94,18 @@ namespace control
                 
                 this->simulation_phases_.pop();
 
-                // Initialize the new phase with the time step
-                if (!this->simulation_phases_.empty())
+                if (this->simulation_phases_.empty())
                 {
+                    // If we are finished, then record a snapshot
+                    this->logger_.log(time_step, output::SystemSnapshot{
+                        .positions = state.positions,
+                        .velocities = state.velocities,
+                        .forces = state.forces
+                    });
+                }
+                else
+                {
+                    // Otherwise, initialise the new phase and continue simulation
                     this->simulation_phases_.front()->set_start_time(time_step);
                     
                     // Prepare the command queue
@@ -113,6 +122,13 @@ namespace control
             {
                 // Log abort event
                 this->logger_.log(time_step, output::AbortSimulationEvent{command.reason});
+
+                // Log snapshot in case we would like it for diagnostic reasons
+                this->logger_.log(time_step, output::SystemSnapshot{
+                    .positions = state.positions,
+                    .velocities = state.velocities,
+                    .forces = state.forces
+                });
             }
         };
         
