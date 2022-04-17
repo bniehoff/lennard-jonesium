@@ -26,8 +26,11 @@
 #include <string>
 #include <variant>
 
+#include <Eigen/Dense>
+
 #include <lennardjonesium/physics/measurements.hpp>
 #include <lennardjonesium/physics/observation.hpp>
+#include <lennardjonesium/physics/system_state.hpp>
 
 namespace output
 {
@@ -69,6 +72,19 @@ namespace output
         physics::Observation data;
     };
 
+    struct SystemSnapshot
+    {
+        /**
+         * Rather than capture the entire SystemState, we capture only the parts that will be
+         * printed to the file.  This way the size of the LogMessage variant does not grow bigger
+         * than 64B (so it will fit in a single cache line, if that is important).
+         */
+
+        Eigen::Matrix4Xd positions;
+        Eigen::Matrix4Xd velocities;
+        Eigen::Matrix4Xd forces;
+    };
+
     using LogMessage = std::variant<
         PhaseStartEvent,
         AdjustTemperatureEvent,
@@ -76,7 +92,8 @@ namespace output
         PhaseCompleteEvent,
         AbortSimulationEvent,
         ThermodynamicData,
-        ObservationData
+        ObservationData,
+        SystemSnapshot
     >;
 } // namespace output
 

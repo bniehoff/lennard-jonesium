@@ -27,6 +27,9 @@
 #include <utility>
 #include <thread>
 
+#include <boost/iostreams/device/null.hpp>
+#include <boost/iostreams/stream.hpp>
+
 #include <lennardjonesium/tools/message_buffer.hpp>
 #include <lennardjonesium/output/log_message.hpp>
 #include <lennardjonesium/output/sinks.hpp>
@@ -48,11 +51,15 @@ namespace output
          */
 
         public:
-            Logger(
-                std::ostream& event_log,
-                std::ostream& thermodynamic_log,
-                std::ostream& observation_log
-            );
+            struct Streams
+            {
+                std::ostream& event_log;
+                std::ostream& thermodynamic_log;
+                std::ostream& observation_log;
+                std::ostream& snapshot_log;
+            };
+
+            Logger(Streams);
 
             // Used by producer thread to send log messages, which will be dispatched to the
             // appropriate destination
@@ -70,6 +77,7 @@ namespace output
             EventSink event_sink_;
             ThermodynamicSink thermodynamic_sink_;
             ObservationSink observation_sink_;
+            SystemSnapshotSink snapshot_sink_;
             tools::MessageBuffer<std::pair<int, LogMessage>> buffer_;
             std::thread consumer_;
     };

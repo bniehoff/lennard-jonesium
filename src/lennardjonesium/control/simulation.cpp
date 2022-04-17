@@ -82,9 +82,15 @@ namespace control
 
         auto thermodynamic_stream = ofstream(bio::file_sink{parameters_.thermodynamic_log_path});
         auto observation_stream = ofstream(bio::file_sink{parameters_.observation_log_path});
+        auto snapshot_stream = ofstream(bio::file_sink{parameters_.snapshot_log_path});
 
         // Create the logger
-        output::Logger logger{event_stream, thermodynamic_stream, observation_stream};
+        output::Logger logger(output::Logger::Streams{
+            .event_log = event_stream,
+            .thermodynamic_log = thermodynamic_stream,
+            .observation_log = observation_stream,
+            .snapshot_log = snapshot_stream
+        });
 
         // Get the SimulationController
         auto simulation_controller = make_simulation_controller_(logger);
@@ -99,6 +105,7 @@ namespace control
         event_stream.close();
         thermodynamic_stream.close();
         observation_stream.close();
+        snapshot_stream.close();
     }
 
     SimulationController Simulation::make_simulation_controller_(output::Logger& logger)

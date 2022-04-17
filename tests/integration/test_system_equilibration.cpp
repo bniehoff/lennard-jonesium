@@ -116,9 +116,19 @@ SCENARIO("Equilibrating the system")
         
         fs::path observation_log_path = local_dir / "observations.csv";
         std::ofstream observation_log{observation_log_path};
+    
+        fs::path snapshot_log_path = test_dir / "snapshots.csv";
+        std::ofstream snapshot_log{snapshot_log_path};
+
+        output::Logger::Streams streams = {
+            .event_log = event_log,
+            .thermodynamic_log = thermodynamic_log,
+            .observation_log = observation_log,
+            .snapshot_log = snapshot_log
+        };
 
         // Set up the logger
-        output::Logger logger{event_log, thermodynamic_log, observation_log};
+        output::Logger logger{streams};
 
         // Set up the SimulationController
         control::EquilibrationPhase::Parameters equilibration_parameters{
@@ -179,9 +189,19 @@ SCENARIO("Equilibrating the system")
         
         fs::path observation_log_path = local_dir / "observations.csv";
         std::ofstream observation_log{observation_log_path};
+    
+        fs::path snapshot_log_path = test_dir / "snapshots.csv";
+        std::ofstream snapshot_log{snapshot_log_path};
+
+        output::Logger::Streams streams = {
+            .event_log = event_log,
+            .thermodynamic_log = thermodynamic_log,
+            .observation_log = observation_log,
+            .snapshot_log = snapshot_log
+        };
 
         // Set up the logger
-        output::Logger logger{event_log, thermodynamic_log, observation_log};
+        output::Logger logger{streams};
 
         // Set up the SimulationController
         control::EquilibrationPhase::Parameters equilibration_parameters{

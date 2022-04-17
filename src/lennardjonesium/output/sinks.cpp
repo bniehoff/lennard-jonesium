@@ -20,9 +20,12 @@
  * <https://www.gnu.org/licenses/>.
  */
 
+#include <ranges>
+
 #include <fmt/core.h>
 #include <fmt/ostream.h>
 
+#include <lennardjonesium/physics/system_state.hpp>
 #include <lennardjonesium/output/log_message.hpp>
 #include <lennardjonesium/output/sinks.hpp>
 
@@ -133,6 +136,50 @@ namespace output
             message.data.specific_heat,
             message.data.diffusion_coefficient
         );
+    }
+
+    void SystemSnapshotSink::write_header()
+    {
+        // We set up two header rows for a multi-index Pandas dataframe
+        fmt::print(
+            destination_,
+            "{},{},{},{},{},{},{},{},{},{},{}\n",
+            "TimeStep",
+            "ParticleID",
+            "Position", "Position", "Position",
+            "Velocity", "Velocity", "Velocity",
+            "Force", "Force", "Force"
+        );
+
+        fmt::print(
+            destination_,
+            ",,{},{},{},{},{},{},{},{},{}\n",
+            "X", "Y", "Z",
+            "X", "Y", "Z",
+            "X", "Y", "Z"
+        );
+    }
+
+    void SystemSnapshotSink::write(int time_step, SystemSnapshot message)
+    {
+        for (int particle_id : std::views::iota(0, message.positions.cols()))
+        {
+            fmt::print(
+                destination_,
+                "{},{},{},{},{},{},{},{},{},{},{}\n",
+                time_step,
+                particle_id,
+                message.positions.col(particle_id).x(),
+                message.positions.col(particle_id).y(),
+                message.positions.col(particle_id).z(),
+                message.velocities.col(particle_id).x(),
+                message.velocities.col(particle_id).y(),
+                message.velocities.col(particle_id).z(),
+                message.forces.col(particle_id).x(),
+                message.forces.col(particle_id).y(),
+                message.forces.col(particle_id).z()
+            );
+        }
     }
 } // namespace output
 
