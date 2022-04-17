@@ -237,6 +237,7 @@ else()
         tests/lennardjonesium/control/test_equilibration_phase.cpp
         tests/lennardjonesium/control/test_observation_phase.cpp
         tests/lennardjonesium/control/test_simulation_controller.cpp
+        tests/lennardjonesium/control/test_simulation.cpp
     )
 
     target_link_libraries(unit_tests

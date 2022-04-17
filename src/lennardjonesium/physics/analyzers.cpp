@@ -106,11 +106,17 @@ namespace physics
          * 
          *      C_V = (3/2) (1 - (3/2) N <(dT)^2> / <T>^2)^(-1)
          */
-        double specific_heat = (3./2.) / (
-            1 - (3./2.) * system_parameters_.particle_count * (
-                temperature_statistics.variance / (temperature * temperature)
-            )
-        );
+
+        // Using nominal temperature
+        // double relative_temperature_fluctuation = temperature_statistics.variance /
+        //     (system_parameters_.temperature * system_parameters_.temperature);
+
+        // Using measured temperature
+        double relative_temperature_fluctuation = temperature_statistics.variance /
+            (temperature * temperature);
+        
+        double specific_heat = (3./2.) /
+            (1 - (3./2.) * system_parameters_.particle_count * relative_temperature_fluctuation);
 
         /**
          * The diffusion coefficient D is related to the mean square displacement via

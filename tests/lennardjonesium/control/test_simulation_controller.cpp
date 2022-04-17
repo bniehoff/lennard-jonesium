@@ -27,7 +27,7 @@ SCENARIO("SimulationController correctly interprets commands")
     // First set up the directory for writing simulation data files
     namespace fs = std::filesystem;
 
-    fs::path test_dir{"test_simulation"};
+    fs::path test_dir{"test_simulation_controller"};
     fs::create_directory(test_dir);
 
     // Next set up the initial condition
