@@ -257,6 +257,7 @@ else()
 
     add_executable(integration_tests
         tests/integration/test_system_equilibration.cpp
+        # tests/integration/test_full_simulation.cpp
     )
 
     target_link_libraries(integration_tests

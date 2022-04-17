@@ -66,22 +66,20 @@ namespace engine
          * force calculation in between.
          */
 
-        // First get the half increment to the velocities using the current value of the forces
-        auto velocity_half_step = state.velocities + (1./2.) * state.forces * time_delta_;
+        // First, half-increment the velocities with the current forces
+        state.velocities += (1./2.) * state.forces * time_delta_;
 
-        // With the half-incremented velocities, give positions and displacements a full
-        // increment:
-        auto position_increment = velocity_half_step * time_delta_;
+        // Using half-incremented velocities, increment positions by full time step
+        auto position_increment = state.velocities * time_delta_;
         state.positions += position_increment;
         state.displacements += position_increment;
 
-        // Next impose boundary conditions and calculate forces
+        // Next impose boundary conditions and calculate updated forces
         if (boundary_condition_) [[likely]] {state | *boundary_condition_;}
         if (force_calculation_) [[likely]] {state | *force_calculation_;}
 
-        // Update the velocities using the first half increment and a second half
-        // increment based on the new forces:
-        state.velocities = velocity_half_step + (1./2.) * state.forces * time_delta_;
+        // Do the second half-increment with the updated forces
+        state.velocities += (1./2.) * state.forces * time_delta_;
 
         // Update the elapsed time
         state.time += time_delta_;
