@@ -20,9 +20,9 @@ SCENARIO("A complete run of the simulation")
     auto parameters = control::Simulation::Parameters
     {
         .system_parameters = {
-            .temperature = 0.66,
+            .temperature = 0.1,
             .density = 0.81,
-            .particle_count = 200
+            .particle_count = 100
         },
 
         .force_parameters = physics::LennardJonesForce::Parameters
@@ -60,7 +60,8 @@ SCENARIO("A complete run of the simulation")
 
         .event_log_path = test_dir / "events.log",
         .thermodynamic_log_path = test_dir / "thermodynamics.csv",
-        .observation_log_path = test_dir / "observations.csv"
+        .observation_log_path = test_dir / "observations.csv",
+        .snapshot_log_path = test_dir / "snapshots.csv"
     };
 
     // Finally, create the Simulation object
