@@ -27,7 +27,7 @@ SCENARIO("SimulationController correctly interprets commands")
     // First set up the directory for writing simulation data files
     namespace fs = std::filesystem;
 
-    fs::path test_dir{"test_simulation"};
+    fs::path test_dir{"test_simulation_controller"};
     fs::create_directory(test_dir);
 
     // Next set up the initial condition
@@ -56,9 +56,19 @@ SCENARIO("SimulationController correctly interprets commands")
         
         fs::path observation_log_path = test_dir / "observations.csv";
         std::ofstream observation_log{observation_log_path};
+    
+        fs::path snapshot_log_path = test_dir / "snapshots.csv";
+        std::ofstream snapshot_log{snapshot_log_path};
+
+        output::Logger::Streams streams = {
+            .event_log = event_log,
+            .thermodynamic_log = thermodynamic_log,
+            .observation_log = observation_log,
+            .snapshot_log = snapshot_log
+        };
 
         // Set up the logger
-        output::Logger logger{event_log, thermodynamic_log, observation_log};
+        output::Logger logger{streams};
 
         // Set up the SimulationController
         control::SimulationController::Schedule schedule;
@@ -83,6 +93,7 @@ SCENARIO("SimulationController correctly interprets commands")
         event_log.close();
         thermodynamic_log.close();
         observation_log.close();
+        snapshot_log.close();
 
         WHEN("I read the events log back in")
         {
@@ -93,18 +104,17 @@ SCENARIO("SimulationController correctly interprets commands")
 
             THEN("I get the expected contents")
             {
-                std::ostringstream expected;
-                expected
-                    << "0: Phase started: SuccessPhase\n"
-                    << "1: Temperature adjusted to: 0.5\n"
-                    << "3: Temperature adjusted to: 0.5\n"
-                    << "5: Phase complete: SuccessPhase\n"
-                    << "5: Phase started: FailurePhase\n"
-                    << "6: Observation recorded\n"
-                    << "8: Observation recorded\n"
-                    << "10: Simulation aborted: Task failed successfully\n";
+                std::string expected = 
+                    "0: Phase started: SuccessPhase\n"
+                    "1: Temperature adjusted to: 0.5\n"
+                    "3: Temperature adjusted to: 0.5\n"
+                    "5: Phase complete: SuccessPhase\n"
+                    "5: Phase started: FailurePhase\n"
+                    "6: Observation recorded\n"
+                    "8: Observation recorded\n"
+                    "10: Simulation aborted: Task failed successfully\n";
                 
-                REQUIRE(expected.view() == contents.view());
+                REQUIRE(expected == contents.view());
             }
         }
     }

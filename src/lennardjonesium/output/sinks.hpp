@@ -26,6 +26,7 @@
 #include <concepts>
 #include <iostream>
 
+#include <lennardjonesium/physics/system_state.hpp>
 #include <lennardjonesium/output/log_message.hpp>
 
 namespace detail
@@ -147,6 +148,27 @@ namespace output
             ObservationSink() = default;
             
             explicit ObservationSink(std::ostream& destination)
+                : detail::SinkCommon{destination}
+            {}
+    };
+
+    /**
+     * SystemSnapshotSink will write the positions, velocities, and forces (accelerations) of all
+     * particles to a file.  One use is for writing the final state at the end of the simulation.
+     * However, it can easily write any number of states, so is also suitable to use for the
+     * trajectory output.
+     */
+    class SystemSnapshotSink
+        : public detail::SinkCommon, public detail::MessageSink<SystemSnapshot>
+    {
+        public:
+            virtual void write_header() override;
+
+            virtual void write(int time_step, SystemSnapshot message) override;
+
+            SystemSnapshotSink() = default;
+            
+            explicit SystemSnapshotSink(std::ostream& destination)
                 : detail::SinkCommon{destination}
             {}
     };

@@ -72,7 +72,7 @@ SCENARIO("Equilibrating the system")
     tools::SystemParameters system_parameters{
         .temperature {0.3},
         .density {0.8},
-        .particle_count {500}
+        .particle_count {100}
     };
 
     // Target system parameters are different (this is not normal)
@@ -83,7 +83,6 @@ SCENARIO("Equilibrating the system")
     engine::InitialCondition initial_condition(system_parameters);
 
     // Now set up the IntegratorBuilder
-    double strength = 4.0;
     double cutoff_distance = 2.0;
     double time_delta = 0.005;
 
@@ -96,7 +95,7 @@ SCENARIO("Equilibrating the system")
     // using short_range_force_type = mock::ConstantShortRangeForce;
     using short_range_force_type = physics::LennardJonesForce;
 
-    short_range_force_type short_range_force({strength, cutoff_distance});
+    short_range_force_type short_range_force({cutoff_distance});
 
     auto measurement_integrator = builder
         .bounding_box(initial_condition.bounding_box())
@@ -117,9 +116,19 @@ SCENARIO("Equilibrating the system")
         
         fs::path observation_log_path = local_dir / "observations.csv";
         std::ofstream observation_log{observation_log_path};
+    
+        fs::path snapshot_log_path = test_dir / "snapshots.csv";
+        std::ofstream snapshot_log{snapshot_log_path};
+
+        output::Logger::Streams streams = {
+            .event_log = event_log,
+            .thermodynamic_log = thermodynamic_log,
+            .observation_log = observation_log,
+            .snapshot_log = snapshot_log
+        };
 
         // Set up the logger
-        output::Logger logger{event_log, thermodynamic_log, observation_log};
+        output::Logger logger{streams};
 
         // Set up the SimulationController
         control::EquilibrationPhase::Parameters equilibration_parameters{
@@ -180,9 +189,19 @@ SCENARIO("Equilibrating the system")
         
         fs::path observation_log_path = local_dir / "observations.csv";
         std::ofstream observation_log{observation_log_path};
+    
+        fs::path snapshot_log_path = test_dir / "snapshots.csv";
+        std::ofstream snapshot_log{snapshot_log_path};
+
+        output::Logger::Streams streams = {
+            .event_log = event_log,
+            .thermodynamic_log = thermodynamic_log,
+            .observation_log = observation_log,
+            .snapshot_log = snapshot_log
+        };
 
         // Set up the logger
-        output::Logger logger{event_log, thermodynamic_log, observation_log};
+        output::Logger logger{streams};
 
         // Set up the SimulationController
         control::EquilibrationPhase::Parameters equilibration_parameters{

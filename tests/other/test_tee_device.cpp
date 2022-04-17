@@ -22,7 +22,7 @@ SCENARIO("Writing content to file and console simultaneously")
     fs::path test_dir{"test_tee_device"};
     fs::create_directory(test_dir);
 
-    fs::path output_file = "lorem_ipsum.txt";
+    fs::path output_file = test_dir / "lorem_ipsum.txt";
 
     std::string lorem_ipsum =
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor\n"
@@ -58,4 +58,7 @@ SCENARIO("Writing content to file and console simultaneously")
             }
         }
     }
+
+    // Clean up
+    fs::remove_all(test_dir);
 }
