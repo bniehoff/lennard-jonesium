@@ -48,17 +48,20 @@ namespace output
             Dispatcher(
                 EventSink& event_sink,
                 ThermodynamicSink& thermodynamic_sink,
-                ObservationSink& observation_sink
+                ObservationSink& observation_sink,
+                SystemSnapshotSink& snapshot_sink
             )
                 : event_sink_{event_sink},
                   thermodynamic_sink_{thermodynamic_sink},
-                  observation_sink_{observation_sink}
+                  observation_sink_{observation_sink},
+                  snapshot_sink_{snapshot_sink}
             {}
 
         private:
             EventSink& event_sink_;
             ThermodynamicSink& thermodynamic_sink_;
             ObservationSink& observation_sink_;
+            SystemSnapshotSink& snapshot_sink_;
     };
 } // namespace output
 

@@ -73,6 +73,11 @@ namespace output
             [time_step, this](ObservationData message)
             {
                 this->observation_sink_.write(time_step, message);
+            },
+
+            [time_step, this](SystemSnapshot message)
+            {
+                this->snapshot_sink_.write(time_step, message);
             }
         };
 

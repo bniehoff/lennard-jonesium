@@ -21,6 +21,21 @@ constexpr bool pipe_compiles = requires (SystemState s, First p1, Second p2)
     s | p1 | p2;
 };
 
+SCENARIO("Size of a system state")
+{
+    GIVEN("Two system states with very different numbers of particles")
+    {
+        SystemState small{2};
+        SystemState large{10000};
+
+        THEN("Their sizes are the same")
+        {
+            REQUIRE(88 == sizeof(small));
+            REQUIRE(88 == sizeof(large));
+        }
+    }
+}
+
 SCENARIO("Representing the system state")
 {
     WHEN("I create a SystemState for a given number of particles")

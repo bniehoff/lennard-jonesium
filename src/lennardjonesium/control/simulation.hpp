@@ -106,6 +106,7 @@ namespace control
                 std::filesystem::path event_log_path = "events.log";
                 std::filesystem::path thermodynamic_log_path = "thermodynamics.csv";
                 std::filesystem::path observation_log_path = "observations.csv";
+                std::filesystem::path snapshot_log_path = "snapshots.csv";
 
                 /**
                  * TODO: Need to decide on a format to output the final state.

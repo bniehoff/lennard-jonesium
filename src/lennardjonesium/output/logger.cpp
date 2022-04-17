@@ -32,23 +32,22 @@
 
 namespace output
 {
-    Logger::Logger(
-        std::ostream& event_log,
-        std::ostream& thermodynamic_log,
-        std::ostream& observation_log
-    )
-        : event_sink_{event_log},
-          thermodynamic_sink_{thermodynamic_log},
-          observation_sink_{observation_log}
+    Logger::Logger(Logger::Streams streams)
+        : event_sink_{streams.event_log},
+          thermodynamic_sink_{streams.thermodynamic_log},
+          observation_sink_{streams.observation_log},
+          snapshot_sink_{streams.snapshot_log}
     {
         // Initialize the log files
         event_sink_.write_header();
         thermodynamic_sink_.write_header();
         observation_sink_.write_header();
+        snapshot_sink_.write_header();
 
         event_sink_.flush();
         thermodynamic_sink_.flush();
         observation_sink_.flush();
+        snapshot_sink_.flush();
 
         // Start the consumer thread
         consumer_ = std::thread(
@@ -56,7 +55,8 @@ namespace output
                 Dispatcher dispatcher{
                     this->event_sink_,
                     this->thermodynamic_sink_,
-                    this->observation_sink_
+                    this->observation_sink_,
+                    this->snapshot_sink_
                 };
 
                 while (auto o = this->buffer_.get())
