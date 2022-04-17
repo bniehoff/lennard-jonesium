@@ -54,7 +54,13 @@ namespace physics
         public:
             struct Parameters
             {
-                double strength = 1.0;
+                /**
+                 * The cutoff distance is the only parameter needed, since the overall strength
+                 * merely sets the temperature scale for the dimensionless variables.
+                 * 
+                 * We still wrap this in a Parameters struct, because this part of the interface
+                 * allows us to inform the Simulation wrapper what parameters are needed.
+                 */
                 double cutoff_distance = 2.5;
             };
 
@@ -67,10 +73,10 @@ namespace physics
             compute(const Eigen::Ref<const Eigen::Vector4d>& separation) const override;
 
             // Get the cutoff distance
-            virtual double cutoff_distance() const override {return parameters_.cutoff_distance;}
+            virtual double cutoff_distance() const override {return cutoff_distance_;}
         
         private:
-            Parameters parameters_;
+            double cutoff_distance_;
             double square_cutoff_distance_;
             double spline_alpha_;
             double spline_beta_;

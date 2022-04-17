@@ -257,7 +257,7 @@ else()
 
     add_executable(integration_tests
         tests/integration/test_system_equilibration.cpp
-        # tests/integration/test_full_simulation.cpp
+        tests/integration/test_full_simulation.cpp
     )
 
     target_link_libraries(integration_tests
@@ -281,5 +281,5 @@ else()
     file(MAKE_DIRECTORY ${lj_temp_dir})
 
     catch_discover_tests(unit_tests WORKING_DIRECTORY ${lj_temp_dir})
-    # catch_discover_tests(integration_tests WORKING_DIRECTORY ${lj_temp_dir})
+    catch_discover_tests(integration_tests WORKING_DIRECTORY ${lj_temp_dir})
 endif()

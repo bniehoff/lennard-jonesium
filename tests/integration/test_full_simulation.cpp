@@ -27,7 +27,6 @@ SCENARIO("A complete run of the simulation")
 
         .force_parameters = physics::LennardJonesForce::Parameters
         {
-            .strength = 1.0,
             .cutoff_distance = 2.0
         },
 
@@ -78,5 +77,5 @@ SCENARIO("A complete run of the simulation")
     }
 
     // Clean up
-    // fs::remove_all(test_dir);
+    fs::remove_all(test_dir);
 }

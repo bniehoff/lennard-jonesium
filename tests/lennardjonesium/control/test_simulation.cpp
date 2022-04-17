@@ -51,7 +51,6 @@ SCENARIO("Running a simulation from a Simulation object")
 
         .force_parameters = physics::LennardJonesForce::Parameters
         {
-            .strength = 1.0,
             .cutoff_distance = 2.0
         },
 

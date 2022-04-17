@@ -72,7 +72,7 @@ SCENARIO("Equilibrating the system")
     tools::SystemParameters system_parameters{
         .temperature {0.3},
         .density {0.8},
-        .particle_count {500}
+        .particle_count {100}
     };
 
     // Target system parameters are different (this is not normal)
@@ -83,7 +83,6 @@ SCENARIO("Equilibrating the system")
     engine::InitialCondition initial_condition(system_parameters);
 
     // Now set up the IntegratorBuilder
-    double strength = 4.0;
     double cutoff_distance = 2.0;
     double time_delta = 0.005;
 
@@ -96,7 +95,7 @@ SCENARIO("Equilibrating the system")
     // using short_range_force_type = mock::ConstantShortRangeForce;
     using short_range_force_type = physics::LennardJonesForce;
 
-    short_range_force_type short_range_force({strength, cutoff_distance});
+    short_range_force_type short_range_force({cutoff_distance});
 
     auto measurement_integrator = builder
         .bounding_box(initial_condition.bounding_box())
