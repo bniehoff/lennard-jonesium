@@ -1,6 +1,9 @@
 # Configure the Cython target
 
-add_cython_target(_lennardjonesium CXX)
+add_cython_target(_lennardjonesium CXX
+    _lennardjonesium.pxd
+    _lennardjonesium.pyx
+)
 
 add_library(_lennardjonesium MODULE ${_lennardjonesium}
     # Once the C++ library is finished, there should be only one file to put here
@@ -10,6 +13,7 @@ add_library(_lennardjonesium MODULE ${_lennardjonesium}
 
 target_link_libraries(_lennardjonesium
     Eigen3::Eigen
+    fmt::fmt
     # Microsoft.GSL::GSL
     # ktl::ktl
 )

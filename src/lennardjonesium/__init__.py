@@ -1,1 +1,4 @@
-from ._lennardjonesiumium import hello_cython, hello_cpp, factorial
+from lennardjonesium._lennardjonesium import (
+    hello_cython,
+    Greeter
+)
