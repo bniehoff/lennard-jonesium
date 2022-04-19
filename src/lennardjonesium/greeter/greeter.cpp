@@ -3,18 +3,20 @@
  */
 
 #include <string>
-#include <vector>
-#include <ranges>
 
-std::string greet(std::string name) {
-    return "Hello, " + name + ", and welcome to C++!";
-}
+#include <fmt/core.h>
+#include <fmt/ostream.h>
 
-int factorial(int n) {
-    int result{1};
-    while(n > 1) {
-        result *= n;
-        n--;
-    }
-    return result;
+#include <lennardjonesium/greeter/greeter.hpp>
+
+void Greeter::greet(std::string name)
+{
+    fmt::print(
+        // output_stream_,
+        "Hello, {}, and welcome to C++!  My favorite numbr is {}\n",
+        name,
+        favorite_number_
+    );
+
+    // output_stream_.flush();
 }

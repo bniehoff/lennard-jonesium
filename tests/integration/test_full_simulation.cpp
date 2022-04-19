@@ -20,8 +20,8 @@ SCENARIO("A complete run of the simulation")
     auto parameters = control::Simulation::Parameters
     {
         .system_parameters = {
-            .temperature = 0.1,
-            .density = 0.81,
+            .temperature = 1.4,
+            .density = 0.5,
             .particle_count = 100
         },
 
@@ -41,7 +41,7 @@ SCENARIO("A complete run of the simulation")
                 {
                     .tolerance = 0.02,
                     .sample_size = 250,
-                    .adjustment_interval = 1000,
+                    .adjustment_interval = 743,
                     .steady_state_time = 5000,
                     .timeout = 100000
                 }
