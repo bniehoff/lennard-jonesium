@@ -132,6 +132,8 @@ add_library(control STATIC
 add_library(api STATIC
     src/cpp/lennardjonesium/api/simulation.hpp
     src/cpp/lennardjonesium/api/simulation.cpp
+    src/cpp/lennardjonesium/api/parameters.hpp
+    src/cpp/lennardjonesium/api/parameters.cpp
 )
 
 # Link the various dependencies
