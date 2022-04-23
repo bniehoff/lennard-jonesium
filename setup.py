@@ -1,4 +1,5 @@
 import sys
+import setuptools
 
 from skbuild import setup
 
@@ -15,9 +16,10 @@ setup(
     description="A simulator for the Lennard-Jones substance",
     author='Ben Niehoff',
     license="GPL v3.0",
-    packages=['lennardjonesium'],
-    package_dir = {'': 'src'},
+    packages=['lennardjonesium', 'lennardjonesium._bindings'],
+    package_dir = {'': 'src', 'lennardjonesium._bindings': 'src/lennardjonesium/bindings'},
     install_requires=['cython'],
     tests_require=['pytest'],
-    setup_requires=setup_requires
+    setup_requires=setup_requires,
+    cmake_languages = ('CXX',)
 )
