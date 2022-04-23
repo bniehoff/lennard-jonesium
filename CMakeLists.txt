@@ -188,16 +188,7 @@ if(SKBUILD)
     find_package(PythonExtensions REQUIRED)
     find_package(Cython REQUIRED)
 
-    add_library(greeter STATIC
-        src/cpp/lennardjonesium/greeter/greeter.hpp
-        src/cpp/lennardjonesium/greeter/greeter.cpp
-    )
-
-    target_link_libraries(greeter
-        PRIVATE fmt::fmt
-    )
-
-    add_subdirectory(src/python/lennardjonesium/bindings)
+    add_subdirectory(src/python/lennardjonesium/simulation)
 else()
     # Otherwise, build the C++ unit tests
     include(CTest)

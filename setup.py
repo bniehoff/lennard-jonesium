@@ -16,7 +16,7 @@ setup(
     description="A simulator for the Lennard-Jones substance",
     author='Ben Niehoff',
     license="GPL v3.0",
-    packages=['lennardjonesium', 'lennardjonesium.bindings'],
+    packages=['lennardjonesium', 'lennardjonesium.simulation'],
     package_dir = {
         '': 'src/python',
         },

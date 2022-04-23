@@ -40,7 +40,13 @@ namespace api
          * would make it cumbersome to declare and use from Cython.  So, we define a simplified
          * struct which uses a more limited set of parameters, with only base arithmetic types,
          * in a flat arrangement which can be easily used by Cython.
+         * 
+         * Note: These defaults are not especially important.  We will define new defaults in
+         * Cython.  However, the default random seed is useful.
          */
+
+        static constexpr unsigned int default_seed =
+            engine::InitialCondition::random_number_engine_type::default_seed;
 
         // System parameters
         double temperature = 0.8;
@@ -48,8 +54,7 @@ namespace api
         int particle_count = 100;
 
         // Random seed
-        unsigned int random_seed =
-            engine::InitialCondition::random_number_engine_type::default_seed;
+        unsigned int random_seed = default_seed;
         
         // Force parameters
         double cutoff_distance = 2.5;
