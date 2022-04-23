@@ -23,22 +23,22 @@
 # # The install directory is relative to the project root (where the first CMakeLists.txt was found)
 # install(TARGETS _lennardjonesium LIBRARY DESTINATION src/lennardjonesium)
 
-add_cython_target(wrapper CXX)
+add_cython_target(python_bindings CXX)
 
-add_library(wrapper MODULE ${wrapper}
-    # Once the C++ library is finished, there should be only one file to put here
-    greeter/greeter.hpp
-    greeter/greeter.cpp
+add_library(python_bindings MODULE ${python_bindings}
+    # Put local .hpp, .cpp sources here (from wrapper directory)
+    # wrapper.hpp
+    # wrapper.cpp
 )
 
-target_link_libraries(wrapper
+target_link_libraries(python_bindings
     Eigen3::Eigen
     fmt::fmt
     # Microsoft.GSL::GSL
     # ktl::ktl
 )
 
-python_extension_module(wrapper)
+python_extension_module(python_bindings)
 
 # The install directory is relative to the project root (where the first CMakeLists.txt was found)
-install(TARGETS wrapper LIBRARY DESTINATION src/lennardjonesium/wrapper)
+install(TARGETS python_bindings LIBRARY DESTINATION src/lennardjonesium/bindings)
