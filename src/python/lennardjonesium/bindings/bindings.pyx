@@ -1,5 +1,5 @@
 """
-_lennardjonesium.pyx
+bindings.pyx
 
 Copyright (c) 2021-2022 Benjamin E. Niehoff
 
@@ -20,7 +20,9 @@ License along with Lennard-Jonesium.  If not, see
 <https://www.gnu.org/licenses/>.
 """
 
-from lennardjonesium._lennardjonesium cimport _Greeter
+from libcpp.string cimport string
+
+from lennardjonesium.bindings.bindings cimport _Greeter
 
 def hello_python(name):
     print("Hello, {}, this is a boring function from Python".format(name))

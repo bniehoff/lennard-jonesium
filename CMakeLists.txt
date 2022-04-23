@@ -52,11 +52,6 @@ add_compile_definitions(
 
 # Define libraries out of which the main library will be built
 
-add_library(greeter STATIC
-    src/cpp/lennardjonesium/greeter/greeter.hpp
-    src/cpp/lennardjonesium/greeter/greeter.cpp
-)
-
 add_library(draft_cpp23 STATIC
     src/cpp/lennardjonesium/draft_cpp23/generator.hpp
     src/cpp/lennardjonesium/draft_cpp23/examples.hpp
@@ -180,6 +175,15 @@ if(SKBUILD)
     find_package(PythonExtensions REQUIRED)
     find_package(Cython REQUIRED)
 
+    add_library(greeter STATIC
+        src/cpp/lennardjonesium/greeter/greeter.hpp
+        src/cpp/lennardjonesium/greeter/greeter.cpp
+    )
+
+    target_link_libraries(greeter
+        PRIVATE fmt::fmt
+    )
+
     add_subdirectory(src/python/lennardjonesium/bindings)
 else()
     # Otherwise, build the C++ unit tests
@@ -244,7 +248,6 @@ else()
         # PRIVATE fmt::fmt
         # PRIVATE Microsoft.GSL::GSL
         # PRIVATE ktl::ktl
-        PRIVATE greeter
         PRIVATE mock
         PRIVATE tools
         PRIVATE physics
