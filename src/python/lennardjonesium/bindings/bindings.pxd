@@ -1,5 +1,5 @@
 """
-wrapper.pyx
+bindings.pxd
 
 Copyright (c) 2021-2022 Benjamin E. Niehoff
 
@@ -20,5 +20,9 @@ License along with Lennard-Jonesium.  If not, see
 <https://www.gnu.org/licenses/>.
 """
 
-cpdef void hello_wrapper(str name):
-    print(f'Hello, {name}, and welcome to the Wrapper!')
+from libcpp.string cimport string
+
+cdef extern from "<lennardjonesium/greeter/greeter.hpp>":
+    cdef cppclass _Greeter "Greeter":
+        _Greeter(int) except +
+        void greet(string) except +
