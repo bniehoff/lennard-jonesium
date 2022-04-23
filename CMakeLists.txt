@@ -127,8 +127,11 @@ add_library(control STATIC
     src/cpp/lennardjonesium/control/simulation_phase.cpp
     src/cpp/lennardjonesium/control/simulation_controller.hpp
     src/cpp/lennardjonesium/control/simulation_controller.cpp
-    src/cpp/lennardjonesium/control/simulation.hpp
-    src/cpp/lennardjonesium/control/simulation.cpp
+)
+
+add_library(api STATIC
+    src/cpp/lennardjonesium/api/simulation.hpp
+    src/cpp/lennardjonesium/api/simulation.cpp
 )
 
 # Link the various dependencies
@@ -163,11 +166,19 @@ target_link_libraries(output
 
 target_link_libraries(control
     PRIVATE Eigen3::Eigen
-    # PRIVATE fmt::fmt
     PRIVATE tools
     PRIVATE physics
     PRIVATE engine
     PRIVATE output
+)
+
+target_link_libraries(api
+    PRIVATE Eigen3::Eigen
+    PRIVATE tools
+    PRIVATE physics
+    PRIVATE engine
+    PRIVATE output
+    PRIVATE control
 )
 
 if(SKBUILD)
@@ -239,14 +250,14 @@ else()
         tests/cpp/lennardjonesium/control/test_equilibration_phase.cpp
         tests/cpp/lennardjonesium/control/test_observation_phase.cpp
         tests/cpp/lennardjonesium/control/test_simulation_controller.cpp
-        tests/cpp/lennardjonesium/control/test_simulation.cpp
+
+        tests/cpp/lennardjonesium/api/test_simulation.cpp
     )
 
     target_link_libraries(unit_tests
         PRIVATE Eigen3::Eigen
         PRIVATE Catch2::Catch2WithMain
         # PRIVATE fmt::fmt
-        # PRIVATE Microsoft.GSL::GSL
         # PRIVATE ktl::ktl
         PRIVATE mock
         PRIVATE tools
@@ -254,6 +265,7 @@ else()
         PRIVATE engine
         PRIVATE output
         PRIVATE control
+        PRIVATE api
     )
 
     add_executable(integration_tests
@@ -265,7 +277,6 @@ else()
         PRIVATE Eigen3::Eigen
         PRIVATE Catch2::Catch2WithMain
         # PRIVATE fmt::fmt
-        # PRIVATE Microsoft.GSL::GSL
         # PRIVATE ktl::ktl
         PRIVATE mock
         PRIVATE tools
@@ -273,6 +284,7 @@ else()
         PRIVATE engine
         PRIVATE output
         PRIVATE control
+        PRIVATE api
     )
 
     include(Catch)

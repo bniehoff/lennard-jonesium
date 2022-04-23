@@ -6,7 +6,7 @@
 
 #include <src/cpp/lennardjonesium/physics/lennard_jones_force.hpp>
 #include <src/cpp/lennardjonesium/control/simulation_phase.hpp>
-#include <src/cpp/lennardjonesium/control/simulation.hpp>
+#include <src/cpp/lennardjonesium/api/simulation.hpp>
 
 namespace fs = std::filesystem;
 
@@ -17,7 +17,7 @@ SCENARIO("A complete run of the simulation")
     fs::create_directory(test_dir);
 
     // Next set up simulation parameters
-    auto parameters = control::Simulation::Parameters
+    auto parameters = api::Simulation::Parameters
     {
         .system_parameters = {
             .temperature = 1.4,
@@ -65,7 +65,7 @@ SCENARIO("A complete run of the simulation")
     };
 
     // Finally, create the Simulation object
-    control::Simulation simulation{parameters};
+    api::Simulation simulation{parameters};
 
     WHEN("I run the simulation")
     {
