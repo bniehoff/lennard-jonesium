@@ -40,7 +40,7 @@
 #include <lennardjonesium/control/simulation_phase.hpp>
 #include <lennardjonesium/control/simulation_controller.hpp>
 
-namespace control
+namespace api
 {
     class Simulation
     {
@@ -65,8 +65,8 @@ namespace control
         >;
 
         using simulation_phase_parameter_type = std::variant<
-            EquilibrationPhase::Parameters,
-            ObservationPhase::Parameters
+            control::EquilibrationPhase::Parameters,
+            control::ObservationPhase::Parameters
         >;
 
         public:
@@ -98,8 +98,8 @@ namespace control
                 // Each SimulationPhase must be given a name and a set of parameters
                 std::vector<std::pair<std::string, simulation_phase_parameter_type>>
                     schedule_parameters = {
-                        {"Equilibration Phase", EquilibrationPhase::Parameters{}},
-                        {"Observation Phase", ObservationPhase::Parameters{}}
+                        {"Equilibration Phase", control::EquilibrationPhase::Parameters{}},
+                        {"Observation Phase", control::ObservationPhase::Parameters{}}
                     };
                 
                 // Filesystem defaults simply place files at top level in the working directory
@@ -107,10 +107,6 @@ namespace control
                 std::filesystem::path thermodynamic_log_path = "thermodynamics.csv";
                 std::filesystem::path observation_log_path = "observations.csv";
                 std::filesystem::path snapshot_log_path = "snapshots.csv";
-
-                /**
-                 * TODO: Need to decide on a format to output the final state.
-                 */
             };
 
             explicit Simulation(Parameters parameters);
@@ -135,9 +131,9 @@ namespace control
             std::unique_ptr<const physics::ShortRangeForce> short_range_force_;
 
             // Construct the SimulationController from the local parameters and a Logger
-            SimulationController make_simulation_controller_(output::Logger&);
+            control::SimulationController make_simulation_controller_(output::Logger&);
     };
-} // namespace control
+} // namespace api
 
 
 #endif

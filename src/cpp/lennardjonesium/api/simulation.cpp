@@ -40,9 +40,9 @@
 #include <lennardjonesium/engine/integrator_builder.hpp>
 #include <lennardjonesium/control/simulation_phase.hpp>
 #include <lennardjonesium/control/simulation_controller.hpp>
-#include <lennardjonesium/control/simulation.hpp>
+#include <lennardjonesium/api/simulation.hpp>
 
-namespace control
+namespace api
 {
     Simulation::Simulation(Simulation::Parameters parameters)
         : parameters_{parameters},
@@ -108,7 +108,7 @@ namespace control
         snapshot_stream.close();
     }
 
-    SimulationController Simulation::make_simulation_controller_(output::Logger& logger)
+    control::SimulationController Simulation::make_simulation_controller_(output::Logger& logger)
     {
         // First build the integrator
         auto integrator = engine::Integrator::Builder(parameters_.time_delta)
@@ -117,25 +117,25 @@ namespace control
             .build();
         
         // Next assemble the scheduler
-        SimulationController::Schedule schedule;
+        control::SimulationController::Schedule schedule;
 
         for (auto [name, phase_parameters] : parameters_.schedule_parameters)
         {
             if (auto eq_phase_parameters =
-                std::get_if<EquilibrationPhase::Parameters>(&phase_parameters))
+                std::get_if<control::EquilibrationPhase::Parameters>(&phase_parameters))
             {
                 schedule.push(
-                    std::make_unique<EquilibrationPhase>(
+                    std::make_unique<control::EquilibrationPhase>(
                         name, parameters_.system_parameters, *eq_phase_parameters
                     )
                 );
             }
 
             if (auto ob_phase_parameters =
-                std::get_if<ObservationPhase::Parameters>(&phase_parameters))
+                std::get_if<control::ObservationPhase::Parameters>(&phase_parameters))
             {
                 schedule.push(
-                    std::make_unique<ObservationPhase>(
+                    std::make_unique<control::ObservationPhase>(
                         name, parameters_.system_parameters, *ob_phase_parameters
                     )
                 );
@@ -145,4 +145,4 @@ namespace control
         // Finally return the SimulationController
         return {std::move(integrator), std::move(schedule), logger};
     }
-} // namespace control
+} // namespace api
