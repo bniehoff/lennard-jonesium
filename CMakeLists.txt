@@ -7,7 +7,7 @@ project(lennardjonesium
 
 include_directories(
     ${PROJECT_SOURCE_DIR}
-    ${PROJECT_SOURCE_DIR}/src
+    ${PROJECT_SOURCE_DIR}/src/cpp
 )
 
 set(CMAKE_CXX_STANDARD 20)
@@ -53,87 +53,87 @@ add_compile_definitions(
 # Define libraries out of which the main library will be built
 
 add_library(greeter STATIC
-    src/lennardjonesium/greeter/greeter.hpp
-    src/lennardjonesium/greeter/greeter.cpp
+    src/cpp/lennardjonesium/greeter/greeter.hpp
+    src/cpp/lennardjonesium/greeter/greeter.cpp
 )
 
 add_library(draft_cpp23 STATIC
-    src/lennardjonesium/draft_cpp23/generator.hpp
-    src/lennardjonesium/draft_cpp23/examples.hpp
+    src/cpp/lennardjonesium/draft_cpp23/generator.hpp
+    src/cpp/lennardjonesium/draft_cpp23/examples.hpp
 )
 
 # This is needed because library has no .cpp files
 set_target_properties(draft_cpp23 PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library(abstract STATIC
-    src/lennardjonesium/abstract/overview.hpp
+    src/cpp/lennardjonesium/abstract/overview.hpp
 )
 
 set_target_properties(abstract PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library(tools STATIC
-    src/lennardjonesium/tools/aligned_generator.hpp
-    src/lennardjonesium/tools/math.hpp
-    src/lennardjonesium/tools/bounding_box.hpp
-    src/lennardjonesium/tools/bounding_box.cpp
-    src/lennardjonesium/tools/system_parameters.hpp
-    src/lennardjonesium/tools/cell_list_array.hpp
-    src/lennardjonesium/tools/cell_list_array.cpp
-    src/lennardjonesium/tools/cubic_lattice.hpp
-    src/lennardjonesium/tools/cubic_lattice.cpp
-    src/lennardjonesium/tools/moving_sample.hpp
-    src/lennardjonesium/tools/overloaded_visitor.hpp
-    src/lennardjonesium/tools/message_buffer.hpp
+    src/cpp/lennardjonesium/tools/aligned_generator.hpp
+    src/cpp/lennardjonesium/tools/math.hpp
+    src/cpp/lennardjonesium/tools/bounding_box.hpp
+    src/cpp/lennardjonesium/tools/bounding_box.cpp
+    src/cpp/lennardjonesium/tools/system_parameters.hpp
+    src/cpp/lennardjonesium/tools/cell_list_array.hpp
+    src/cpp/lennardjonesium/tools/cell_list_array.cpp
+    src/cpp/lennardjonesium/tools/cubic_lattice.hpp
+    src/cpp/lennardjonesium/tools/cubic_lattice.cpp
+    src/cpp/lennardjonesium/tools/moving_sample.hpp
+    src/cpp/lennardjonesium/tools/overloaded_visitor.hpp
+    src/cpp/lennardjonesium/tools/message_buffer.hpp
 )
 
 add_library(physics STATIC
-    src/lennardjonesium/physics/system_state.hpp
-    src/lennardjonesium/physics/system_state.cpp
-    src/lennardjonesium/physics/forces.hpp
-    src/lennardjonesium/physics/lennard_jones_force.hpp
-    src/lennardjonesium/physics/lennard_jones_force.cpp
-    src/lennardjonesium/physics/derived_properties.hpp
-    src/lennardjonesium/physics/derived_properties.cpp
-    src/lennardjonesium/physics/measurements.hpp
-    src/lennardjonesium/physics/transformations.hpp
-    src/lennardjonesium/physics/transformations.cpp
-    src/lennardjonesium/physics/observation.hpp
-    src/lennardjonesium/physics/analyzers.hpp
-    src/lennardjonesium/physics/analyzers.cpp
+    src/cpp/lennardjonesium/physics/system_state.hpp
+    src/cpp/lennardjonesium/physics/system_state.cpp
+    src/cpp/lennardjonesium/physics/forces.hpp
+    src/cpp/lennardjonesium/physics/lennard_jones_force.hpp
+    src/cpp/lennardjonesium/physics/lennard_jones_force.cpp
+    src/cpp/lennardjonesium/physics/derived_properties.hpp
+    src/cpp/lennardjonesium/physics/derived_properties.cpp
+    src/cpp/lennardjonesium/physics/measurements.hpp
+    src/cpp/lennardjonesium/physics/transformations.hpp
+    src/cpp/lennardjonesium/physics/transformations.cpp
+    src/cpp/lennardjonesium/physics/observation.hpp
+    src/cpp/lennardjonesium/physics/analyzers.hpp
+    src/cpp/lennardjonesium/physics/analyzers.cpp
 )
 
 add_library(engine STATIC
-    src/lennardjonesium/engine/particle_pair_filter.hpp
-    src/lennardjonesium/engine/particle_pair_filter.cpp
-    src/lennardjonesium/engine/boundary_condition.hpp
-    src/lennardjonesium/engine/boundary_condition.cpp
-    src/lennardjonesium/engine/force_calculation.hpp
-    src/lennardjonesium/engine/force_calculation.cpp
-    src/lennardjonesium/engine/integrator.hpp
-    src/lennardjonesium/engine/integrator.cpp
-    src/lennardjonesium/engine/integrator_builder.hpp
-    src/lennardjonesium/engine/initial_condition.hpp
-    src/lennardjonesium/engine/initial_condition.cpp
+    src/cpp/lennardjonesium/engine/particle_pair_filter.hpp
+    src/cpp/lennardjonesium/engine/particle_pair_filter.cpp
+    src/cpp/lennardjonesium/engine/boundary_condition.hpp
+    src/cpp/lennardjonesium/engine/boundary_condition.cpp
+    src/cpp/lennardjonesium/engine/force_calculation.hpp
+    src/cpp/lennardjonesium/engine/force_calculation.cpp
+    src/cpp/lennardjonesium/engine/integrator.hpp
+    src/cpp/lennardjonesium/engine/integrator.cpp
+    src/cpp/lennardjonesium/engine/integrator_builder.hpp
+    src/cpp/lennardjonesium/engine/initial_condition.hpp
+    src/cpp/lennardjonesium/engine/initial_condition.cpp
 )
 
 add_library(output STATIC
-    src/lennardjonesium/output/log_message.hpp
-    src/lennardjonesium/output/sinks.hpp
-    src/lennardjonesium/output/sinks.cpp
-    src/lennardjonesium/output/dispatcher.hpp
-    src/lennardjonesium/output/dispatcher.cpp
-    src/lennardjonesium/output/logger.hpp
-    src/lennardjonesium/output/logger.cpp
+    src/cpp/lennardjonesium/output/log_message.hpp
+    src/cpp/lennardjonesium/output/sinks.hpp
+    src/cpp/lennardjonesium/output/sinks.cpp
+    src/cpp/lennardjonesium/output/dispatcher.hpp
+    src/cpp/lennardjonesium/output/dispatcher.cpp
+    src/cpp/lennardjonesium/output/logger.hpp
+    src/cpp/lennardjonesium/output/logger.cpp
 )
 
 add_library(control STATIC
-    src/lennardjonesium/control/command_queue.hpp
-    src/lennardjonesium/control/simulation_phase.hpp
-    src/lennardjonesium/control/simulation_phase.cpp
-    src/lennardjonesium/control/simulation_controller.hpp
-    src/lennardjonesium/control/simulation_controller.cpp
-    src/lennardjonesium/control/simulation.hpp
-    src/lennardjonesium/control/simulation.cpp
+    src/cpp/lennardjonesium/control/command_queue.hpp
+    src/cpp/lennardjonesium/control/simulation_phase.hpp
+    src/cpp/lennardjonesium/control/simulation_phase.cpp
+    src/cpp/lennardjonesium/control/simulation_controller.hpp
+    src/cpp/lennardjonesium/control/simulation_controller.cpp
+    src/cpp/lennardjonesium/control/simulation.hpp
+    src/cpp/lennardjonesium/control/simulation.cpp
 )
 
 # Link the various dependencies
@@ -180,7 +180,7 @@ if(SKBUILD)
     find_package(PythonExtensions REQUIRED)
     find_package(Cython REQUIRED)
 
-    add_subdirectory(src/lennardjonesium/bindings)
+    add_subdirectory(src/python/lennardjonesium/bindings)
 else()
     # Otherwise, build the C++ unit tests
     include(CTest)
@@ -189,10 +189,10 @@ else()
     find_package(Catch2 REQUIRED)
 
     add_library(mock STATIC
-        tests/mock/constant_short_range_force.hpp
-        tests/mock/constant_short_range_force.cpp
-        tests/mock/fixed_phases.hpp
-        tests/mock/fixed_phases.cpp
+        tests/cpp/mock/constant_short_range_force.hpp
+        tests/cpp/mock/constant_short_range_force.cpp
+        tests/cpp/mock/fixed_phases.hpp
+        tests/cpp/mock/fixed_phases.cpp
     )
 
     target_link_libraries(mock
@@ -206,38 +206,36 @@ else()
     )
 
     add_executable(unit_tests
-        tests/other/test_eigen.cpp
-        tests/other/test_modulo.cpp
-        tests/other/test_reference_unique_ptr.cpp
-        tests/other/test_tee_device.cpp
-        tests/other/test_constant_short_range_force.cpp
+        tests/cpp/other/test_eigen.cpp
+        tests/cpp/other/test_modulo.cpp
+        tests/cpp/other/test_reference_unique_ptr.cpp
+        tests/cpp/other/test_tee_device.cpp
+        tests/cpp/other/test_constant_short_range_force.cpp
 
-        tests/lennardjonesium/greeter/test_greeter.cpp
+        tests/cpp/lennardjonesium/tools/test_bounding_box.cpp
+        tests/cpp/lennardjonesium/tools/test_cell_list_array.cpp
+        tests/cpp/lennardjonesium/tools/test_cubic_lattice.cpp
+        tests/cpp/lennardjonesium/tools/test_moving_sample.cpp
+        tests/cpp/lennardjonesium/tools/test_message_buffer.cpp
 
-        tests/lennardjonesium/tools/test_bounding_box.cpp
-        tests/lennardjonesium/tools/test_cell_list_array.cpp
-        tests/lennardjonesium/tools/test_cubic_lattice.cpp
-        tests/lennardjonesium/tools/test_moving_sample.cpp
-        tests/lennardjonesium/tools/test_message_buffer.cpp
+        tests/cpp/lennardjonesium/physics/test_system_state.cpp
+        tests/cpp/lennardjonesium/physics/test_measurements.cpp
+        tests/cpp/lennardjonesium/physics/test_lennard_jones_force.cpp
 
-        tests/lennardjonesium/physics/test_system_state.cpp
-        tests/lennardjonesium/physics/test_measurements.cpp
-        tests/lennardjonesium/physics/test_lennard_jones_force.cpp
+        tests/cpp/lennardjonesium/engine/test_periodic_boundary_condition.cpp
+        tests/cpp/lennardjonesium/engine/test_particle_pair_filter.cpp
+        tests/cpp/lennardjonesium/engine/test_short_range_force_calculation.cpp
+        tests/cpp/lennardjonesium/engine/test_velocity_verlet_integrator.cpp
+        tests/cpp/lennardjonesium/engine/test_initial_condition.cpp
 
-        tests/lennardjonesium/engine/test_periodic_boundary_condition.cpp
-        tests/lennardjonesium/engine/test_particle_pair_filter.cpp
-        tests/lennardjonesium/engine/test_short_range_force_calculation.cpp
-        tests/lennardjonesium/engine/test_velocity_verlet_integrator.cpp
-        tests/lennardjonesium/engine/test_initial_condition.cpp
+        tests/cpp/lennardjonesium/output/test_sinks.cpp
+        tests/cpp/lennardjonesium/output/test_dispatcher.cpp
+        tests/cpp/lennardjonesium/output/test_logger.cpp
 
-        tests/lennardjonesium/output/test_sinks.cpp
-        tests/lennardjonesium/output/test_dispatcher.cpp
-        tests/lennardjonesium/output/test_logger.cpp
-
-        tests/lennardjonesium/control/test_equilibration_phase.cpp
-        tests/lennardjonesium/control/test_observation_phase.cpp
-        tests/lennardjonesium/control/test_simulation_controller.cpp
-        tests/lennardjonesium/control/test_simulation.cpp
+        tests/cpp/lennardjonesium/control/test_equilibration_phase.cpp
+        tests/cpp/lennardjonesium/control/test_observation_phase.cpp
+        tests/cpp/lennardjonesium/control/test_simulation_controller.cpp
+        tests/cpp/lennardjonesium/control/test_simulation.cpp
     )
 
     target_link_libraries(unit_tests
@@ -256,8 +254,8 @@ else()
     )
 
     add_executable(integration_tests
-        tests/integration/test_system_equilibration.cpp
-        tests/integration/test_full_simulation.cpp
+        tests/cpp/integration/test_system_equilibration.cpp
+        tests/cpp/integration/test_full_simulation.cpp
     )
 
     target_link_libraries(integration_tests
