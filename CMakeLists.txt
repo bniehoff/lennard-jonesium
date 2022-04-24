@@ -20,10 +20,13 @@ find_package(fmt REQUIRED)
 add_compile_options(
     -Wall -Werror -Wextra -Wpedantic
     # -fsanitize=undefined
-    -O3                 # Enable optimization level 3
-    -march=native       # Enables vectorization for Eigen in GCC and Clang
-    -ffast-math         # Disables adherence to error reporting and rounding rules in GCC
-                        # (Needed for efficient std::floor() function)
+    -O3                     # Enable optimization level 3
+    -march=native           # Enables vectorization for Eigen in GCC and Clang
+    -ffast-math             # Disables adherence to error reporting and rounding rules in GCC
+                            # (Needed for efficient std::floor() function)
+    -fPIC                   # Position-independent code generation, needed for boost::iostreams
+                            # to work in shared library context via Cython
+    -fvisibility=hidden     # Make sure only the symbols that are needed are visible
 )
 
 # TODO: Possibly set per-target?

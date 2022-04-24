@@ -48,7 +48,7 @@ class Configuration:
     
     @dataclass
     class _Observation:
-        name: str = 'Obserevation Phase'
+        name: str = 'Observation Phase'
         tolerance: float = 0.10
         sample_size: int = 50
         observation_interval: int = 200
@@ -63,5 +63,5 @@ class Configuration:
     
     system: _System = _System()
     equilibration: _Equilibration = _Equilibration()
-    observations: _Observation = _Observation()
+    observation: _Observation = _Observation()
     filepaths: _Filepaths = _Filepaths()

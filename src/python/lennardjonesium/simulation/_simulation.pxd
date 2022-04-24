@@ -21,18 +21,14 @@ License along with Lennard-Jonesium.  If not, see
 """
 
 
-from lennardjonesium.simulation._parameters cimport _SimplifiedParameters
+from libcpp.memory cimport unique_ptr
+
+from lennardjonesium.simulation._configuration cimport _Configuration
 
 
 # Grab the declarations we need for the Simulation class
 cdef extern from "<lennardjonesium/api/simulation.hpp>" namespace "api" nogil:
-    cdef cppclass _FullParameters "api::Simulation::Parameters":
-        # We don't expose any further details besides that it can be default constructed
-        _FullParameters() except +
-    
     cdef cppclass _Simulation "api::Simulation":
-        _Simulation(_FullParameters) except +
-
         # Run the simulation
         void run()
 
@@ -42,7 +38,6 @@ cdef extern from "<lennardjonesium/api/simulation.hpp>" namespace "api" nogil:
         double force(double)
 
 
-# We also need the function that is used to convert SimplifiedParameters to the full
-# Simulation::Parameters
-cdef extern from "<lennardjonesium/api/parameters.hpp>" namespace "api" nogil:
-    cdef _FullParameters make_simulation_parameters(_SimplifiedParameters) except +
+# Also grab the factory function needed to create a Simulation from a Configuration
+cdef extern from "<lennardjonesium/api/configuration.hpp>" namespace "api" nogil:
+    cdef unique_ptr[_Simulation] make_simulation(_Configuration) except +

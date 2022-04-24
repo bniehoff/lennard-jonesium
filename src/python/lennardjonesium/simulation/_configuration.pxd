@@ -20,7 +20,9 @@ License along with Lennard-Jonesium.  If not, see
 <https://www.gnu.org/licenses/>.
 """
 
+
 from libcpp.string cimport string
+
 
 # Grab all declarations related to building Configuration structs
 cdef extern from "<lennardjonesium/api/configuration.hpp>" namespace "api" nogil:
@@ -66,10 +68,10 @@ cdef extern from "<lennardjonesium/api/configuration.hpp>" namespace "api" nogil
         
         cppclass _Filepaths "api::Configuration::Filepaths":
             _Filepaths() except +
-            
+
             string event_log
             string thermodynamic_log
-            string observation_loh
+            string observation_log
             string snapshot_log
         
         # Now declare the actual member variables
