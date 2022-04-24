@@ -48,8 +48,8 @@ namespace api
         : parameters_{parameters},
           initial_condition_{
               parameters.system_parameters,
-              parameters.unit_cell,
-              parameters.random_seed
+              parameters.random_seed,
+              parameters.unit_cell
           }
     {
         // We need to create the ShortRangeForce

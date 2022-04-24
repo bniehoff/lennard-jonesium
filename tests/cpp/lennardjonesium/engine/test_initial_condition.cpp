@@ -27,7 +27,7 @@ SCENARIO("Creating initial conditions with specified properties")
     WHEN("I create an initial condition")
     {
         engine::InitialCondition initial_condition{
-            system_parameters, tools::CubicLattice::BodyCentered(), rd()
+            system_parameters, rd(), tools::CubicLattice::BodyCentered()
         };
 
         THEN("The resulting initial_condition has the correct properties")

@@ -36,20 +36,20 @@ namespace engine
 {
     InitialCondition::InitialCondition(
         tools::SystemParameters system_parameters,
-        tools::CubicLattice::UnitCell unit_cell,
-        std::random_device::result_type seed
+        std::random_device::result_type seed,
+        tools::CubicLattice::UnitCell unit_cell
     )
         : InitialCondition::InitialCondition(
             system_parameters,
-            tools::CubicLattice{system_parameters, unit_cell},
-            seed
+            seed,
+            tools::CubicLattice{system_parameters, unit_cell}
         )
     {}
 
     InitialCondition::InitialCondition(
         tools::SystemParameters system_parameters,
-        tools::CubicLattice cubic_lattice,
-        std::random_device::result_type seed
+        std::random_device::result_type seed,
+        tools::CubicLattice cubic_lattice
     )
         : system_parameters_{system_parameters},
           bounding_box_{cubic_lattice.bounding_box()},
