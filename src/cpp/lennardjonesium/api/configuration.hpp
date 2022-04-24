@@ -27,15 +27,11 @@
 #include <string>
 #include <memory>
 
-#include <lennardjonesium/engine/initial_condition.hpp>
+#include <lennardjonesium/api/seed_generator.hpp>
 #include <lennardjonesium/api/simulation.hpp>
 
 namespace api
 {
-    // We need to make this available to Cython without having to import initial_condition.hpp
-    inline constexpr unsigned int default_random_seed =
-        engine::InitialCondition::random_number_engine_type::default_seed;
-
     struct Configuration
     {
         /**
@@ -55,7 +51,7 @@ namespace api
             int particle_count = 100;
 
             // Random seed
-            unsigned int random_seed = default_random_seed;
+            unsigned int random_seed = SeedGenerator::default_seed;
             
             // Force parameters
             double cutoff_distance = 2.5;
