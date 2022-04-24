@@ -86,7 +86,7 @@ namespace api
             // Output filenames:
             std::string event_log = "events.log";
             std::string thermodynamic_log = "thermodynamics.csv";
-            std::string observation_loh = "observations.csv";
+            std::string observation_log = "observations.csv";
             std::string snapshot_log = "snapshots.csv";
         };
 

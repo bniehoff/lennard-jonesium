@@ -83,7 +83,7 @@ namespace api
 
             .event_log_path = configuration.filepaths.event_log,
             .thermodynamic_log_path = configuration.filepaths.thermodynamic_log,
-            .observation_log_path = configuration.filepaths.observation_loh,
+            .observation_log_path = configuration.filepaths.observation_log,
             .snapshot_log_path = configuration.filepaths.snapshot_log
         };
 
