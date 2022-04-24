@@ -1,1 +1,1 @@
-from lennardjonesium.simulation import Parameters
+from lennardjonesium.simulation import Parameters, Simulation

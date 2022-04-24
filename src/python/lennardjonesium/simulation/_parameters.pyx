@@ -28,7 +28,8 @@ from lennardjonesium.simulation._parameters cimport _default_seed, _SimplifiedPa
 
 cdef class Parameters:
     """
-    The Parameters class exposes the SimplifiedParameters to Python
+    The Parameters class exposes the SimplifiedParameters to Python.  Would be nice if we had
+    Dataclasses in Cython, instead we have to create the getters and setters manually.
     """
     cdef _SimplifiedParameters _parameters
 
@@ -80,6 +81,10 @@ cdef class Parameters:
     
     # def __dealloc__(self):
     #     del self._parameters
+
+    # A function for accessing the SimplifiedParameters struct directly
+    # Note that we cannot use @property on cdef functions
+    cdef _SimplifiedParameters data(self): return self._parameters
     
     # Define properties that echo all values
     @property

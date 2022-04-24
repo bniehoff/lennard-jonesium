@@ -1,1 +1,2 @@
 from lennardjonesium.simulation._parameters import Parameters
+from lennardjonesium.simulation._simulation import Simulation
