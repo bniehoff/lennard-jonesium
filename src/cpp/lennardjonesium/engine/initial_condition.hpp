@@ -25,6 +25,8 @@
 
 #include <random>
 
+#include <Eigen/Dense>
+
 #include <lennardjonesium/tools/bounding_box.hpp>
 #include <lennardjonesium/tools/cubic_lattice.hpp>
 #include <lennardjonesium/tools/system_parameters.hpp>
@@ -54,8 +56,8 @@ namespace engine
             // Constructor
             InitialCondition(
                 tools::SystemParameters system_parameters,
-                tools::CubicLattice::UnitCell unit_cell = tools::CubicLattice::FaceCentered(),
-                std::random_device::result_type seed = random_number_engine_type::default_seed
+                std::random_device::result_type seed = random_number_engine_type::default_seed,
+                tools::CubicLattice::UnitCell unit_cell = tools::CubicLattice::FaceCentered()
             );
             
             // These return by value so that the original InitialCondition will not be modified
@@ -72,8 +74,8 @@ namespace engine
              */
             InitialCondition(
                 tools::SystemParameters system_parameters,
-                tools::CubicLattice cubic_lattice,
-                std::random_device::result_type seed
+                std::random_device::result_type seed,
+                tools::CubicLattice cubic_lattice
             );
 
             // Data members
