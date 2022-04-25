@@ -138,6 +138,8 @@ add_library(api STATIC
     src/cpp/lennardjonesium/api/seed_generator.hpp
     src/cpp/lennardjonesium/api/configuration.hpp
     src/cpp/lennardjonesium/api/configuration.cpp
+    src/cpp/lennardjonesium/api/worker.hpp
+    src/cpp/lennardjonesium/api/worker.cpp
 )
 
 # Link the various dependencies
