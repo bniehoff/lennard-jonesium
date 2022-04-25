@@ -36,7 +36,10 @@ cdef class Simulation:
     """
     cdef unique_ptr[_Simulation] _simulation
 
-    def __cinit__(self, configuration = Configuration()):
+    def __cinit__(self, configuration = None):
+        if configuration is None:
+            configuration = Configuration()
+
         if (not isinstance(configuration, Configuration)):
             raise TypeError('Initialization argument must be of type Configuration')
         
