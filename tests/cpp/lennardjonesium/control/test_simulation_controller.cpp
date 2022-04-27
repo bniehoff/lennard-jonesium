@@ -106,8 +106,8 @@ SCENARIO("SimulationController correctly interprets commands")
             {
                 std::string expected = 
                     "0: Phase started: SuccessPhase\n"
-                    "1: Temperature adjusted to: 0.5\n"
-                    "3: Temperature adjusted to: 0.5\n"
+                    "1: Temperature measured at: 0.25, adjusted to: 0.5\n"
+                    "3: Temperature measured at: 0.25, adjusted to: 0.5\n"
                     "5: Phase complete: SuccessPhase\n"
                     "5: Phase started: FailurePhase\n"
                     "6: Observation recorded\n"

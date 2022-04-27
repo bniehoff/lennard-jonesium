@@ -51,6 +51,7 @@ SCENARIO("Dispatcher sends to correct files")
     GIVEN("The dispatcher has been sent a number of messages")
     {
         std::string phase_name{"Test Phase"};
+        double measured_temperature{0.25};
         double target_temperature{0.5};
         std::string abort_reason{"Could not reverse the polarity"};
 
@@ -86,7 +87,10 @@ SCENARIO("Dispatcher sends to correct files")
         };
 
         dispatcher.send(0, output::PhaseStartEvent{phase_name});
-        dispatcher.send(3, output::AdjustTemperatureEvent{target_temperature});
+        dispatcher.send(3, output::AdjustTemperatureEvent{
+            .measured_temperature = measured_temperature,
+            .target_temperature = target_temperature
+        });
         dispatcher.send(3, output::ObservationData{observation});
         dispatcher.send(5, output::PhaseCompleteEvent{phase_name});
         dispatcher.send(6, output::RecordObservationEvent{});
@@ -113,7 +117,7 @@ SCENARIO("Dispatcher sends to correct files")
             {
                 std::string expected = 
                     "0: Phase started: Test Phase\n"
-                    "3: Temperature adjusted to: 0.5\n"
+                    "3: Temperature measured at: 0.25, adjusted to: 0.5\n"
                     "5: Phase complete: Test Phase\n"
                     "6: Observation recorded\n"
                     "8: Simulation aborted: Could not reverse the polarity\n";

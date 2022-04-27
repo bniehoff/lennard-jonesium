@@ -79,10 +79,13 @@ namespace control
 
             [&](const AdjustTemperature& command)
             {
-                state | physics::set_temperature(command.temperature);
+                state | physics::set_temperature(command.target_temperature);
 
                 // Log temperature adjustment event
-                this->logger_.log(time_step, output::AdjustTemperatureEvent{command.temperature});
+                this->logger_.log(time_step, output::AdjustTemperatureEvent{
+                    .measured_temperature = command.measured_temperature,
+                    .target_temperature = command.target_temperature
+                });
             },
 
             [&](const PhaseComplete& command [[maybe_unused]])

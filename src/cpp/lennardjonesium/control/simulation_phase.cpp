@@ -57,7 +57,10 @@ namespace control
                 >= equilibration_parameters_.tolerance) [[unlikely]]
             {
                 last_adjustment_time_ = time_step;
-                command_queue.push(AdjustTemperature{system_parameters_.temperature});
+                command_queue.push(AdjustTemperature{
+                    .measured_temperature = last_temperature_,
+                    .target_temperature = system_parameters_.temperature
+                });
             }
         }
 

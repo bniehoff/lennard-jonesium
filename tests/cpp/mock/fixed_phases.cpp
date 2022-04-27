@@ -39,7 +39,7 @@ namespace mock
         {
         case 1:
         case 3:
-            command_queue.push(control::AdjustTemperature{0.5});
+            command_queue.push(control::AdjustTemperature{0.25, 0.5});
             command_queue.push(control::AdvanceTime{});
             break;
             

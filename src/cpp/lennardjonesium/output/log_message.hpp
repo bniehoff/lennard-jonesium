@@ -47,7 +47,8 @@ namespace output
 
     struct AdjustTemperatureEvent
     {
-        double temperature;
+        double measured_temperature;
+        double target_temperature;
     };
 
     struct RecordObservationEvent {};

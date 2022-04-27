@@ -45,9 +45,10 @@ namespace output
     {
         fmt::print(
             destination_,
-            "{}: Temperature adjusted to: {}\n",
+            "{}: Temperature measured at: {:.4g}, adjusted to: {:.4g}\n",
             time_step,
-            message.temperature
+            message.measured_temperature,
+            message.target_temperature
         );
     }
     
