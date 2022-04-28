@@ -26,13 +26,15 @@
 #include <ranges>
 #include <chrono>
 
-#include <fmt/core.h>
+#include <sstream>
+#include <syncstream>
 
-#include <lennardjonesium/tools/message_buffer.hpp>
+#include <fmt/core.h>
+#include <fmt/ostream.h>
 #include <lennardjonesium/api/worker.hpp>
 
 namespace api
-{
+{   
     void Worker::launch()
     {
         std::thread producer
@@ -40,30 +42,34 @@ namespace api
             [this]() {
                 for (int i : std::views::iota(0, 10))
                 {
-                    this->message_buffer_.put(
-                        fmt::format("Count: {}", i)
-                    );
+                    fmt::print(this->message_syncstream_, "Count: {}", i);
                     std::this_thread::sleep_for(std::chrono::milliseconds(500));
                 }
 
-                this->message_buffer_.close();
+                this->message_syncstream_.setstate(std::ios::eofbit);
             }
         };
 
         producer.detach();
     }
 
-    std::pair<bool, std::string> Worker::get()
+    std::pair<bool, std::string> Worker::poll()
     {
-        auto message = message_buffer_.get();
+        // Must get EOF flag first, _then_ check if there is anything in the stream
+        bool eof = message_syncstream_.eof();
+        message_syncstream_.emit();
+        std::string contents = message_stream_.str();
 
-        if (message.has_value())
+        // Clear contents
+        message_stream_.str("");
+
+        if (contents.length() > 0)
         {
-            return {true, message.value()};
+            return {false, contents};
         }
         else
         {
-            return {false, ""};
+            return {eof, contents};
         }
     }
 } // namespace api

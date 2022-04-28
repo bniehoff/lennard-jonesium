@@ -27,7 +27,8 @@
 #include <utility>
 #include <thread>
 
-#include <lennardjonesium/tools/message_buffer.hpp>
+#include <sstream>
+#include <syncstream>
 
 namespace api
 {
@@ -36,10 +37,11 @@ namespace api
         public:
             void launch();
 
-            std::pair<bool, std::string> get();
+            std::pair<bool, std::string> poll();
 
         private:
-            tools::MessageBuffer<std::string> message_buffer_;
+            std::stringstream message_stream_{};
+            std::osyncstream message_syncstream_{message_stream_};
     };
 } // namespace api
 

@@ -35,12 +35,13 @@ cdef class Worker:
         self._worker.launch()
 
         while (True):
-            has_value, value = self._worker.get()
-            
-            if has_value:
-                print(str(value, 'utf-8'), flush=True)
-            else:
+            eof, value = self._worker.poll()
+
+            if eof:
                 break
+            
+            if value:
+                print(str(value, 'utf-8'), flush=True)
             
             # We don't want to poll continuously, it will block other threads
             time.sleep(0.1)

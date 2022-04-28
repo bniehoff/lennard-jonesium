@@ -28,5 +28,5 @@ cdef extern from "<lennardjonesium/api/worker.hpp>" namespace "api" nogil:
     cdef cppclass _Worker "api::Worker":
         _Worker() except +
         void launch() except +
-        pair[bool, string] get() except +
+        pair[bool, string] poll() except +
         
