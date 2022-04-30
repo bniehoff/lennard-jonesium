@@ -28,6 +28,7 @@
 
 #include <sstream>
 #include <syncstream>
+#include <iostream>
 
 #include <fmt/core.h>
 #include <fmt/ostream.h>
@@ -42,7 +43,9 @@ namespace api
             [this]() {
                 for (int i : std::views::iota(0, 10))
                 {
-                    fmt::print(this->message_syncstream_, "Count: {}", i);
+                    // fmt::print(this->message_syncstream_, "Count: {}\n", i);
+                    fmt::print(std::cout, "Count: {}\n", i);
+                    std::cout.flush();
                     std::this_thread::sleep_for(std::chrono::milliseconds(500));
                 }
 

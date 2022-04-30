@@ -34,14 +34,12 @@ cdef class Worker:
     def run(self):
         self._worker.launch()
 
-        while (True):
-            eof, value = self._worker.poll()
+        # eof, value = self._worker.poll()
 
-            if eof:
-                break
+        # while (not eof):
+        #     print(str(value, 'utf-8'), flush=True, end="")
             
-            if value:
-                print(str(value, 'utf-8'), flush=True)
-            
-            # We don't want to poll continuously, it will block other threads
-            time.sleep(0.1)
+        #     # We don't want to poll continuously, it will block other threads
+        #     time.sleep(0.7)
+
+        #     eof, value = self._worker.poll()
