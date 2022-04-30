@@ -102,7 +102,9 @@ SCENARIO("Equilibration Phase decision-making")
             REQUIRE(std::holds_alternative<control::AdjustTemperature>(command_queue.front()));
             REQUIRE(
                 Approx(system_parameters.temperature)
-                    == std::get<control::AdjustTemperature>(command_queue.front()).temperature
+                    == std::get<control::AdjustTemperature>(
+                        command_queue.front()
+                    ).target_temperature
             );
             command_queue.pop();
             REQUIRE(std::holds_alternative<control::AdvanceTime>(command_queue.front()));

@@ -29,7 +29,11 @@ from lennardjonesium.simulation._configuration cimport _Configuration
 # Grab the declarations we need for the Simulation class
 cdef extern from "<lennardjonesium/api/simulation.hpp>" namespace "api" nogil:
     cdef cppclass _Simulation "api::Simulation":
-        # Run the simulation
+        # Run the simulation asynchronously
+        void launch()
+        void wait()
+
+        # Synchronous wrapper
         void run()
 
         # Calculate quantities based on particle separation, for plotting

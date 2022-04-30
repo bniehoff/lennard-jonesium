@@ -134,7 +134,7 @@ namespace tools
             // Wait until either the buffer is nonempty, or the buffer has been closed
             update_signal_.wait(
                 lock,
-                [&]() {return !this->buffer_.empty() || !this->open_for_write_;}
+                [this]() {return !this->buffer_.empty() || !this->open_for_write_;}
             );
 
             if (!buffer_.empty())

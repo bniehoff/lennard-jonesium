@@ -56,7 +56,8 @@ namespace control
     // Adjust the temperature of the system
     struct AdjustTemperature
     {
-        double temperature;
+        double measured_temperature;
+        double target_temperature;
     };
 
     // On success, end this phase and move on to next

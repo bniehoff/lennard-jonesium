@@ -84,6 +84,10 @@ cdef class Simulation:
     
     # def __dealloc__(self):
     #     del self._simulation
+
+    def launch(self): self._simulation.get().launch()
+
+    def wait(self): self._simulation.get().wait()
     
     def run(self): self._simulation.get().run()
 
