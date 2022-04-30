@@ -55,7 +55,7 @@ namespace api
             [this, count]() {
                 for (int i : std::views::iota(0, count))
                 {
-                    this->buffer_->put(fmt::format("Count: {}\n", i));
+                    this->buffer_->write(fmt::format("Count: {}\n", i));
                     std::this_thread::sleep_for(std::chrono::milliseconds(500));
                 }
 
@@ -74,23 +74,47 @@ namespace api
         }
     }
 
-    std::pair<bool, std::string> AsyncWorker::get()
+    // std::pair<bool, std::string> AsyncWorker::get()
+    // {
+    //     if (buffer_)
+    //     {
+    //         auto message = buffer_->get();
+    //         if (message.has_value())
+    //         {
+    //             return {true, message.value()};
+    //         }
+    //         else
+    //         {
+    //             return {false, ""};
+    //         }
+    //     }
+    //     else
+    //     {
+    //         return {false, ""};
+    //     }
+    // }
+
+    bool AsyncWorker::eof()
     {
         if (buffer_)
         {
-            auto message = buffer_->get();
-            if (message.has_value())
-            {
-                return {true, message.value()};
-            }
-            else
-            {
-                return {false, ""};
-            }
+            return buffer_->eof();
         }
         else
         {
-            return {false, ""};
+            return true;
+        }
+    }
+
+    std::string AsyncWorker::read()
+    {
+        if (buffer_)
+        {
+            return buffer_->read();
+        }
+        else
+        {
+            return {};
         }
     }
 

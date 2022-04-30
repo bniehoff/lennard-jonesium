@@ -35,5 +35,7 @@ cdef extern from "<lennardjonesium/api/worker.hpp>" namespace "api":
         void launch(int) except +
         void launch() except +
         void wait() except +
-        pair[bool, string] get() except +
+        # pair[bool, string] get() except +
+        bool eof() except +
+        string read() except +
         

@@ -29,7 +29,7 @@
 #include <thread>
 #include <chrono>
 
-#include <lennardjonesium/tools/message_buffer.hpp>
+#include <lennardjonesium/tools/text_buffer.hpp>
 
 namespace api
 {
@@ -41,14 +41,17 @@ namespace api
 
     class AsyncWorker : public Worker
     {
-        using buffer_type = tools::MessageBuffer<std::string>;
+        using buffer_type = tools::TextBuffer;
 
         public:
             virtual void launch(int count = 10) override;
 
             void wait();
 
-            std::pair<bool, std::string> get();
+            // std::pair<bool, std::string> get();
+
+            std::string read();
+            bool eof();
 
             ~AsyncWorker() noexcept;
         

@@ -40,9 +40,15 @@ cdef class AsyncWorker:
     def launch(self, count: int = 10):
         self._worker.launch(count)
     
-    def get(self):
-        has_value, value = self._worker.get()
-        return has_value, str(value, 'utf-8')
+    # def get(self):
+    #     has_value, value = self._worker.get()
+    #     return has_value, str(value, 'utf-8')
     
     def wait(self):
         self._worker.wait()
+    
+    def eof(self):
+        return self._worker.eof()
+    
+    def read(self):
+        return str(self._worker.read(), 'utf-8')
