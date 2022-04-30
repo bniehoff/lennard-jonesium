@@ -28,6 +28,7 @@
 #include <filesystem>
 #include <iostream>
 #include <thread>
+#include <mutex>
 #include <exception>
 
 #include <boost/iostreams/tee.hpp>
@@ -97,9 +98,19 @@ namespace api
 
         // Launch the simulation job
         simulation_job_ = std::jthread(
-            [simulation_controller=std::move(simulation_controller), initial_state]() mutable
+            [this, simulation_controller=std::move(simulation_controller), initial_state]() mutable
             {
+                {
+                    std::lock_guard<std::mutex> lock(this->mutex_);
+                    this->is_running_ = true;
+                }
+
                 initial_state | simulation_controller;
+
+                {
+                    std::lock_guard<std::mutex> lock(this->mutex_);
+                    this->is_running_ = false;
+                }
             }
         );
     }

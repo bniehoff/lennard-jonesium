@@ -21,6 +21,7 @@ License along with Lennard-Jonesium.  If not, see
 """
 
 
+from libcpp cimport bool
 from libcpp.memory cimport unique_ptr
 
 from lennardjonesium.simulation._configuration cimport _Configuration
@@ -32,6 +33,9 @@ cdef extern from "<lennardjonesium/api/simulation.hpp>" namespace "api" nogil:
         # Run the simulation asynchronously
         void launch()
         void wait()
+
+        # Check whether the simulation is running
+        bool is_running()
 
         # Synchronous wrapper
         void run()

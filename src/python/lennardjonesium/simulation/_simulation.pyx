@@ -88,6 +88,8 @@ cdef class Simulation:
     def launch(self): self._simulation.get().launch()
 
     def wait(self): self._simulation.get().wait()
+
+    def is_running(self): return self._simulation.get().is_running()
     
     def run(self): self._simulation.get().run()
 

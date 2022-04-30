@@ -32,6 +32,7 @@
 #include <filesystem>
 #include <iostream>
 #include <thread>
+#include <mutex>
 
 #include <boost/iostreams/tee.hpp>
 #include <boost/iostreams/stream.hpp>
@@ -74,6 +75,7 @@ namespace api
          *  Asynchronous running:
          *      launch():       Launch the simulation in a separate thread
          *      wait():         Wait for an asynchronously-launched simulation to finish
+         *      is_running():   Tell whether a simulation job is currently running
          * 
          *  Synchronous running:
          *      run():          Synchronous wrapper around launch() and wait().  Blocks while
@@ -145,6 +147,13 @@ namespace api
             // Wait for the currently-running simulation to finish
             void wait();
 
+            // Check whether the simulation is currently running
+            bool is_running()
+            {
+                std::lock_guard<std::mutex> lock(mutex_);
+                return is_running_;
+            }
+
             // Synchronous wrapper around launch() and wait()
             void run(std::ostream& echo_stream = std::cout);
 
@@ -185,6 +194,9 @@ namespace api
 
             // The thread where the asynchronous simulation is running
             std::jthread simulation_job_;
+
+            std::mutex mutex_;
+            bool is_running_ = false;
 
             // Construct the SimulationController from the local parameters and a Logger
             control::SimulationController make_simulation_controller_(output::Logger&);

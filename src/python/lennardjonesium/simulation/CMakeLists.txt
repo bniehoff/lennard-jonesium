@@ -43,6 +43,27 @@ target_link_libraries(_simulation
 python_extension_module(_simulation)
 
 
+
+# Worker module
+add_cython_target(_worker CXX)
+add_library(_worker MODULE ${_worker})
+set_target_properties(_worker PROPERTIES LINKER_LANGUAGE CXX)
+# Statically link libstdc++ (Anaconda packages an olf libstc++ which gets in the way otherwise)
+target_link_options(_worker
+    PUBLIC -static-libstdc++
+)
+target_link_libraries(_worker
+    Eigen3::Eigen
+    fmt::fmt
+    tools
+    physics
+    engine
+    output
+    control
+    api
+)
+python_extension_module(_worker)
+
 # The install directory is relative to the project root (where the first CMakeLists.txt was found)
-install(TARGETS _seed_generator _simulation
+install(TARGETS _seed_generator _simulation _worker
     LIBRARY DESTINATION src/python/lennardjonesium/simulation)
