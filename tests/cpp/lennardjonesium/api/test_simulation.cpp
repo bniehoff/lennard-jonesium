@@ -96,6 +96,22 @@ SCENARIO("Running a simulation from a Simulation object")
         }
     }
 
+    WHEN("I re-run the simulation")
+    {
+        simulation.run();
+
+        THEN("I get the same output files again")
+        {
+            int event_lines = observation_count + 2;
+            int thermodynamic_lines = (observation_count * observation_interval) + 1;
+            int observation_lines = observation_count + 1;
+
+            REQUIRE(event_lines == count_lines(parameters.event_log_path));
+            REQUIRE(thermodynamic_lines == count_lines(parameters.thermodynamic_log_path));
+            REQUIRE(observation_lines == count_lines(parameters.observation_log_path));
+        }
+    }
+
     // Clean up
     fs::remove_all(test_dir);
 }

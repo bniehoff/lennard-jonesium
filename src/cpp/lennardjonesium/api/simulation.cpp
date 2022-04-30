@@ -27,6 +27,8 @@
 #include <utility>
 #include <filesystem>
 #include <iostream>
+#include <thread>
+#include <exception>
 
 #include <boost/iostreams/tee.hpp>
 #include <boost/iostreams/stream.hpp>
@@ -68,44 +70,70 @@ namespace api
         assert(short_range_force_ != nullptr && "Failed to construct ShortRangeForce");
     }
 
-    void Simulation::run()
+    void Simulation::launch(std::ostream& echo_stream)
     {
-        // First create the file streams.  We always duplicate the events log to stdout.
+        // Wait for any currently-running jobs to finish
+        wait();
+
+        // Next open the file streams.  We duplicate the events log to the given echo stream.
         namespace bio = boost::iostreams;
-        using tee_device = bio::tee_device<std::ostream, bio::file_sink>;
-        using tee_stream = bio::stream<tee_device>;
-        using ofstream = bio::stream<bio::file_sink>;
 
-        auto event_stream = tee_stream(
-            tee_device(std::cout, bio::file_sink{parameters_.event_log_path})
-        );
+        event_stream_.open(bio::tee(echo_stream, bio::file_sink{parameters_.event_log_path}));
+        thermodynamic_stream_.open(bio::file_sink{parameters_.thermodynamic_log_path});
+        observation_stream_.open(bio::file_sink{parameters_.observation_log_path});
+        snapshot_stream_.open(bio::file_sink{parameters_.snapshot_log_path});
 
-        auto thermodynamic_stream = ofstream(bio::file_sink{parameters_.thermodynamic_log_path});
-        auto observation_stream = ofstream(bio::file_sink{parameters_.observation_log_path});
-        auto snapshot_stream = ofstream(bio::file_sink{parameters_.snapshot_log_path});
-
-        // Create the logger
-        output::Logger logger(output::Logger::Streams{
-            .event_log = event_stream,
-            .thermodynamic_log = thermodynamic_stream,
-            .observation_log = observation_stream,
-            .snapshot_log = snapshot_stream
+        // Recreate the Logger
+        logger_ = std::make_unique<output::Logger>(output::Logger::Streams{
+            .event_log = event_stream_,
+            .thermodynamic_log = thermodynamic_stream_,
+            .observation_log = observation_stream_,
+            .snapshot_log = snapshot_stream_
         });
 
-        // Get the SimulationController
-        auto simulation_controller = make_simulation_controller_(logger);
+        // Create the SimulationController and initial state
+        auto simulation_controller = make_simulation_controller_(*logger_);
+        auto initial_state = initial_condition_.system_state();
 
-        // Generate the initial state and actually run the simulation
-        physics::SystemState state = initial_condition_.system_state();
-        state | simulation_controller;
+        // Launch the simulation job
+        simulation_job_ = std::jthread(
+            [simulation_controller=std::move(simulation_controller), initial_state]() mutable
+            {
+                initial_state | simulation_controller;
+            }
+        );
+    }
 
-        // Close the logger and file streams
-        logger.close();
+    void Simulation::wait()
+    {
+        // If a simulation job is running, then wait for it to end and then clean up
+        if (simulation_job_.joinable())
+        {
+            simulation_job_.join();
 
-        event_stream.close();
-        thermodynamic_stream.close();
-        observation_stream.close();
-        snapshot_stream.close();
+            // Destroy the Logger (waits for logging to finish)
+            logger_.reset();
+
+            // Close the file streams
+            event_stream_.close();
+            thermodynamic_stream_.close();
+            observation_stream_.close();
+            snapshot_stream_.close();
+        }
+    }
+
+    void Simulation::run(std::ostream& echo_stream)
+    {
+        // run() is just a synchronous wrapper for launch() and wait()
+        launch(echo_stream);
+        wait();
+    }
+
+    Simulation::~Simulation()
+    {
+        // Wait for any running simulations to finish
+        try {wait();}
+        catch(...) {}
     }
 
     control::SimulationController Simulation::make_simulation_controller_(output::Logger& logger)

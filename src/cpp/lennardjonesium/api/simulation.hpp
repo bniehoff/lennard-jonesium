@@ -30,6 +30,12 @@
 #include <string>
 #include <utility>
 #include <filesystem>
+#include <iostream>
+#include <thread>
+
+#include <boost/iostreams/tee.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/iostreams/device/file.hpp>
 
 #include <lennardjonesium/tools/system_parameters.hpp>
 #include <lennardjonesium/tools/cubic_lattice.hpp>
@@ -45,11 +51,33 @@ namespace api
     class Simulation
     {
         /**
-         * Simulation encapsulates all the information needed to run a complete simulation.  It
-         * provides some simple methods for running the simulation and getting information about it:
+         * Simulation encapsulates all the information needed to run a complete simulation.
+         * It provides an asynchronous interface for launching the simulation, and manages the
+         * associated thread via launch() and wait().  It also provides a synchronous wrapper via
+         * the single method run().
          * 
-         *  Running:
-         *      run():          Run the simulation
+         * Note that only one instance of the simulation can be running at a time, even if using
+         * the asynchronous interface.  If the simulation is currently running when calling
+         * launch() or run(), then we will wait for the current instance to finish and then
+         * re-launch.
+         * 
+         * NOTE: Whenever the simulation is re-run, the files it generated will be overwritten.
+         * 
+         * TODO: The launch() method takes an ostream& parameter to indicate where the events log
+         * should be echoed (usually to stdout).  However, it is difficult for Python to provide
+         * an ostream&, so we need to re-think this method if we want to expose this option to
+         * Python.
+         * 
+         * TODO: Consider implementing the capability to stop a currently-running simulation.  This
+         * would require modifications of SimulationController to check for the stop signal.
+         * 
+         *  Asynchronous running:
+         *      launch():       Launch the simulation in a separate thread
+         *      wait():         Wait for an asynchronously-launched simulation to finish
+         * 
+         *  Synchronous running:
+         *      run():          Synchronous wrapper around launch() and wait().  Blocks while
+         *                      running entire simulation.
          * 
          *  Information:
          *      parameters():   Get the parameters used to define the simulation
@@ -111,8 +139,14 @@ namespace api
 
             explicit Simulation(Parameters parameters);
 
-            // Builds a SimulationController from the Parameters and runs it
-            void run();
+            // Launch the simulation asynchronously
+            void launch(std::ostream& echo_stream = std::cout);
+
+            // Wait for the currently-running simulation to finish
+            void wait();
+
+            // Synchronous wrapper around launch() and wait()
+            void run(std::ostream& echo_stream = std::cout);
 
             Parameters parameters() {return parameters_;}
 
@@ -120,6 +154,9 @@ namespace api
             double potential(double distance) {return short_range_force_->potential(distance);}
             double virial(double distance) {return short_range_force_->virial(distance);}
             double force(double distance) {return short_range_force_->force(distance);}
+
+            // Clean up any running simulations
+            ~Simulation() noexcept;
         
         private:
             Parameters parameters_;
@@ -129,6 +166,25 @@ namespace api
             // We use a pointer to the generic ShortRangeForce, in case we might like to implement
             // other ShortRangeForces in the future
             std::unique_ptr<const physics::ShortRangeForce> short_range_force_;
+
+            // Output file streams
+            // We use Boost for the uniform close() interface, which std::ostream doesn't have
+            using tee_device = boost::iostreams::tee_device<
+                std::ostream, boost::iostreams::file_sink
+            >;
+            using tee_stream = boost::iostreams::stream<tee_device>;
+            using file_stream = boost::iostreams::stream<boost::iostreams::file_sink>;
+
+            tee_stream event_stream_;
+            file_stream thermodynamic_stream_;
+            file_stream observation_stream_;
+            file_stream snapshot_stream_;
+
+            // The Logger will be recreated for each simulation run (since it cannot be restarted)
+            std::unique_ptr<output::Logger> logger_;
+
+            // The thread where the asynchronous simulation is running
+            std::jthread simulation_job_;
 
             // Construct the SimulationController from the local parameters and a Logger
             control::SimulationController make_simulation_controller_(output::Logger&);
