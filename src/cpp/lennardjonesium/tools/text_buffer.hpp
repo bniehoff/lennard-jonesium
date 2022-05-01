@@ -29,6 +29,8 @@
 #include <mutex>
 #include <condition_variable>
 
+#include <boost/iostreams/filter/line.hpp>
+
 namespace tools
 {
     class TextBuffer
@@ -48,7 +50,7 @@ namespace tools
          * I don't have the patience right now to wrap so many methods!
          * 
          * Usage:
-         *      write():        Push a string to the buffer.
+         *      write():        Push a string to the buffer.  Returns number of characters written.
          * 
          *      read():         Read the contents of the buffer.  This call is blocking, until
          *                      there are contents to be returned (so if it returns the empty
@@ -69,9 +71,33 @@ namespace tools
         private:
             std::mutex mutex_;
             std::condition_variable update_signal_;
-            std::stringstream buffer_;
+            std::stringstream stream_;
             bool end_of_write_ = false;
             bool end_of_read_ = false;
+    };
+
+    class TextBufferFilter : public boost::iostreams::line_filter
+    {
+        /**
+         * TextBufferFilter is a wrapper for TextBuffer that models the boost::iostreams::filter
+         * concept.  This allows it to grab lines from a stream and push them to a TextBuffer
+         * object.
+         */
+
+        public:
+            explicit TextBufferFilter(TextBuffer& buffer) : buffer_{buffer} {}
+
+            template<typename Sink>
+            void close(Sink& snk, BOOST_IOS::openmode which)
+            {
+                buffer_.close();
+                boost::iostreams::line_filter::close(snk, which);
+            }
+        
+        private:
+            TextBuffer& buffer_;
+
+            virtual string_type do_filter(const string_type&) override;
     };
 } // namespace tools
 

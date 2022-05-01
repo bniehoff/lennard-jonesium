@@ -29,6 +29,8 @@
 #include <thread>
 #include <chrono>
 
+#include <boost/iostreams/filtering_stream.hpp>
+
 #include <lennardjonesium/tools/text_buffer.hpp>
 
 namespace api
@@ -41,8 +43,6 @@ namespace api
 
     class AsyncWorker : public Worker
     {
-        using buffer_type = tools::TextBuffer;
-
         public:
             virtual void launch(int count = 10) override;
 
@@ -56,8 +56,9 @@ namespace api
             ~AsyncWorker() noexcept;
         
         private:
-            std::unique_ptr<buffer_type> buffer_;
+            std::unique_ptr<tools::TextBuffer> buffer_;
             std::jthread producer_;
+            boost::iostreams::filtering_ostream out_stream_;
     };
 } // namespace api
 

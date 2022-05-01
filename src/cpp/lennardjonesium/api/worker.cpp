@@ -30,6 +30,11 @@
 
 #include <fmt/core.h>
 #include <fmt/ostream.h>
+
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/device/null.hpp>
+
+#include <lennardjonesium/tools/text_buffer.hpp>
 #include <lennardjonesium/api/worker.hpp>
 
 
@@ -49,17 +54,22 @@ namespace api
     {
         wait();
 
-        buffer_ = std::make_unique<buffer_type>();
+        buffer_ = std::make_unique<tools::TextBuffer>();
+        out_stream_.push(tools::TextBufferFilter(*buffer_));
+        out_stream_.push(boost::iostreams::null_sink());
 
         producer_ = std::jthread(
             [this, count]() {
                 for (int i : std::views::iota(0, count))
                 {
-                    this->buffer_->write(fmt::format("Count: {}\n", i));
+                    // this->buffer_->write(fmt::format("Count: {}\n", i));
+                    fmt::print(this->out_stream_, "Count: {}\n", i);
+                    this->out_stream_.flush();
                     std::this_thread::sleep_for(std::chrono::milliseconds(500));
                 }
 
-                this->buffer_->close();
+                this->out_stream_.reset();
+                // this->buffer_->close();
             }
         );
     }
@@ -73,26 +83,6 @@ namespace api
             buffer_.reset();
         }
     }
-
-    // std::pair<bool, std::string> AsyncWorker::get()
-    // {
-    //     if (buffer_)
-    //     {
-    //         auto message = buffer_->get();
-    //         if (message.has_value())
-    //         {
-    //             return {true, message.value()};
-    //         }
-    //         else
-    //         {
-    //             return {false, ""};
-    //         }
-    //     }
-    //     else
-    //     {
-    //         return {false, ""};
-    //     }
-    // }
 
     bool AsyncWorker::eof()
     {

@@ -26,6 +26,8 @@
 #include <mutex>
 #include <condition_variable>
 
+#include <iostream>
+
 #include <lennardjonesium/tools/text_buffer.hpp>
 
 namespace
@@ -39,50 +41,19 @@ namespace
 
 namespace tools
 {
+    // TextBuffer methods
+
     void TextBuffer::write(std::string_view text)
     {
         {
             std::lock_guard<std::mutex> lock(mutex_);
-            if (!end_of_write_) {buffer_ << text;}
+            if (!end_of_write_)
+            {
+                stream_ << text;
+            }
         }
 
         update_signal_.notify_one();
-    }
-
-    std::string TextBuffer::read()
-    {
-        // Need a unique lock to wait for condition variable
-        std::unique_lock<std::mutex> lock(mutex_);
-
-        // Wait until there is text in the buffer or eof is set
-        update_signal_.wait(
-            lock,
-            [this]() {return !is_empty(this->buffer_) || this->end_of_write_;}
-        );
-
-        // Since we are about to empty the buffer (or it is empty already), then if end_of_write_
-        // is set, we can set end_of_read_
-        end_of_read_ = end_of_write_;
-
-        // If there is something to read, return it
-        if (!is_empty(buffer_))
-        {
-            std::string text = buffer_.str();
-            buffer_.str("");
-            return text;
-        }
-        else
-        {
-            // Otherwise, return the empty string
-            return {};
-        }
-    }
-
-    bool TextBuffer::eof()
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
-
-        return end_of_read_;
     }
 
     void TextBuffer::close()
@@ -96,5 +67,50 @@ namespace tools
         // Notify all of change
         update_signal_.notify_all();
     }
+
+    std::string TextBuffer::read()
+    {
+        // Need a unique lock to wait for condition variable
+        std::unique_lock<std::mutex> lock(mutex_);
+
+        // Wait until there is text in the buffer or end_of_write_ is set
+        update_signal_.wait(
+            lock,
+            [this]() {return !is_empty(this->stream_) || this->end_of_write_;}
+        );
+
+        // Since we are about to empty the buffer (or it is empty already), then if end_of_write_
+        // is set, we can set end_of_read_
+        end_of_read_ = end_of_write_;
+
+        // If there is something to read, return it
+        if (!is_empty(stream_))
+        {
+            std::string text = stream_.str();
+            stream_.str("");
+            return text;
+        }
+        else
+        {
+            // Otherwise, return the empty string
+            return {};
+        }
+    }
+
+    bool TextBuffer::eof()
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        return end_of_read_;
+    }
+
+    // TextBufferFilter methods
+
+    TextBufferFilter::string_type
+    TextBufferFilter::do_filter(const TextBufferFilter::string_type& line)
+    {
+        // boost::iostreams::line_filter removes the newline character
+        buffer_.write(line + '\n');
+        return line;
+    };
 } // namespace tools
 
