@@ -28,6 +28,7 @@
 #include <sstream>
 #include <mutex>
 #include <condition_variable>
+#include <memory>
 
 #include <boost/iostreams/filter/line.hpp>
 
@@ -45,28 +46,24 @@ namespace tools
          * In theory, TextBuffer should allow multiple producers and multiple consumers; however,
          * using multiple consumers would be rather silly.
          * 
-         * TODO: It would be nice to turn TextBuffer into something that inherits from stringstream,
-         * so that it can be directly used in contexts that expect an ostream/istream.  However,
-         * I don't have the patience right now to wrap so many methods!
-         * 
          * Usage:
          *      write():        Push a string to the buffer.  Returns number of characters written.
+         * 
+         *      close():        Close the write() end of the stream; eof will be indicated to the
+         *                      read() end after the stream is empty.
          * 
          *      read():         Read the contents of the buffer.  This call is blocking, until
          *                      there are contents to be returned (so if it returns the empty
          *                      string, then we have reached eof).
          * 
          *      eof():          Returns whether we have reached the end of the stream.
-         * 
-         *      close():        Close the write() end of the stream; eof will be indicated to the
-         *                      read() end after the stream is empty.
          */
 
         public:
             void write(std::string_view);
+            void close();
             std::string read();
             bool eof();
-            void close();
         
         private:
             std::mutex mutex_;

@@ -34,12 +34,14 @@
 #include <thread>
 #include <mutex>
 
-#include <boost/iostreams/tee.hpp>
 #include <boost/iostreams/stream.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/chain.hpp>
 #include <boost/iostreams/device/file.hpp>
 
 #include <lennardjonesium/tools/system_parameters.hpp>
 #include <lennardjonesium/tools/cubic_lattice.hpp>
+#include <lennardjonesium/tools/text_buffer.hpp>
 #include <lennardjonesium/physics/forces.hpp>
 #include <lennardjonesium/physics/lennard_jones_force.hpp>
 #include <lennardjonesium/engine/initial_condition.hpp>
@@ -63,11 +65,6 @@ namespace api
          * re-launch.
          * 
          * NOTE: Whenever the simulation is re-run, the files it generated will be overwritten.
-         * 
-         * TODO: The launch() method takes an ostream& parameter to indicate where the events log
-         * should be echoed (usually to stdout).  However, it is difficult for Python to provide
-         * an ostream&, so we need to re-think this method if we want to expose this option to
-         * Python.
          * 
          * TODO: Consider implementing the capability to stop a currently-running simulation.  This
          * would require modifications of SimulationController to check for the stop signal.
@@ -98,6 +95,8 @@ namespace api
             control::EquilibrationPhase::Parameters,
             control::ObservationPhase::Parameters
         >;
+
+        using echo_chain_type = boost::iostreams::chain<boost::iostreams::output>;
 
         public:
             struct Parameters
@@ -142,20 +141,17 @@ namespace api
             explicit Simulation(Parameters parameters);
 
             // Launch the simulation asynchronously
-            void launch(std::ostream& echo_stream = std::cout);
+            void launch();
+            void launch(std::ostream& echo_stream);
+            void launch(tools::TextBuffer& echo_buffer);
 
             // Wait for the currently-running simulation to finish
             void wait();
 
-            // Check whether the simulation is currently running
-            bool is_running()
-            {
-                std::lock_guard<std::mutex> lock(mutex_);
-                return is_running_;
-            }
-
             // Synchronous wrapper around launch() and wait()
-            void run(std::ostream& echo_stream = std::cout);
+            void run();
+            void run(std::ostream& echo_stream);
+            void run(tools::TextBuffer& echo_buffer);
 
             Parameters parameters() {return parameters_;}
 
@@ -168,6 +164,9 @@ namespace api
             ~Simulation() noexcept;
         
         private:
+            // Uniform launch method takes a chain of filters in order to create events stream
+            void launch_(echo_chain_type);
+
             Parameters parameters_;
 
             engine::InitialCondition initial_condition_;
@@ -176,27 +175,8 @@ namespace api
             // other ShortRangeForces in the future
             std::unique_ptr<const physics::ShortRangeForce> short_range_force_;
 
-            // Output file streams
-            // We use Boost for the uniform close() interface, which std::ostream doesn't have
-            using tee_device = boost::iostreams::tee_device<
-                std::ostream, boost::iostreams::file_sink
-            >;
-            using tee_stream = boost::iostreams::stream<tee_device>;
-            using file_stream = boost::iostreams::stream<boost::iostreams::file_sink>;
-
-            tee_stream event_stream_;
-            file_stream thermodynamic_stream_;
-            file_stream observation_stream_;
-            file_stream snapshot_stream_;
-
-            // The Logger will be recreated for each simulation run (since it cannot be restarted)
-            std::unique_ptr<output::Logger> logger_;
-
             // The thread where the asynchronous simulation is running
             std::jthread simulation_job_;
-
-            std::mutex mutex_;
-            bool is_running_ = false;
 
             // Construct the SimulationController from the local parameters and a Logger
             control::SimulationController make_simulation_controller_(output::Logger&);
