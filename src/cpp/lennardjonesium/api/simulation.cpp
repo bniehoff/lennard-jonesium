@@ -44,6 +44,7 @@
 #include <lennardjonesium/physics/lennard_jones_force.hpp>
 #include <lennardjonesium/engine/initial_condition.hpp>
 #include <lennardjonesium/engine/integrator_builder.hpp>
+#include <lennardjonesium/output/logger.hpp>
 #include <lennardjonesium/control/simulation_phase.hpp>
 #include <lennardjonesium/control/simulation_controller.hpp>
 #include <lennardjonesium/api/simulation.hpp>
@@ -81,6 +82,8 @@ namespace api
 
         // Start with a nullptr; we will create a buffer if requested
         std::shared_ptr<tools::TextBuffer> buffer;
+
+        using echo_chain_type = boost::iostreams::chain<boost::iostreams::output>;
 
         // Configure the echo chain
         echo_chain_type echo_chain{};

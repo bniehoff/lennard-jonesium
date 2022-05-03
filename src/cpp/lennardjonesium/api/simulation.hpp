@@ -32,12 +32,6 @@
 #include <filesystem>
 #include <iostream>
 #include <thread>
-#include <mutex>
-
-#include <boost/iostreams/stream.hpp>
-#include <boost/iostreams/filtering_stream.hpp>
-#include <boost/iostreams/chain.hpp>
-#include <boost/iostreams/device/file.hpp>
 
 #include <lennardjonesium/tools/system_parameters.hpp>
 #include <lennardjonesium/tools/cubic_lattice.hpp>
@@ -95,8 +89,6 @@ namespace api
             control::EquilibrationPhase::Parameters,
             control::ObservationPhase::Parameters
         >;
-
-        using echo_chain_type = boost::iostreams::chain<boost::iostreams::output>;
 
         public:
             struct Parameters
@@ -171,11 +163,7 @@ namespace api
             ~Simulation() noexcept;
         
         private:
-            // Uniform launch method takes a chain of filters in order to create events stream
-            // void launch_(echo_chain_type);
-
             Parameters parameters_;
-
             engine::InitialCondition initial_condition_;
 
             // We use a pointer to the generic ShortRangeForce, in case we might like to implement
