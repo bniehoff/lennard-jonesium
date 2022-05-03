@@ -22,6 +22,9 @@
 
 #include <ranges>
 
+// test
+#include <iostream>
+
 #include <fmt/core.h>
 #include <fmt/ostream.h>
 
@@ -31,6 +34,9 @@
 
 namespace output
 {
+    // The EventSink flushes after every message.  This should not be a problem, as Events are
+    // not very frequent.
+
     void EventSink::write(int time_step, PhaseStartEvent message)
     {
         fmt::print(
@@ -39,6 +45,8 @@ namespace output
             time_step,
             message.name
         );
+
+        flush();
     }
 
     void EventSink::write(int time_step, AdjustTemperatureEvent message)
@@ -50,6 +58,8 @@ namespace output
             message.measured_temperature,
             message.target_temperature
         );
+
+        flush();
     }
     
     void EventSink::write(int time_step, RecordObservationEvent message [[maybe_unused]])
@@ -59,6 +69,8 @@ namespace output
             "{}: Observation recorded\n",
             time_step
         );
+
+        flush();
     }
     
     void EventSink::write(int time_step, PhaseCompleteEvent message)
@@ -69,6 +81,8 @@ namespace output
             time_step,
             message.name
         );
+
+        flush();
     }
     
     void EventSink::write(int time_step, AbortSimulationEvent message)
@@ -79,6 +93,8 @@ namespace output
             time_step,
             message.reason
         );
+
+        flush();
     }
 
     void ThermodynamicSink::write_header()

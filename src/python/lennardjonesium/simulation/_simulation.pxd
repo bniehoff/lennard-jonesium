@@ -22,7 +22,7 @@ License along with Lennard-Jonesium.  If not, see
 
 
 from libcpp cimport bool
-from libcpp.memory cimport unique_ptr
+from libcpp.memory cimport unique_ptr, shared_ptr
 from libcpp.string cimport string
 
 from lennardjonesium.simulation._configuration cimport _Configuration
@@ -33,19 +33,29 @@ cdef extern from "<lennardjonesium/tools/text_buffer.hpp>" namespace "tools" nog
     cdef cppclass _TextBuffer "tools::TextBuffer":
         _TextBuffer() except +
         string read() except +
-        bool eof() except +
+
+
+# We also need the EchoMode enum
+cdef extern from "<lennardjonesium/api/simulation.hpp>" namespace "api" nogil:
+    cdef cppclass _EchoMode "api::Simulation::EchoMode":
+        pass
+
+cdef extern from "<lennardjonesium/api/simulation.hpp>" namespace "api::Simulation::EchoMode" nogil:
+    cdef _EchoMode silent
+    cdef _EchoMode console
+    cdef _EchoMode buffer
 
 
 # Grab the declarations we need for the Simulation class
 cdef extern from "<lennardjonesium/api/simulation.hpp>" namespace "api" nogil:
     cdef cppclass _Simulation "api::Simulation":
         # Run the simulation asynchronously
-        void launch()
-        void launch(_TextBuffer)
+        shared_ptr[_TextBuffer] launch()
+        shared_ptr[_TextBuffer] launch(_EchoMode)
         void wait()
 
         # Synchronous wrapper
-        # void run()
+        void run()
 
         # Calculate quantities based on particle separation, for plotting
         double potential(double)

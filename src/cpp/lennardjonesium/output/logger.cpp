@@ -59,11 +59,15 @@ namespace output
                     this->snapshot_sink_
                 };
 
-                while (auto o = this->buffer_.get())
+                auto dispatch = [&dispatcher](message_type message)
                 {
-                    auto [time_step, message] = o.value();
-                    dispatcher.send(time_step, message);
-                }
+                    auto [time_step, log_message] = message;
+                    dispatcher.send(time_step, log_message);
+                };
+
+                // while (this->buffer_.get_and(dispatch));
+
+                while (auto o = this->buffer_.get()) {dispatch(o.value());}
 
                 dispatcher.flush_all();
             }

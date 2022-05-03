@@ -31,6 +31,7 @@
 #include <optional>
 #include <utility>
 #include <memory>
+#include <functional>
 
 namespace tools
 {
@@ -55,7 +56,13 @@ namespace tools
              *      empty, then get() returns std::nullopt.  Then the consumer knows that it can
              *      terminate.
              * 
-             *  3. close(): The owner of the MessageBuffer should call close() after all the
+             *  3. bool get_and(callback): Sometimes for synchronization purposes, we would like to
+             *      do something with the message popped off the buffer before releasing the lock
+             *      (such as making sure output is flushed immediately).  The consumer should
+             *      provide a callback which accepts a message as input.  We return true if a
+             *      message was processed, or false if there are no further messages.
+             * 
+             *  4. close(): The owner of the MessageBuffer should call close() after all the
              *      producers have finished.  This allows the consumers to get whatever items
              *      remain in the queue, and then terminate themselves.
              * 
@@ -96,6 +103,7 @@ namespace tools
 
             void put(T);
             std::optional<T> get();
+            bool get_and(std::function<void (T)>);
             void close();
 
         private:
@@ -146,6 +154,32 @@ namespace tools
 
             // If the buffer is empty and closed for write, return std::nullopt
             return {};
+        }
+    }
+
+    template<class T, class Alloc>
+    bool MessageBuffer<T, Alloc>::get_and(std::function<void (T)> callback)
+    {
+        // Get a unique lock in order to (possibly) wait on the condition variable
+        {
+            std::unique_lock<std::mutex> lock(mutex_);
+
+            // Wait until either the buffer is nonempty, or the buffer has been closed
+            update_signal_.wait(
+                lock,
+                [this]() {return !this->buffer_.empty() || !this->open_for_write_;}
+            );
+
+            if (!buffer_.empty())
+            {
+                auto message = std::move(buffer_.front());
+                buffer_.pop();
+                callback(message);
+                return true;
+            }
+
+            // If the buffer is empty and closed for write, return false
+            return false;
         }
     }
 

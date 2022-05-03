@@ -31,46 +31,58 @@
 #include <memory>
 
 #include <boost/iostreams/filter/line.hpp>
+#include <boost/iostreams/operations.hpp>
+
+#include <lennardjonesium/tools/message_buffer.hpp>
 
 namespace tools
 {
     class TextBuffer
     {
         /**
-         * TextBuffer is similar to MessageBuffer, but specialized for multi-line text.
-         * 
-         * TextBuffer allows one thread to write into a block text buffer and another thread to
-         * read from it.  Rather than reading one line at a time, a read operation grabs the entire
-         * contents.
+         * TextBuffer is a wrapper around MessageBuffer<std::string>, and provides a simpler
+         * interface which is easier to call from Cython.  In particular, we wrap the get() method
+         * with a method called read(), which simply returns the empty string when we reach the
+         * end of the message queue.  To make sure that none of the actual messages is the empty
+         * string, we wrap put() in a write() method which automatically discards empty strings.
          * 
          * In theory, TextBuffer should allow multiple producers and multiple consumers; however,
          * using multiple consumers would be rather silly.
          * 
          * Usage:
-         *      write():        Push a string to the buffer.  Returns number of characters written.
+         *      write():        Push a string to the buffer.
          * 
-         *      close():        Close the write() end of the stream; eof will be indicated to the
-         *                      read() end after the stream is empty.
+         *      close():        Close the write() end of the stream; the read() end will continue
+         *                      to pop elements from the queue until the queue is empty.
          * 
-         *      read():         Read the contents of the buffer.  This call is blocking, until
-         *                      there are contents to be returned (so if it returns the empty
-         *                      string, then we have reached eof).
-         * 
-         *      eof():          Returns whether we have reached the end of the stream.
+         *      read():         Pop one string from the queue and return it.
          */
 
         public:
-            void write(std::string_view);
-            void close();
-            std::string read();
-            bool eof();
+            void write(const std::string& s)
+            {
+                if (!s.empty())
+                {
+                    buffer_.put(s);
+                }
+            }
+
+            void close() {buffer_.close();}
+            
+            std::string read()
+            {
+                if (auto o = buffer_.get())
+                {
+                    return o.value();
+                }
+                else
+                {
+                    return {};
+                }
+            }
         
         private:
-            std::mutex mutex_;
-            std::condition_variable update_signal_;
-            std::stringstream stream_;
-            bool end_of_write_ = false;
-            bool end_of_read_ = false;
+            tools::MessageBuffer<std::string> buffer_;
     };
 
     class TextBufferFilter : public boost::iostreams::line_filter
@@ -82,7 +94,22 @@ namespace tools
          */
 
         public:
+            struct category
+                : boost::iostreams::dual_use,
+                boost::iostreams::filter_tag,
+                boost::iostreams::multichar_tag,
+                // boost::iostreams::flushable_tag,
+                boost::iostreams::closable_tag
+            { };
+
             explicit TextBufferFilter(TextBuffer& buffer) : buffer_{buffer} {}
+
+            // template<typename Sink>
+            // bool flush(Sink& snk)
+            // {
+            //     std::cout << "TextBufferFilter flushed\n";
+            //     return boost::iostreams::flush(snk);
+            // }
 
             template<typename Sink>
             void close(Sink& snk, BOOST_IOS::openmode which)
@@ -94,7 +121,12 @@ namespace tools
         private:
             TextBuffer& buffer_;
 
-            virtual string_type do_filter(const string_type&) override;
+            virtual string_type do_filter(const string_type& line) override
+            {
+                // boost::iostreams::line_filter removes the newline character
+                buffer_.write(line);
+                return line;
+            };
     };
 } // namespace tools
 

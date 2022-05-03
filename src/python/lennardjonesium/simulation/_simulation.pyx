@@ -21,12 +21,17 @@ License along with Lennard-Jonesium.  If not, see
 """
 
 
-from libcpp.memory cimport unique_ptr, make_unique
+from libcpp.memory cimport unique_ptr, make_unique, shared_ptr
 from libcpp.utility cimport move
 from libcpp.string cimport string
 
 from lennardjonesium.simulation._configuration cimport _Configuration
-from lennardjonesium.simulation._simulation cimport _TextBuffer, _Simulation, make_simulation
+from lennardjonesium.simulation._simulation cimport (
+    _TextBuffer,
+    _Simulation,
+    _EchoMode,
+    make_simulation
+)
 
 from lennardjonesium.simulation.configuration import Configuration
 
@@ -35,12 +40,8 @@ cdef class Simulation:
     """
     The Simulation class ...
     """
-    cdef unique_ptr[_TextBuffer] _text_buffer
+    cdef shared_ptr[_TextBuffer] _text_buffer
     cdef unique_ptr[_Simulation] _simulation
-
-    def _reset_text_buffer(self):
-        self._text_buffer.reset()
-        self._text_buffer = make_unique[_TextBuffer]()
 
     def __cinit__(self, configuration = None):
         if configuration is None:
@@ -96,19 +97,16 @@ cdef class Simulation:
     #     del self._simulation
 
     def launch(self):
-        self._reset_text_buffer()
-        # p[0] is the only way to dereference pointers in Cython
-        self._simulation.get().launch(self._text_buffer.get()[0])
+        self._text_buffer = self._simulation.get().launch(<_EchoMode> buffer)
 
     def wait(self): self._simulation.get().wait()
     
     def read(self):
         return str(self._text_buffer.get().read(), 'utf-8') if self._text_buffer else ""
     
-    def eof(self):
-        return self._text_buffer.get().eof() if self._text_buffer else True
-    
-    # def run(self): self._simulation.get().run()
+    def run(self):
+        # This does not echo the events to the console, can be useful for running silently
+        self._simulation.get().run()
 
     cpdef double potential(self, double separation):
         return self._simulation.get().potential(separation)

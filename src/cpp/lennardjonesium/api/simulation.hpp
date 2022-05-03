@@ -140,18 +140,25 @@ namespace api
 
             explicit Simulation(Parameters parameters);
 
+            // Choose how the Events output should be echoed
+            enum class EchoMode
+            {
+                silent,
+                console,
+                buffer
+            };
+
             // Launch the simulation asynchronously
-            void launch();
-            void launch(std::ostream& echo_stream);
-            void launch(tools::TextBuffer& echo_buffer);
+            // If the EchoMode is buffer, then a buffer is returned; otherwise nullptr is returned
+            std::shared_ptr<tools::TextBuffer> launch(EchoMode = EchoMode::silent);
 
             // Wait for the currently-running simulation to finish
             void wait();
 
             // Synchronous wrapper around launch() and wait()
-            void run();
-            void run(std::ostream& echo_stream);
-            void run(tools::TextBuffer& echo_buffer);
+            // It does not make sense to return a buffer, since the call blocks until finished.
+            // If EchoMode::buffer is selected, the effect will be the same as EchoMode::silent.
+            void run(EchoMode = EchoMode::silent);
 
             Parameters parameters() {return parameters_;}
 
@@ -165,7 +172,7 @@ namespace api
         
         private:
             // Uniform launch method takes a chain of filters in order to create events stream
-            void launch_(echo_chain_type);
+            // void launch_(echo_chain_type);
 
             Parameters parameters_;
 

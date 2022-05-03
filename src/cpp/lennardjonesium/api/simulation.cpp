@@ -74,27 +74,33 @@ namespace api
         assert(short_range_force_ != nullptr && "Failed to construct ShortRangeForce");
     }
 
-    // Build the chain of echo filters and then delegate to a uniform launch_() method
-    void Simulation::launch() {Simulation::launch_({});}
-
-    void Simulation::launch(std::ostream& echo_stream)
-    {
-        echo_chain_type chain{};
-        chain.push(echo_stream);
-        Simulation::launch_(chain);
-    }
-
-    void Simulation::launch(tools::TextBuffer& echo_buffer)
-    {
-        echo_chain_type chain{};
-        chain.push(tools::TextBufferFilter(echo_buffer));
-        Simulation::launch_(chain);
-    }
-
-    void Simulation::launch_(Simulation::echo_chain_type echo_chain)
+    std::shared_ptr<tools::TextBuffer> Simulation::launch(Simulation::EchoMode echo_mode)
     {
         // Wait for any currently-running jobs to finish
         wait();
+
+        // Start with a nullptr; we will create a buffer if requested
+        std::shared_ptr<tools::TextBuffer> buffer;
+
+        // Configure the echo chain
+        echo_chain_type echo_chain{};
+
+        switch (echo_mode)
+        {
+        case EchoMode::console:
+            echo_chain.push(boost::iostreams::tee(std::cout));
+            break;
+        
+        case EchoMode::buffer:
+            buffer = std::make_shared<tools::TextBuffer>();
+            echo_chain.push(tools::TextBufferFilter(*buffer));
+            break;
+        
+        case EchoMode::silent:
+            [[fallthrough]];
+        default:
+            break;
+        }
 
         using event_stream_type = boost::iostreams::filtering_ostream;
         using file_sink_type = boost::iostreams::file_sink;
@@ -102,7 +108,7 @@ namespace api
 
         // Launch the simulation job (it sets up its own local variables)
         simulation_job_ = std::jthread(
-            [this, echo_chain]() mutable
+            [this, echo_chain, buffer]() mutable
             {
                 // Set up streams
                 echo_chain.push(file_sink_type{this->parameters_.event_log_path});
@@ -143,8 +149,14 @@ namespace api
                 thermodynamic_stream.close();
                 observation_stream.close();
                 snapshot_stream.close();
+
+                // Free our copy of the shared buffer
+                buffer.reset();
             }
         );
+
+        // Return the shared buffer to the caller
+        return buffer;
     }
 
     void Simulation::wait()
@@ -157,21 +169,12 @@ namespace api
     }
 
     // run() is just a synchronous wrapper for launch() and wait()
-    void Simulation::run()
+    void Simulation::run(EchoMode echo_mode)
     {
-        launch();
-        wait();
-    }
+        // There is no point in using buffered echo mode
+        if (echo_mode == EchoMode::buffer) {echo_mode = EchoMode::silent;}
 
-    void Simulation::run(std::ostream& echo_stream)
-    {
-        launch(echo_stream);
-        wait();
-    }
-
-    void Simulation::run(tools::TextBuffer& echo_buffer)
-    {
-        launch(echo_buffer);
+        launch(echo_mode);
         wait();
     }
 

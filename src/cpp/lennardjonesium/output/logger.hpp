@@ -27,9 +27,6 @@
 #include <utility>
 #include <thread>
 
-#include <boost/iostreams/device/null.hpp>
-#include <boost/iostreams/stream.hpp>
-
 #include <lennardjonesium/tools/message_buffer.hpp>
 #include <lennardjonesium/output/log_message.hpp>
 #include <lennardjonesium/output/sinks.hpp>
@@ -78,7 +75,9 @@ namespace output
             ThermodynamicSink thermodynamic_sink_;
             ObservationSink observation_sink_;
             SystemSnapshotSink snapshot_sink_;
-            tools::MessageBuffer<std::pair<int, LogMessage>> buffer_;
+
+            using message_type = std::pair<int, LogMessage>;
+            tools::MessageBuffer<message_type> buffer_;
             std::thread consumer_;
     };
 } // namespace output

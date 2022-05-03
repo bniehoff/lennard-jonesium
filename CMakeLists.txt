@@ -83,7 +83,6 @@ add_library(tools STATIC
     src/cpp/lennardjonesium/tools/overloaded_visitor.hpp
     src/cpp/lennardjonesium/tools/message_buffer.hpp
     src/cpp/lennardjonesium/tools/text_buffer.hpp
-    src/cpp/lennardjonesium/tools/text_buffer.cpp
 )
 
 add_library(physics STATIC
@@ -140,8 +139,6 @@ add_library(api STATIC
     src/cpp/lennardjonesium/api/seed_generator.hpp
     src/cpp/lennardjonesium/api/configuration.hpp
     src/cpp/lennardjonesium/api/configuration.cpp
-    src/cpp/lennardjonesium/api/worker.hpp
-    src/cpp/lennardjonesium/api/worker.cpp
 )
 
 # Link the various dependencies

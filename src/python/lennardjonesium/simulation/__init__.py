@@ -1,4 +1,3 @@
 from lennardjonesium.simulation._seed_generator import SeedGenerator
 from lennardjonesium.simulation.configuration import Configuration
 from lennardjonesium.simulation._simulation import Simulation
-from lennardjonesium.simulation._worker import Worker, AsyncWorker
