@@ -32,13 +32,16 @@
 #include <filesystem>
 #include <iostream>
 #include <thread>
+#include <mutex>
 
-#include <boost/iostreams/tee.hpp>
 #include <boost/iostreams/stream.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/chain.hpp>
 #include <boost/iostreams/device/file.hpp>
 
 #include <lennardjonesium/tools/system_parameters.hpp>
 #include <lennardjonesium/tools/cubic_lattice.hpp>
+#include <lennardjonesium/tools/text_buffer.hpp>
 #include <lennardjonesium/physics/forces.hpp>
 #include <lennardjonesium/physics/lennard_jones_force.hpp>
 #include <lennardjonesium/engine/initial_condition.hpp>
@@ -63,17 +66,13 @@ namespace api
          * 
          * NOTE: Whenever the simulation is re-run, the files it generated will be overwritten.
          * 
-         * TODO: The launch() method takes an ostream& parameter to indicate where the events log
-         * should be echoed (usually to stdout).  However, it is difficult for Python to provide
-         * an ostream&, so we need to re-think this method if we want to expose this option to
-         * Python.
-         * 
          * TODO: Consider implementing the capability to stop a currently-running simulation.  This
          * would require modifications of SimulationController to check for the stop signal.
          * 
          *  Asynchronous running:
          *      launch():       Launch the simulation in a separate thread
          *      wait():         Wait for an asynchronously-launched simulation to finish
+         *      is_running():   Tell whether a simulation job is currently running
          * 
          *  Synchronous running:
          *      run():          Synchronous wrapper around launch() and wait().  Blocks while
@@ -96,6 +95,8 @@ namespace api
             control::EquilibrationPhase::Parameters,
             control::ObservationPhase::Parameters
         >;
+
+        using echo_chain_type = boost::iostreams::chain<boost::iostreams::output>;
 
         public:
             struct Parameters
@@ -139,14 +140,25 @@ namespace api
 
             explicit Simulation(Parameters parameters);
 
+            // Choose how the Events output should be echoed
+            enum class EchoMode
+            {
+                silent,
+                console,
+                buffer
+            };
+
             // Launch the simulation asynchronously
-            void launch(std::ostream& echo_stream = std::cout);
+            // If the EchoMode is buffer, then a buffer is returned; otherwise nullptr is returned
+            std::shared_ptr<tools::TextBuffer> launch(EchoMode = EchoMode::silent);
 
             // Wait for the currently-running simulation to finish
             void wait();
 
             // Synchronous wrapper around launch() and wait()
-            void run(std::ostream& echo_stream = std::cout);
+            // It does not make sense to return a buffer, since the call blocks until finished.
+            // If EchoMode::buffer is selected, the effect will be the same as EchoMode::silent.
+            void run(EchoMode = EchoMode::silent);
 
             Parameters parameters() {return parameters_;}
 
@@ -159,6 +171,9 @@ namespace api
             ~Simulation() noexcept;
         
         private:
+            // Uniform launch method takes a chain of filters in order to create events stream
+            // void launch_(echo_chain_type);
+
             Parameters parameters_;
 
             engine::InitialCondition initial_condition_;
@@ -166,22 +181,6 @@ namespace api
             // We use a pointer to the generic ShortRangeForce, in case we might like to implement
             // other ShortRangeForces in the future
             std::unique_ptr<const physics::ShortRangeForce> short_range_force_;
-
-            // Output file streams
-            // We use Boost for the uniform close() interface, which std::ostream doesn't have
-            using tee_device = boost::iostreams::tee_device<
-                std::ostream, boost::iostreams::file_sink
-            >;
-            using tee_stream = boost::iostreams::stream<tee_device>;
-            using file_stream = boost::iostreams::stream<boost::iostreams::file_sink>;
-
-            tee_stream event_stream_;
-            file_stream thermodynamic_stream_;
-            file_stream observation_stream_;
-            file_stream snapshot_stream_;
-
-            // The Logger will be recreated for each simulation run (since it cannot be restarted)
-            std::unique_ptr<output::Logger> logger_;
 
             // The thread where the asynchronous simulation is running
             std::jthread simulation_job_;

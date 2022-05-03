@@ -28,14 +28,18 @@
 #include <filesystem>
 #include <iostream>
 #include <thread>
+#include <mutex>
 #include <exception>
 
 #include <boost/iostreams/tee.hpp>
 #include <boost/iostreams/stream.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/chain.hpp>
 #include <boost/iostreams/device/file.hpp>
 
 #include <lennardjonesium/tools/overloaded_visitor.hpp>
 #include <lennardjonesium/tools/system_parameters.hpp>
+#include <lennardjonesium/tools/text_buffer.hpp>
 #include <lennardjonesium/physics/forces.hpp>
 #include <lennardjonesium/physics/lennard_jones_force.hpp>
 #include <lennardjonesium/engine/initial_condition.hpp>
@@ -70,62 +74,107 @@ namespace api
         assert(short_range_force_ != nullptr && "Failed to construct ShortRangeForce");
     }
 
-    void Simulation::launch(std::ostream& echo_stream)
+    std::shared_ptr<tools::TextBuffer> Simulation::launch(Simulation::EchoMode echo_mode)
     {
         // Wait for any currently-running jobs to finish
         wait();
 
-        // Next open the file streams.  We duplicate the events log to the given echo stream.
-        namespace bio = boost::iostreams;
+        // Start with a nullptr; we will create a buffer if requested
+        std::shared_ptr<tools::TextBuffer> buffer;
 
-        event_stream_.open(bio::tee(echo_stream, bio::file_sink{parameters_.event_log_path}));
-        thermodynamic_stream_.open(bio::file_sink{parameters_.thermodynamic_log_path});
-        observation_stream_.open(bio::file_sink{parameters_.observation_log_path});
-        snapshot_stream_.open(bio::file_sink{parameters_.snapshot_log_path});
+        // Configure the echo chain
+        echo_chain_type echo_chain{};
 
-        // Recreate the Logger
-        logger_ = std::make_unique<output::Logger>(output::Logger::Streams{
-            .event_log = event_stream_,
-            .thermodynamic_log = thermodynamic_stream_,
-            .observation_log = observation_stream_,
-            .snapshot_log = snapshot_stream_
-        });
+        switch (echo_mode)
+        {
+        case EchoMode::console:
+            echo_chain.push(boost::iostreams::tee(std::cout));
+            break;
+        
+        case EchoMode::buffer:
+            buffer = std::make_shared<tools::TextBuffer>();
+            echo_chain.push(tools::TextBufferFilter(*buffer));
+            break;
+        
+        case EchoMode::silent:
+            [[fallthrough]];
+        default:
+            break;
+        }
 
-        // Create the SimulationController and initial state
-        auto simulation_controller = make_simulation_controller_(*logger_);
-        auto initial_state = initial_condition_.system_state();
+        using event_stream_type = boost::iostreams::filtering_ostream;
+        using file_sink_type = boost::iostreams::file_sink;
+        using file_stream_type = boost::iostreams::stream<file_sink_type>;
 
-        // Launch the simulation job
+        // Launch the simulation job (it sets up its own local variables)
         simulation_job_ = std::jthread(
-            [simulation_controller=std::move(simulation_controller), initial_state]() mutable
+            [this, echo_chain, buffer]() mutable
             {
+                // Set up streams
+                echo_chain.push(file_sink_type{this->parameters_.event_log_path});
+                event_stream_type event_stream{echo_chain};
+
+                file_stream_type thermodynamic_stream{
+                    file_sink_type{this->parameters_.thermodynamic_log_path}
+                };
+
+                file_stream_type observation_stream{
+                    file_sink_type{this->parameters_.observation_log_path}
+                };
+
+                file_stream_type snapshot_stream{
+                    file_sink_type{this->parameters_.snapshot_log_path}
+                };
+
+                // Set up logger
+                output::Logger logger{output::Logger::Streams{
+                    .event_log = event_stream,
+                    .thermodynamic_log = thermodynamic_stream,
+                    .observation_log = observation_stream,
+                    .snapshot_log = snapshot_stream
+                }};
+                
+                // Create initial state and SimulationController
+                auto initial_state = this->initial_condition_.system_state();
+                auto simulation_controller = make_simulation_controller_(logger);
+
+                // Run the actual simulation
                 initial_state | simulation_controller;
+
+                // Close the logger
+                logger.close();
+
+                // Close the streams (note that event_stream is a different type)
+                event_stream.reset();
+                thermodynamic_stream.close();
+                observation_stream.close();
+                snapshot_stream.close();
+
+                // Free our copy of the shared buffer
+                buffer.reset();
             }
         );
+
+        // Return the shared buffer to the caller
+        return buffer;
     }
 
     void Simulation::wait()
     {
-        // If a simulation job is running, then wait for it to end and then clean up
+        // If a simulation job is running, then wait for it to end
         if (simulation_job_.joinable())
         {
             simulation_job_.join();
-
-            // Destroy the Logger (waits for logging to finish)
-            logger_.reset();
-
-            // Close the file streams
-            event_stream_.close();
-            thermodynamic_stream_.close();
-            observation_stream_.close();
-            snapshot_stream_.close();
         }
     }
 
-    void Simulation::run(std::ostream& echo_stream)
+    // run() is just a synchronous wrapper for launch() and wait()
+    void Simulation::run(EchoMode echo_mode)
     {
-        // run() is just a synchronous wrapper for launch() and wait()
-        launch(echo_stream);
+        // There is no point in using buffered echo mode
+        if (echo_mode == EchoMode::buffer) {echo_mode = EchoMode::silent;}
+
+        launch(echo_mode);
         wait();
     }
 

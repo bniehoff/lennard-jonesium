@@ -21,11 +21,17 @@ License along with Lennard-Jonesium.  If not, see
 """
 
 
-from libcpp.memory cimport unique_ptr
+from libcpp.memory cimport unique_ptr, make_unique, shared_ptr
 from libcpp.utility cimport move
+from libcpp.string cimport string
 
 from lennardjonesium.simulation._configuration cimport _Configuration
-from lennardjonesium.simulation._simulation cimport _Simulation, make_simulation
+from lennardjonesium.simulation._simulation cimport (
+    _TextBuffer,
+    _Simulation,
+    _EchoMode,
+    make_simulation
+)
 
 from lennardjonesium.simulation.configuration import Configuration
 
@@ -34,6 +40,7 @@ cdef class Simulation:
     """
     The Simulation class ...
     """
+    cdef shared_ptr[_TextBuffer] _text_buffer
     cdef unique_ptr[_Simulation] _simulation
 
     def __cinit__(self, configuration = None):
@@ -43,10 +50,11 @@ cdef class Simulation:
         if (not isinstance(configuration, Configuration)):
             raise TypeError('Initialization argument must be of type Configuration')
         
-        cdef _Configuration _configuration = _Configuration()
-        
         # Build the C++ Configuration object
         # TODO: Maybe there is a way for the Python Configuration class to do this
+        cdef _Configuration _configuration = _Configuration()
+        
+        # System settings
         _configuration.system.temperature = configuration.system.temperature
         _configuration.system.density = configuration.system.density
         _configuration.system.particle_count = configuration.system.particle_count
@@ -54,6 +62,7 @@ cdef class Simulation:
         _configuration.system.cutoff_distance = configuration.system.cutoff_distance
         _configuration.system.time_delta = configuration.system.time_delta
 
+        # Equilibration settings
         _configuration.equilibration.name = bytes(configuration.equilibration.name, 'utf-8')
         _configuration.equilibration.tolerance = configuration.equilibration.tolerance
         _configuration.equilibration.sample_size = configuration.equilibration.sample_size
@@ -63,6 +72,7 @@ cdef class Simulation:
             configuration.equilibration.steady_state_time
         _configuration.equilibration.timeout = configuration.equilibration.timeout
 
+        # Observation settings
         _configuration.observation.name = bytes(configuration.observation.name, 'utf-8')
         _configuration.observation.tolerance = configuration.observation.tolerance
         _configuration.observation.sample_size = configuration.observation.sample_size
@@ -70,6 +80,7 @@ cdef class Simulation:
             configuration.observation.observation_interval
         _configuration.observation.observation_count = configuration.observation.observation_count
 
+        # Output files
         _configuration.filepaths.event_log = \
             bytes(configuration.filepaths.event_log, 'utf-8')
         _configuration.filepaths.thermodynamic_log = \
@@ -85,11 +96,17 @@ cdef class Simulation:
     # def __dealloc__(self):
     #     del self._simulation
 
-    def launch(self): self._simulation.get().launch()
+    def launch(self):
+        self._text_buffer = self._simulation.get().launch(<_EchoMode> buffer)
 
     def wait(self): self._simulation.get().wait()
     
-    def run(self): self._simulation.get().run()
+    def read(self):
+        return str(self._text_buffer.get().read(), 'utf-8') if self._text_buffer else ""
+    
+    def run(self):
+        # This does not echo the events to the console, can be useful for running silently
+        self._simulation.get().run()
 
     cpdef double potential(self, double separation):
         return self._simulation.get().potential(separation)

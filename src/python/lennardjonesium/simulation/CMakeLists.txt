@@ -42,7 +42,6 @@ target_link_libraries(_simulation
 )
 python_extension_module(_simulation)
 
-
 # The install directory is relative to the project root (where the first CMakeLists.txt was found)
 install(TARGETS _seed_generator _simulation
     LIBRARY DESTINATION src/python/lennardjonesium/simulation)

@@ -31,50 +31,47 @@ namespace output
 {
     void Dispatcher::send(int time_step, LogMessage message)
     {
-        // For EventSink, we flush every time, so that we will see output to the console
-        // Events do not happen frequently, so this should not be a problem
         auto message_dispatcher = tools::OverloadedVisitor
         {
+            // Events
             [time_step, this](PhaseStartEvent message)
             {
                 this->event_sink_.write(time_step, message);
-                this->event_sink_.flush();
             },
             
             [time_step, this](AdjustTemperatureEvent message)
             {
                 this->event_sink_.write(time_step, message);
-                this->event_sink_.flush();
             },
             
             [time_step, this](RecordObservationEvent message)
             {
                 this->event_sink_.write(time_step, message);
-                this->event_sink_.flush();
             },
             
             [time_step, this](PhaseCompleteEvent message)
             {
                 this->event_sink_.write(time_step, message);
-                this->event_sink_.flush();
             },
             
             [time_step, this](AbortSimulationEvent message)
             {
                 this->event_sink_.write(time_step, message);
-                this->event_sink_.flush();
             },
             
+            // Thermodynamics
             [time_step, this](ThermodynamicData message)
             {
                 this->thermodynamic_sink_.write(time_step, message);
             },
             
+            // Observations
             [time_step, this](ObservationData message)
             {
                 this->observation_sink_.write(time_step, message);
             },
 
+            // Snapshots
             [time_step, this](SystemSnapshot message)
             {
                 this->snapshot_sink_.write(time_step, message);

@@ -82,6 +82,7 @@ add_library(tools STATIC
     src/cpp/lennardjonesium/tools/moving_sample.hpp
     src/cpp/lennardjonesium/tools/overloaded_visitor.hpp
     src/cpp/lennardjonesium/tools/message_buffer.hpp
+    src/cpp/lennardjonesium/tools/text_buffer.hpp
 )
 
 add_library(physics STATIC
