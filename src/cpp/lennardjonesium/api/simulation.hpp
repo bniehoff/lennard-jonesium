@@ -66,7 +66,6 @@ namespace api
          *  Asynchronous running:
          *      launch():       Launch the simulation in a separate thread
          *      wait():         Wait for an asynchronously-launched simulation to finish
-         *      is_running():   Tell whether a simulation job is currently running
          * 
          *  Synchronous running:
          *      run():          Synchronous wrapper around launch() and wait().  Blocks while

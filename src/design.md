@@ -69,7 +69,7 @@ For representing points in 3-dimensional space, as well as velocity and force ve
 [Eigen 3](http://eigen.tuxfamily.org/index.php?title=Main_Page).  We will not have a need for most
 of its linear algebra features, however.
 
-## Techinical architecture
+## Technical architecture
 
 The main bottleneck in simulating the physics of the Lennard-Jones potential is in calculating the
 inter-particle forces.  In principle, this operation must be done pairwise between every pair
@@ -146,3 +146,117 @@ in L1 cache, then it seems there is little to be gained by using arrays over lin
 cache line is 64 bytes, which is only half of a Particle, so there is not likely to be much
 performance benefit to using an array over a linked list.  Nevertheless, the array implementation
 is a bit simpler, so I will stick with that.
+
+## Guideline to the code
+
+The source code is divided into two main parts: a C++ library which does the heavy work of
+simulating the physics system, and a Python module which facilitates running and visualizing
+simulations.  The Python module is still in progress, although the most basic functionality is
+there.
+
+The C++ library is divided into six sub-libraries, arranged in a hierarchical structure:
+
+1. [API](cpp/lennardjonesium/api): The interface to C++ or Python for running simulations
+2. [Control](cpp/lennardjonesium/control): Controls the flow of execution of the simulation
+3. [Output](cpp/lennardjonesium/output): Handles output of data to files
+4. [Engine](cpp/lennardjonesium/engine): Sets up initial conditions and integrates the equations of motion
+5. [Physics](cpp/lennardjonesium/physics): Deals with physics concepts: forces, momenta, etc.
+6. [Tools](cpp/lennardjonesium/tools): Collection of low-level utilities
+
+Each library in this structure is built upon the more basic libraries below it; so, for example,
+Control may import names from Physics, but not vice versa.  This helps keep everything organized.
+
+Here's a brief walkthrough of what is in each sub-library:
+
+### The API library
+
+In this library, we have three classes:
+
+1. `Simulation`
+2. `Configuration`
+3. `SeedGenerator`
+
+`Simulation` is the main interface to the C++ library.  It takes a set of parameters which describe
+everything about the simulation to be run, and also provides methods for running the simulation
+either asynchronously (`launch()` and `wait()`) or synchronously (`run()`), which is simply a
+wrapper.
+
+`Configuration` is a helper class mostly for interfacing with Python.  Since the
+`Simulation::Parameters` struct includes many C++ types which are hard to describe in Cython, the
+`Configuration` class gives a simpler interface in terms of numeric types and strings.  It also
+provides the factory function `make_simulation()` which creates a `Simulation` object from this
+`Configuration` struct.
+
+`SeedGenerator` is just a thin wrapper around some important functions from the `<random>` header,
+in order to make them more readily accessible from Python.  This allows both C++ and Python to
+generate random seeds in a consistent way, which is important for repeatability of simulations.
+
+### The Control library
+
+The Control library has three main definitions:
+
+1. `SimulationController`
+2. `SimulationPhase`
+3. `CommandQueue`
+
+`SimulationController` is the "brains" of the simulation.  It runs a "schedule" which is a sequence
+of `SimulationPhase` instances.  The `SimulationController` executes the "main loop" of the
+simulation, which means that it processes all of the `Command`s in the `CommandQueue`, until the
+`CommandQueue` is empty.  Some `Command`s instruct the `SimulationController` to get further
+`Command`s from the currently-active `SimulationPhase`, which is how the main loop continues.  
+Other `Command`s involve operations like fixing the temperature of the simulation when it drifts,
+or writing data to log files, or changing the currently-active `SimulationPhase` to the next one
+in the schedule.
+
+`SimulationPhase` manages a particular phase of the simulation, which can be either Equilibration
+or Observation.  A typical simulation begins with an Equilibration phase, where the velocities are
+explicitly adjusted until equilibrium is reached at a requested temperature.  After this follows an
+Observation phase, where the system is allowed to evolve without interference, and we measure a
+number of quantities of interest about it.  The `SimulationPhase` object is responsible for
+directing each of these different stages of behavior by issuing the appropriate `Command`s based
+upon data it receives from the `SimulationController`.
+
+`CommandQueue` is simply a `std::queue` of `Command`s, which encapsulate the notion of instructions
+to be performed.
+
+### The Output library
+
+The Output library defines the following:
+
+1. `Logger`
+2. `LogMessage`
+3. `Dispatcher`
+4. `Sink`s
+
+`Logger` is responsible for taking `LogMessage`s and routing them to the appropriate destination
+file.  Once a `LogMessage` is collected, it is put onto a queue, where it is eventually processed
+by the `Dispatcher` which sends it to the appropriate `Sink`, based upon its type.  There are four
+different `Sink`s, which represent four different files being written by the simulation:
+
+1. Events log (text)
+2. Thermodynamics log (`.csv`)
+3. Observations log (`.csv`)
+4. Snapshots log (`.csv`)
+
+The Events log just contains information about what the `SimulationPhase`s are doing and when
+transitions happen between them.  This is useful as console output in order to track the progress
+of the simulation.
+
+The Thermodynamics log contains measurements of *instantaneous* thermodynamic quantities at every
+time step.  These are the "raw data" of the simulation, and can be used to perform all necessary
+statistical mechanics calculations.
+
+The Observations log contains *aggregate* measurements done over *time*.  In principle, everything
+in the Observations log can be computed via the appropriate statistical measures on time windows
+within the Thermodynamics log.  So, if one wanted, one could simply keep the Thermodynamics log and
+do post-processing on it.  However, I thought it was convenient to generate this information as the
+simulation is running.
+
+The Snapshots log contains the positions and velocities of every particle in the system, at a given
+time step.  For now, this file is used only to record the *final* positions and velocities.  But
+in principle, the structure of the file allows one to include snapshots from more than one time
+step (although it would make the file very large if we attempted to include a lot of snapshots).
+
+### The Engine library
+
+*To be continued...*

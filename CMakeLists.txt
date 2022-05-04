@@ -63,12 +63,6 @@ add_library(draft_cpp23 STATIC
 # This is needed because library has no .cpp files
 set_target_properties(draft_cpp23 PROPERTIES LINKER_LANGUAGE CXX)
 
-add_library(abstract STATIC
-    src/cpp/lennardjonesium/abstract/overview.hpp
-)
-
-set_target_properties(abstract PROPERTIES LINKER_LANGUAGE CXX)
-
 add_library(tools STATIC
     src/cpp/lennardjonesium/tools/aligned_generator.hpp
     src/cpp/lennardjonesium/tools/math.hpp
@@ -142,11 +136,6 @@ add_library(api STATIC
 )
 
 # Link the various dependencies
-target_link_libraries(abstract
-    PRIVATE Eigen3::Eigen
-    PRIVATE draft_cpp23
-)
-
 target_link_libraries(tools
     PRIVATE Eigen3::Eigen
     PRIVATE draft_cpp23
