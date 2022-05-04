@@ -21,17 +21,18 @@ License along with Lennard-Jonesium.  If not, see
 """
 
 
+# cimports
 from libcpp.memory cimport unique_ptr, make_unique, shared_ptr
 from libcpp.utility cimport move
 from libcpp.string cimport string
 
 from lennardjonesium.simulation._configuration cimport _Configuration
 from lennardjonesium.simulation._simulation cimport (
-    _TextBuffer,
-    _Simulation,
-    _EchoMode,
-    make_simulation
+    _TextBuffer, _Simulation, _EchoMode, make_simulation
 )
+
+# imports
+import time
 
 from lennardjonesium.simulation.configuration import Configuration
 
@@ -96,17 +97,31 @@ cdef class Simulation:
     # def __dealloc__(self):
     #     del self._simulation
 
-    def launch(self):
-        self._text_buffer = self._simulation.get().launch(<_EchoMode> buffer)
+    def launch(self, *, echo: bool = True):
+        if echo:
+            self._text_buffer = self._simulation.get().launch(<_EchoMode> _buffer)
+        else:
+            self._simulation.get().launch(<_EchoMode> _silent)
 
     def wait(self): self._simulation.get().wait()
     
     def read(self):
         return str(self._text_buffer.get().read(), 'utf-8') if self._text_buffer else ""
     
-    def run(self):
-        # This does not echo the events to the console, can be useful for running silently
-        self._simulation.get().run()
+    def run(self, *, echo: bool = True, delay: float = 0.05):
+        if echo:
+            # We have to use the asynchronous API in order for the console output to show in a
+            # Jupyter notebook
+            self.launch(echo=echo)
+            line = self.read()
+            while line:
+                print(line, flush=True)
+                time.sleep(delay)
+                line = self.read()
+            self.wait()
+        else:
+            # The direct run() method uses silent mode by default
+            self._simulation.get().run()
 
     cpdef double potential(self, double separation):
         return self._simulation.get().potential(separation)

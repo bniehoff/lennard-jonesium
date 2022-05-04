@@ -41,9 +41,9 @@ cdef extern from "<lennardjonesium/api/simulation.hpp>" namespace "api" nogil:
         pass
 
 cdef extern from "<lennardjonesium/api/simulation.hpp>" namespace "api::Simulation::EchoMode" nogil:
-    cdef _EchoMode silent
-    cdef _EchoMode console
-    cdef _EchoMode buffer
+    cdef _EchoMode _silent "api::Simulation::EchoMode::silent"
+    cdef _EchoMode _console "api::Simulation::EchoMode::console"
+    cdef _EchoMode _buffer "api::Simulation::EchoMode::buffer"
 
 
 # Grab the declarations we need for the Simulation class
