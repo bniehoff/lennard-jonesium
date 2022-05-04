@@ -4,8 +4,9 @@ Microcanonical simulation of the Lennard-Jones substance and analysis of phase t
 Completely rebuilt in Python and modern C++ using object-oriented and functional programming
 principles.
 
-The project is not yet finished.  For now, it is possible to build and run the C++ tests with
-CMake.  Eventually one will be able to build and install the Python package, but the project is not
-yet configured for this.
+The project is mostly done. The C++ part (which does all the hard work) is working well. The
+Python part has a basic interface which can be used to run simulations from a Jupyter notebook. 
+More features are planned for running many simulations over a range of temperature and density
+parameters.
 
 To begin reading and understanding the code, I suggest starting with [design.md](src/design.md).
