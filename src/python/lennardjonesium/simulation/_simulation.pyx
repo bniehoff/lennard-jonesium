@@ -22,13 +22,15 @@ License along with Lennard-Jonesium.  If not, see
 
 
 # cimports
-from libcpp.memory cimport unique_ptr, make_unique, shared_ptr
+from libcpp.memory cimport unique_ptr, make_unique
 from libcpp.utility cimport move
 from libcpp.string cimport string
 
 from lennardjonesium.simulation._configuration cimport _Configuration
 from lennardjonesium.simulation._simulation cimport (
-    _TextBuffer, _Simulation, _EchoMode, make_simulation
+    _Simulation,
+    _SimulationBuffer,
+    make_simulation
 )
 
 # imports
@@ -41,7 +43,7 @@ cdef class Simulation:
     """
     The Simulation class ...
     """
-    cdef shared_ptr[_TextBuffer] _text_buffer
+    cdef _SimulationBuffer _simulation_buffer
     cdef unique_ptr[_Simulation] _simulation
 
     def __cinit__(self, configuration = None):
@@ -97,31 +99,18 @@ cdef class Simulation:
     # def __dealloc__(self):
     #     del self._simulation
 
-    def launch(self, *, echo: bool = True):
-        if echo:
-            self._text_buffer = self._simulation.get().launch(<_EchoMode> _buffer)
-        else:
-            self._simulation.get().launch(<_EchoMode> _silent)
-
-    def wait(self): self._simulation.get().wait()
-    
-    def read(self):
-        return str(self._text_buffer.get().read(), 'utf-8') if self._text_buffer else ""
-    
     def run(self, *, echo: bool = True, delay: float = 0.05):
         if echo:
-            # We have to use the asynchronous API in order for the console output to show in a
-            # Jupyter notebook
-            self.launch(echo=echo)
-            line = self.read()
+            # We have to use the asynchronous API and Python's print() function
+            self._simulation_buffer.launch(self._simulation.get()[0])
+            line = str(self._simulation_buffer.read(), 'utf-8')
             while line:
                 print(line, flush=True)
                 time.sleep(delay)
-                line = self.read()
-            self.wait()
+                line = str(self._simulation_buffer.read(), 'utf-8')
+            self._simulation_buffer.wait()
         else:
-            # The direct run() method uses silent mode by default
-            self._simulation.get().run()
+            self._simulation.get().run(_Simulation._Echo.Silent())
 
     cpdef double potential(self, double separation):
         return self._simulation.get().potential(separation)

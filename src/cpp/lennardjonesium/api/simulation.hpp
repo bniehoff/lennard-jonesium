@@ -31,11 +31,12 @@
 #include <utility>
 #include <filesystem>
 #include <iostream>
-#include <thread>
+
+#include <boost/iostreams/chain.hpp>
+#include <boost/iostreams/tee.hpp>
 
 #include <lennardjonesium/tools/system_parameters.hpp>
 #include <lennardjonesium/tools/cubic_lattice.hpp>
-#include <lennardjonesium/tools/text_buffer.hpp>
 #include <lennardjonesium/physics/forces.hpp>
 #include <lennardjonesium/physics/lennard_jones_force.hpp>
 #include <lennardjonesium/engine/initial_condition.hpp>
@@ -49,27 +50,12 @@ namespace api
     {
         /**
          * Simulation encapsulates all the information needed to run a complete simulation.
-         * It provides an asynchronous interface for launching the simulation, and manages the
-         * associated thread via launch() and wait().  It also provides a synchronous wrapper via
-         * the single method run().
+         * It provides the following methods:
          * 
-         * Note that only one instance of the simulation can be running at a time, even if using
-         * the asynchronous interface.  If the simulation is currently running when calling
-         * launch() or run(), then we will wait for the current instance to finish and then
-         * re-launch.
-         * 
-         * NOTE: Whenever the simulation is re-run, the files it generated will be overwritten.
-         * 
-         * TODO: Consider implementing the capability to stop a currently-running simulation.  This
-         * would require modifications of SimulationController to check for the stop signal.
-         * 
-         *  Asynchronous running:
-         *      launch():       Launch the simulation in a separate thread
-         *      wait():         Wait for an asynchronously-launched simulation to finish
-         * 
-         *  Synchronous running:
-         *      run():          Synchronous wrapper around launch() and wait().  Blocks while
-         *                      running entire simulation.
+         *  Running:
+         *      run():          Runs the simulation synchronously, in this thread.  Note that the
+         *                      Logger launches a consumer thread for logging, but it should not be
+         *                      too active as it is for file IO only.
          * 
          *  Information:
          *      parameters():   Get the parameters used to define the simulation
@@ -78,6 +64,8 @@ namespace api
          *      potential():    Evaluate the potential for a given separation distance
          *      virial():       Evaluate the virial for a given separation distance
          *      force():        Evaluate the force for a given separation distance
+         * 
+         * NOTE: Whenever the simulation is re-run, the files it generated will be overwritten.
          */
 
         using force_parameter_type = std::variant<
@@ -131,25 +119,28 @@ namespace api
 
             explicit Simulation(Parameters parameters);
 
-            // Choose how the Events output should be echoed
-            enum class EchoMode
+            // Run the simulation
+            // We accept a boost::iostreams::chain object that represents any filters that should
+            // be applied to the Events log entries on their way to the being written to the Events
+            // file.  The main purpose is to allow capturing the output to std::cout via
+            // boost::iostreams::tee, although one could also do other things.
+            using echo_chain_type = boost::iostreams::chain<boost::iostreams::output>;
+
+            struct Echo
             {
-                silent,
-                console,
-                buffer
+                // Here we provide some basic Echo modes.  One can create any chain, though.
+                static echo_chain_type Silent() {return {};}
+
+                static echo_chain_type Console() {
+                    echo_chain_type echo_chain{};
+                    echo_chain.push(boost::iostreams::tee(std::cout));
+                    return echo_chain;
+                }
+
+                Echo() = delete;
             };
 
-            // Launch the simulation asynchronously
-            // If the EchoMode is buffer, then a buffer is returned; otherwise nullptr is returned
-            std::shared_ptr<tools::TextBuffer> launch(EchoMode = EchoMode::silent);
-
-            // Wait for the currently-running simulation to finish
-            void wait();
-
-            // Synchronous wrapper around launch() and wait()
-            // It does not make sense to return a buffer, since the call blocks until finished.
-            // If EchoMode::buffer is selected, the effect will be the same as EchoMode::silent.
-            void run(EchoMode = EchoMode::silent);
+            void run(echo_chain_type = Echo::Silent());
 
             Parameters parameters() {return parameters_;}
 
@@ -157,9 +148,6 @@ namespace api
             double potential(double distance) {return short_range_force_->potential(distance);}
             double virial(double distance) {return short_range_force_->virial(distance);}
             double force(double distance) {return short_range_force_->force(distance);}
-
-            // Clean up any running simulations
-            ~Simulation() noexcept;
         
         private:
             Parameters parameters_;
@@ -168,9 +156,6 @@ namespace api
             // We use a pointer to the generic ShortRangeForce, in case we might like to implement
             // other ShortRangeForces in the future
             std::unique_ptr<const physics::ShortRangeForce> short_range_force_;
-
-            // The thread where the asynchronous simulation is running
-            std::jthread simulation_job_;
 
             // Construct the SimulationController from the local parameters and a Logger
             control::SimulationController make_simulation_controller_(output::Logger&);

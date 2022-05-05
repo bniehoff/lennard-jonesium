@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.18)
 
 project(lennardjonesium
-    VERSION 0.1.0
+    VERSION 0.1.1
     DESCRIPTION "A Python C++ extension package for simulating Lennard-Jones particles"
 )
 
@@ -133,6 +133,8 @@ add_library(api STATIC
     src/cpp/lennardjonesium/api/seed_generator.hpp
     src/cpp/lennardjonesium/api/configuration.hpp
     src/cpp/lennardjonesium/api/configuration.cpp
+    src/cpp/lennardjonesium/api/simulation_buffer.hpp
+    src/cpp/lennardjonesium/api/simulation_buffer.cpp
 )
 
 # Link the various dependencies
