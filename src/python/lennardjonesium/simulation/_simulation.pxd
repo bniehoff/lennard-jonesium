@@ -36,26 +36,31 @@ cdef extern from "<lennardjonesium/tools/text_buffer.hpp>" namespace "tools" nog
 
 
 # We also need the EchoMode enum
-cdef extern from "<lennardjonesium/api/simulation.hpp>" namespace "api" nogil:
-    cdef cppclass _EchoMode "api::Simulation::EchoMode":
-        pass
+# cdef extern from "<lennardjonesium/api/simulation.hpp>" namespace "api" nogil:
+#     cdef cppclass _EchoMode "api::Simulation::EchoMode":
+#         pass
 
-cdef extern from "<lennardjonesium/api/simulation.hpp>" namespace "api::Simulation::EchoMode" nogil:
-    cdef _EchoMode _silent "api::Simulation::EchoMode::silent"
-    cdef _EchoMode _console "api::Simulation::EchoMode::console"
-    cdef _EchoMode _buffer "api::Simulation::EchoMode::buffer"
+# cdef extern from "<lennardjonesium/api/simulation.hpp>" namespace "api::Simulation::EchoMode" nogil:
+#     cdef _EchoMode _silent "api::Simulation::EchoMode::silent"
+#     cdef _EchoMode _console "api::Simulation::EchoMode::console"
+#     cdef _EchoMode _buffer "api::Simulation::EchoMode::buffer"
 
 
 # Grab the declarations we need for the Simulation class
 cdef extern from "<lennardjonesium/api/simulation.hpp>" namespace "api" nogil:
     cdef cppclass _Simulation "api::Simulation":
-        # Run the simulation asynchronously
-        shared_ptr[_TextBuffer] launch()
-        shared_ptr[_TextBuffer] launch(_EchoMode)
-        void wait()
+        cppclass echo_chain_type:
+            pass
+        
+        cppclass _Echo "Echo":
+            @staticmethod
+            echo_chain_type Silent()
 
-        # Synchronous wrapper
-        void run()
+            @staticmethod
+            echo_chain_type Console()
+
+        # Run synchronously
+        void run(echo_chain_type)
 
         # Calculate quantities based on particle separation, for plotting
         double potential(double)

@@ -28,7 +28,10 @@ from libcpp.string cimport string
 
 from lennardjonesium.simulation._configuration cimport _Configuration
 from lennardjonesium.simulation._simulation cimport (
-    _TextBuffer, _Simulation, _EchoMode, make_simulation
+    # _TextBuffer,
+    _Simulation,
+    # _EchoMode,
+    make_simulation
 )
 
 # imports
@@ -41,7 +44,7 @@ cdef class Simulation:
     """
     The Simulation class ...
     """
-    cdef shared_ptr[_TextBuffer] _text_buffer
+    # cdef shared_ptr[_TextBuffer] _text_buffer
     cdef unique_ptr[_Simulation] _simulation
 
     def __cinit__(self, configuration = None):
@@ -97,31 +100,37 @@ cdef class Simulation:
     # def __dealloc__(self):
     #     del self._simulation
 
-    def launch(self, *, echo: bool = True):
-        if echo:
-            self._text_buffer = self._simulation.get().launch(<_EchoMode> _buffer)
-        else:
-            self._simulation.get().launch(<_EchoMode> _silent)
+    # def launch(self, *, echo: bool = True):
+    #     if echo:
+    #         self._text_buffer = self._simulation.get().launch(<_EchoMode> _buffer)
+    #     else:
+    #         self._simulation.get().launch(<_EchoMode> _silent)
 
-    def wait(self): self._simulation.get().wait()
+    # def wait(self): self._simulation.get().wait()
     
-    def read(self):
-        return str(self._text_buffer.get().read(), 'utf-8') if self._text_buffer else ""
+    # def read(self):
+    #     return str(self._text_buffer.get().read(), 'utf-8') if self._text_buffer else ""
     
-    def run(self, *, echo: bool = True, delay: float = 0.05):
+    # def run(self, *, echo: bool = True, delay: float = 0.05):
+    #     if echo:
+    #         # We have to use the asynchronous API in order for the console output to show in a
+    #         # Jupyter notebook
+    #         self.launch(echo=echo)
+    #         line = self.read()
+    #         while line:
+    #             print(line, flush=True)
+    #             time.sleep(delay)
+    #             line = self.read()
+    #         self.wait()
+    #     else:
+    #         # The direct run() method uses silent mode by default
+    #         self._simulation.get().run()
+
+    def run(self, *, echo: bool = True):
         if echo:
-            # We have to use the asynchronous API in order for the console output to show in a
-            # Jupyter notebook
-            self.launch(echo=echo)
-            line = self.read()
-            while line:
-                print(line, flush=True)
-                time.sleep(delay)
-                line = self.read()
-            self.wait()
+            self._simulation.get().run(_Simulation._Echo.Console())
         else:
-            # The direct run() method uses silent mode by default
-            self._simulation.get().run()
+            self._simulation.get().run(_Simulation._Echo.Silent())
 
     cpdef double potential(self, double separation):
         return self._simulation.get().potential(separation)
