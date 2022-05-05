@@ -26,12 +26,7 @@
 #include <vector>
 #include <utility>
 #include <filesystem>
-#include <iostream>
-#include <thread>
-#include <mutex>
-#include <exception>
 
-#include <boost/iostreams/tee.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/chain.hpp>
@@ -39,7 +34,6 @@
 
 #include <lennardjonesium/tools/overloaded_visitor.hpp>
 #include <lennardjonesium/tools/system_parameters.hpp>
-#include <lennardjonesium/tools/text_buffer.hpp>
 #include <lennardjonesium/physics/forces.hpp>
 #include <lennardjonesium/physics/lennard_jones_force.hpp>
 #include <lennardjonesium/engine/initial_condition.hpp>
@@ -75,117 +69,51 @@ namespace api
         assert(short_range_force_ != nullptr && "Failed to construct ShortRangeForce");
     }
 
-    std::shared_ptr<tools::TextBuffer> Simulation::launch(Simulation::EchoMode echo_mode)
+    void Simulation::run(echo_chain_type echo_chain)
     {
-        // Wait for any currently-running jobs to finish
-        wait();
-
-        // Start with a nullptr; we will create a buffer if requested
-        std::shared_ptr<tools::TextBuffer> buffer;
-
-        using echo_chain_type = boost::iostreams::chain<boost::iostreams::output>;
-
-        // Configure the echo chain
-        echo_chain_type echo_chain{};
-
-        switch (echo_mode)
-        {
-        case EchoMode::console:
-            echo_chain.push(boost::iostreams::tee(std::cout));
-            break;
-        
-        case EchoMode::buffer:
-            buffer = std::make_shared<tools::TextBuffer>();
-            echo_chain.push(tools::TextBufferFilter(*buffer));
-            break;
-        
-        case EchoMode::silent:
-            [[fallthrough]];
-        default:
-            break;
-        }
-
         using event_stream_type = boost::iostreams::filtering_ostream;
         using file_sink_type = boost::iostreams::file_sink;
         using file_stream_type = boost::iostreams::stream<file_sink_type>;
 
-        // Launch the simulation job (it sets up its own local variables)
-        simulation_job_ = std::jthread(
-            [this, echo_chain, buffer]() mutable
-            {
-                // Set up streams
-                echo_chain.push(file_sink_type{this->parameters_.event_log_path});
-                event_stream_type event_stream{echo_chain};
+        // Set up streams
+        echo_chain.push(file_sink_type{parameters_.event_log_path});
+        event_stream_type event_stream{echo_chain};
 
-                file_stream_type thermodynamic_stream{
-                    file_sink_type{this->parameters_.thermodynamic_log_path}
-                };
+        file_stream_type thermodynamic_stream{
+            file_sink_type{parameters_.thermodynamic_log_path}
+        };
 
-                file_stream_type observation_stream{
-                    file_sink_type{this->parameters_.observation_log_path}
-                };
+        file_stream_type observation_stream{
+            file_sink_type{parameters_.observation_log_path}
+        };
 
-                file_stream_type snapshot_stream{
-                    file_sink_type{this->parameters_.snapshot_log_path}
-                };
+        file_stream_type snapshot_stream{
+            file_sink_type{parameters_.snapshot_log_path}
+        };
 
-                // Set up logger
-                output::Logger logger{output::Logger::Streams{
-                    .event_log = event_stream,
-                    .thermodynamic_log = thermodynamic_stream,
-                    .observation_log = observation_stream,
-                    .snapshot_log = snapshot_stream
-                }};
-                
-                // Create initial state and SimulationController
-                auto initial_state = this->initial_condition_.system_state();
-                auto simulation_controller = make_simulation_controller_(logger);
+        // Set up logger
+        output::Logger logger{output::Logger::Streams{
+            .event_log = event_stream,
+            .thermodynamic_log = thermodynamic_stream,
+            .observation_log = observation_stream,
+            .snapshot_log = snapshot_stream
+        }};
+        
+        // Create initial state and SimulationController
+        auto initial_state = initial_condition_.system_state();
+        auto simulation_controller = make_simulation_controller_(logger);
 
-                // Run the actual simulation
-                initial_state | simulation_controller;
+        // Run the actual simulation
+        initial_state | simulation_controller;
 
-                // Close the logger
-                logger.close();
+        // Close the logger
+        logger.close();
 
-                // Close the streams (note that event_stream is a different type)
-                event_stream.reset();
-                thermodynamic_stream.close();
-                observation_stream.close();
-                snapshot_stream.close();
-
-                // Free our copy of the shared buffer
-                buffer.reset();
-            }
-        );
-
-        // Return the shared buffer to the caller
-        return buffer;
-    }
-
-    void Simulation::wait()
-    {
-        // If a simulation job is running, then wait for it to end
-        if (simulation_job_.joinable())
-        {
-            simulation_job_.join();
-        }
-    }
-
-    // run() is just a synchronous wrapper for launch() and wait()
-    void Simulation::run(EchoMode echo_mode)
-    {
-        // There is no point in using buffered echo mode
-        if (echo_mode == EchoMode::buffer) {echo_mode = EchoMode::silent;}
-
-        launch(echo_mode);
-        wait();
-    }
-
-    Simulation::~Simulation()
-    {
-        // Wait for any running simulations to finish
-        try {wait();}
-        catch(...) {}
+        // Close the streams (note that event_stream is a different type)
+        event_stream.reset();
+        thermodynamic_stream.close();
+        observation_stream.close();
+        snapshot_stream.close();
     }
 
     control::SimulationController Simulation::make_simulation_controller_(output::Logger& logger)
