@@ -28,24 +28,6 @@ from libcpp.string cimport string
 from lennardjonesium.simulation._configuration cimport _Configuration
 
 
-# Grab what's needed from the TextBuffer class
-cdef extern from "<lennardjonesium/tools/text_buffer.hpp>" namespace "tools" nogil:
-    cdef cppclass _TextBuffer "tools::TextBuffer":
-        _TextBuffer() except +
-        string read() except +
-
-
-# We also need the EchoMode enum
-# cdef extern from "<lennardjonesium/api/simulation.hpp>" namespace "api" nogil:
-#     cdef cppclass _EchoMode "api::Simulation::EchoMode":
-#         pass
-
-# cdef extern from "<lennardjonesium/api/simulation.hpp>" namespace "api::Simulation::EchoMode" nogil:
-#     cdef _EchoMode _silent "api::Simulation::EchoMode::silent"
-#     cdef _EchoMode _console "api::Simulation::EchoMode::console"
-#     cdef _EchoMode _buffer "api::Simulation::EchoMode::buffer"
-
-
 # Grab the declarations we need for the Simulation class
 cdef extern from "<lennardjonesium/api/simulation.hpp>" namespace "api" nogil:
     cdef cppclass _Simulation "api::Simulation":
@@ -66,6 +48,15 @@ cdef extern from "<lennardjonesium/api/simulation.hpp>" namespace "api" nogil:
         double potential(double)
         double virial(double)
         double force(double)
+
+
+# For launching simulations with output synchronized with Python's print(), we need the
+# SimulationBuffer class
+cdef extern from "<lennardjonesium/api/simulation_buffer.hpp>" namespace "api" nogil:
+    cdef cppclass _SimulationBuffer "api::SimulationBuffer":
+        void launch(_Simulation&)
+        void wait()
+        string read()
 
 
 # Also grab the factory function needed to create a Simulation from a Configuration
