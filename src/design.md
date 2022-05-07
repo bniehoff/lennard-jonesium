@@ -170,16 +170,25 @@ Here's a brief walkthrough of what is in each sub-library:
 
 ### The API library
 
-In this library, we have three classes:
+In this library, we have the following classes:
 
 1. `Simulation`
-2. `Configuration`
-3. `SeedGenerator`
+2. `SimulationBuffer`
+3. `SimulationPool`
+4. `Configuration`
+5. `SeedGenerator`
 
 `Simulation` is the main interface to the C++ library. It takes a set of parameters which describe
-everything about the simulation to be run, and also provides methods for running the simulation
-either asynchronously (`launch()` and `wait()`) or synchronously (`run()`), which is simply a
-wrapper.
+everything about the simulation, and provides a synchronous `run()` method.
+
+`SimulationBuffer` is a wrapper class for `Simulation` which provides an asynchronous interface with
+`launch()`, `wait()`, and `read()` methods. The `read()` method is for obtaining the lines of the
+Events output (as though reading a file), so that the caller can display them to the screen as
+desired (for example, Python should use its own `print()` function).
+
+`SimulationPool` provides a different asynchronous interface for pushing `Simulation`s into a queue
+and allowing a pool of worker threads to run them. This is most useful if one needs to run many
+simulations and would like to take advantage of parallelism.
 
 `Configuration` is a helper class mostly for interfacing with Python. Since the
 `Simulation::Parameters` struct includes many C++ types which are hard to describe in Cython, the
@@ -234,9 +243,9 @@ by the `Dispatcher` which sends it to the appropriate `Sink`, based upon its typ
 different `Sink`s, which represent four different files being written by the simulation:
 
 1. Events log (text)
-2. Thermodynamics log (`.csv`)
-3. Observations log (`.csv`)
-4. Snapshots log (`.csv`)
+2. Thermodynamics log (.csv)
+3. Observations log (.csv)
+4. Snapshots log (.csv)
 
 The Events log just contains information about what the `SimulationPhase`s are doing and when
 transitions happen between them. This is useful as console output in order to track the progress
@@ -259,4 +268,102 @@ step (although it would make the file very large if we attempted to include a lo
 
 ### The Engine library
 
-*To be continued...*
+This library contains the following classes:
+
+1. `InitialCondition`
+2. `Integrator`
+3. `BoundaryCondition`
+4. `ForceCalculation`
+5. `ParticlePairFilter`
+6. `Integrator::Builder`
+
+`InitialCondition` is responsible for generating the initial state, assigning particle positions and
+velocities in order to match the requested density and temperature.
+
+`Integrator` is responsible for how to advance the time by one time step. It implements an
+integration algorithm (for example Velocity-Verlet) and delegates certain parts of it to the
+`BoundaryCondition` and `ForceCalculation`.
+
+`BoundaryCondition` is responsible for imposing the periodic boundary conditions on the system.
+
+`ForceCalculation` is responsible for calculating the forces, given some pairwise interparticle
+force law (in the form of a `ShortRangeForce`), and a `ParticlePairFilter` which helps provide a
+list of pairs of particles which are likely to be close enough to interact.
+
+`ParticlePairFilter` is responsible for generating a list of all pairs of particles that should have
+forces calculated between them.  Naively, this would be all pairs of particles; a smarter method
+involves using Cell Lists to consider only particles likely to be close enough to each other.
+
+`Integrator::Builder` provides an easier way to create an `Integrator` instance, since it is made of
+many nested parts, and would otherwise be annoying to construct.
+
+### The Physics library
+
+The Physics library contains many classes and functions related to the actual physics being
+simulated. These include:
+
+1. `SystemState`
+2. Derived properties
+3. Measurements
+4. Analyzers
+5. Transformations
+6. Forces
+
+`SystemState` contains all the information needed to describe the state of the system at one point
+in time. So, it contains all the particle positions, velocities, forces, and some additional
+information about energies.
+
+"Derived properties" are properties of a single `SystemState` (that is, properties of the system at
+a single instant in time) which must be calculated by aggregating over the particles in the system.
+These properties include things like the kinetic energy, mean square displaceement, center of mass,
+or angular momentum.
+
+A "Measurement" is a device that captures a collection of "derived properties" from a given
+`SystemState`. It is useful to obtain all the desired derived properties at the same time, since
+many of them are dependent on each other (for example, temperature and total energy can reuse the
+value calculated from the kinetic energy).
+
+"Analyzers" are a further type of device that aggregates Measurements of the `SystemState` over
+*time*. An Analyzer calculates time-averaged statistics over some time window to produce an
+Observation, which is an outcome of the experiment (such as specific heat, or diffusion
+coefficient).
+
+"Transformations" are functions that act on the `SystemState` to change it in a non-physical way.
+For example, one can rescale the velocities in order to correct the temperature, or one can shift
+the velocities in order to change the momentum or angular momentum. These transformations are done
+only during the construction of the initial state, and during the Equilibration phase of the
+simulation.
+
+"Forces" of course are physical forces. The main one is the `LennardJonesForce`, which implements
+the fundamental force law on which the simulation is based.
+
+### The Tools library
+
+Under `tools/` one can find a variety of useful classes and functions, which are reused throughout
+the code in various ways.
+
+`BoundingBox` is a fairly simple wrapper around an Eigen array that gives a useful interface for
+dealing with the simulation region in which the particles live.
+
+`CubicLattice` provides tools for placing particles in an initial configuration on the sites of
+some regular lattice, for example a body-centered or face-centered cubic lattice. While one could
+in principle randomly choose the initial positions of the particles, it is possible that such
+random choices could lead to particles being very close together, where they will experience very
+strong forces that throw off the accuracy of the integration method. So, placing the particles at
+the vertices of a regular lattice avoids this problem.
+
+`CellListArray` implements the Cell Lists which are used to determine which particles are close
+enough to each other to justify calculating their mutual force. In particular, it provides
+generators (coroutines) for iterating over the cells, so that every cell is considered along with
+its 26 neighboring cells, exactly once.
+
+`MovingSample` is a template class that encapsulates the notion of statistics in a time window. It
+can keep track of statistics of a basic scalar quantity (such as `double`), or alternatively,
+it can be used for a vector quantity, given as an `Eigen::Vector` type. For scalar quantities,
+it computes the mean and variance of the sample; for vector quantities, it computes a covariance
+matrix in place of the variance.
+
+`MessageBuffer` implements an asynchronous producer/consumer queue, which allows multiple producers
+and multiple consumers. It is mainly used in the `Logger`, so that output to files can take place
+in a separate thread. However, it can also be repurposed in other ways, such as to provide a thread
+scheduler for the `SimulationPool`.
