@@ -135,6 +135,8 @@ add_library(api STATIC
     src/cpp/lennardjonesium/api/configuration.cpp
     src/cpp/lennardjonesium/api/simulation_buffer.hpp
     src/cpp/lennardjonesium/api/simulation_buffer.cpp
+    src/cpp/lennardjonesium/api/simulation_pool.hpp
+    src/cpp/lennardjonesium/api/simulation_pool.cpp
 )
 
 # Link the various dependencies
@@ -241,6 +243,7 @@ else()
         tests/cpp/lennardjonesium/control/test_simulation_controller.cpp
 
         tests/cpp/lennardjonesium/api/test_simulation.cpp
+        tests/cpp/lennardjonesium/api/test_simulation_pool.cpp
     )
 
     target_link_libraries(unit_tests
