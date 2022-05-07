@@ -62,3 +62,17 @@ cdef extern from "<lennardjonesium/api/simulation_buffer.hpp>" namespace "api" n
 # Also grab the factory function needed to create a Simulation from a Configuration
 cdef extern from "<lennardjonesium/api/configuration.hpp>" namespace "api" nogil:
     cdef unique_ptr[_Simulation] make_simulation(_Configuration) except +
+
+
+# C++ declarations for Cython Simulation class
+cdef class Simulation:
+    cdef _SimulationBuffer _cpp_simulation_buffer
+    cdef unique_ptr[_Simulation] _cpp_simulation
+
+    # Get the internal _simulation
+    cdef _Simulation* cpp_simulation(self)
+
+    # Physics functions
+    cpdef double potential(self, double)
+    cpdef double virial(self, double)
+    cpdef double force(self, double)
