@@ -8,6 +8,8 @@ from debugpy import configure
 
 from lennardjonesium.simulation import Configuration
 
+from tests.python.lennardjonesium.paths import temp_dir, file_stem
+
 class TestConfiguration(unittest.TestCase):
     def test_from_dict(self):
         dictionary = {
@@ -35,7 +37,7 @@ class TestConfiguration(unittest.TestCase):
         self.assertEqual(2000, configuration.equilibration.timeout)
     
     def test_read_write_files(self):
-        test_dir = pathlib.Path('temp/test_configuration')
+        test_dir = temp_dir / file_stem(__file__)
         test_dir.mkdir(parents=True, exist_ok=True)
         test_file = test_dir / 'test.ini'
 
