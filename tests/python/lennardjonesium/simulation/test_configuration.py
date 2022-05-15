@@ -4,11 +4,11 @@ Test Configuration class
 
 import unittest
 import pathlib
-from debugpy import configure
+import shutil
 
 from lennardjonesium.simulation import Configuration
 
-from tests.python.lennardjonesium.paths import temp_dir, file_stem
+from tests.python.paths import temp_dir
 
 class TestConfiguration(unittest.TestCase):
     def test_from_dict(self):
@@ -37,7 +37,8 @@ class TestConfiguration(unittest.TestCase):
         self.assertEqual(2000, configuration.equilibration.timeout)
     
     def test_read_write_files(self):
-        test_dir = temp_dir / file_stem(__file__)
+        this_file = pathlib.Path(__file__)
+        test_dir = temp_dir / this_file.stem
         test_dir.mkdir(parents=True, exist_ok=True)
         test_file = test_dir / 'test.ini'
 
@@ -50,5 +51,5 @@ class TestConfiguration(unittest.TestCase):
 
         self.assertEqual(source_conf, dest_conf)
 
-        test_file.unlink()
-        test_dir.rmdir()
+        # Clean up
+        shutil.rmtree(test_dir)
