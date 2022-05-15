@@ -139,7 +139,14 @@ class Configuration:
 
     def read(self, filename: str):
         """
-        Reads a Configuration from a file
+        Reads a Configuration from a file.
+
+        The filepaths for the log files will be read literally from the config file, whether they
+        are absolute or relative paths.  This works fine if one is running LennardJonesium from the
+        same directory where the config file is located.  In other cases, one probably wants a
+        relative path to be interpreted as relative to the location of the config file, rather than
+        from the working directory where Python was launched.  This circumstance will be handled
+        elsewhere.
         """
         parser = configparser.ConfigParser()
         parser.read(filename)
