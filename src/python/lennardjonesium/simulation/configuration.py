@@ -133,7 +133,7 @@ class Configuration:
                         elif field_type is bool:
                             value = cp.getboolean(section, key)
                         else:
-                            value = cp.get(section, key)
+                            value = cp[section][key]
 
                         self.__getattribute__(section).__setattr__(key, value)
 
