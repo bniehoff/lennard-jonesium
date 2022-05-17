@@ -22,7 +22,6 @@ License along with Lennard-Jonesium.  If not, see
 
 
 from dataclasses import dataclass
-import configparser
 
 from lennardjonesium.tools import INIParsable, DictParsable
 from lennardjonesium.simulation._seed_generator import SeedGenerator
