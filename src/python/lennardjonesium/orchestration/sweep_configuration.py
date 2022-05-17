@@ -1,5 +1,5 @@
 """
-configuration.py
+sweep_configuration.py
 
 Copyright (c) 2021-2022 Benjamin E. Niehoff
 
@@ -22,28 +22,45 @@ License along with Lennard-Jonesium.  If not, see
 
 
 from dataclasses import dataclass
-import configparser
+
 
 from lennardjonesium.tools import INIParsable, DictParsable
-from lennardjonesium.simulation._seed_generator import SeedGenerator
 
 
 @dataclass
-class Configuration(INIParsable, DictParsable):
+class SweepConfiguration(INIParsable, DictParsable):
     """
-    The Configuration holds all of the parameters needed to run a single Simulation.  These are
-    stored in a convenient nested dataclass structure.  We also provide some methods for reading
-    and writing config files, as well as conversion to a Configuration from a simple nested
-    dictionary.
+    A SweepConfiguration describes how to generate Configuration objects for a collection of
+    related simulations, over a range of temperatures and densities.  This is useful for running
+    a large number of jobs in order to generate data for a complete phase diagram.
     """
+
     @dataclass
     class _System:
-        temperature: float = 0.8
-        density: float = 1.0
+        """
+        These are mostly the same as the Configuration._System parameters, except that the
+        temperature and density parameters describe a range, and we do not provide a random seed.
+        (A random seed will be obtained/stored separately for each run.)
+        """
+        temperature_start: float = 0.1
+        temperature_stop: float = 1.0
+        temperature_step: float = 0.1
+        density_start: float = 0.1
+        density_stop: float = 1.0
+        density_step: float = 0.1
         particle_count: int = 100
         cutoff_distance: float = 2.5
         time_delta: float = 0.005
-        random_seed: int = SeedGenerator.default_seed()
+    
+    @dataclass
+    class _Templates:
+        """
+        These format strings show how the temperature and density values will be used to construct
+        the specific directories and SimulationPhase names that will be used for each simulation.
+        They should be strings with format fields named `temperature`, `density`, and `name`.
+        """
+        directory: str = 'T{temperature:f}/d{density:f}'
+        phase_name: str = 'T={temperature:f}, d={density:f} {name}'
     
     @dataclass
     class _Equilibration:
@@ -63,13 +80,19 @@ class Configuration(INIParsable, DictParsable):
         observation_count: int = 20
     
     @dataclass
-    class _Filepaths:
+    class _Filenames:
+        """
+        These fields should include only the file name to be used, not the directory.  Each output
+        file will be automatically placed in a subdirectory given by the `self.templates.directory`
+        format string described above.
+        """
         event_log: str = 'events.log'
         thermodynamic_log: str = 'thermodynamics.csv'
         observation_log: str = 'observations.csv'
         snapshot_log: str = 'snapshots.csv'
     
     system: _System = _System()
+    templates: _Templates = _Templates()
     equilibration: _Equilibration = _Equilibration()
     observation: _Observation = _Observation()
-    filepaths: _Filepaths = _Filepaths()
+    filenames: _Filenames = _Filenames()

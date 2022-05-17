@@ -1,1 +1,2 @@
 from lennardjonesium.orchestration.run import run
+from lennardjonesium.orchestration.sweep_configuration import SweepConfiguration

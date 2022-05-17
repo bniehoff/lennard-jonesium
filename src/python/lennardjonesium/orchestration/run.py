@@ -27,7 +27,7 @@ from typing import Union, Optional
 from types import FunctionType, BuiltinFunctionType
 from copy import deepcopy
 
-from lennardjonesium.simulation import Configuration, Simulation, SeedGenerator
+from lennardjonesium.simulation import Configuration, Simulation
 
 def run(
     config_file: Union[str, pathlib.Path],

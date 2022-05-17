@@ -18,6 +18,7 @@ setup(
     license="GPL v3.0",
     packages=[
         'lennardjonesium',
+        'lennardjonesium.tools',
         'lennardjonesium.simulation',
         'lennardjonesium.orchestration',
         ],
