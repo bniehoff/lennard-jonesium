@@ -24,11 +24,12 @@ License along with Lennard-Jonesium.  If not, see
 from dataclasses import dataclass
 import configparser
 
+from lennardjonesium.tools import INIParsable, DictParsable
 from lennardjonesium.simulation._seed_generator import SeedGenerator
 
 
 @dataclass
-class Configuration:
+class Configuration(INIParsable, DictParsable):
     """
     The Configuration holds all of the parameters needed to run a single Simulation.  These are
     stored in a convenient nested dataclass structure.  We also provide some methods for reading
@@ -72,96 +73,3 @@ class Configuration:
     equilibration: _Equilibration = _Equilibration()
     observation: _Observation = _Observation()
     filepaths: _Filepaths = _Filepaths()
-
-    @classmethod
-    def from_dict(cls, d: dict):
-        """
-        Creates a Configuration object from a nested dictionary.
-        """
-        c = cls()
-        c.read_dict(d)
-        return c
-    
-    @classmethod
-    def from_config_parser(cls, cp: configparser.ConfigParser):
-        """
-        Creates a Configuration object from a ConfigParser object.
-        """
-        c = cls()
-        c.read_config_parser(cp)
-        return c
-    
-    @classmethod
-    def from_file(cls, filename: str):
-        """
-        Creates a Configuration object from a config file
-        """
-        c = cls()
-        c.read(filename)
-        return c
-    
-    def read_dict(self, d: dict):
-        """
-        Sets the fields based on values from a dictionary.
-        """
-        # We only look for the keys that are actually defined in the dataclass, so if the
-        # dictionary contains additional keys, they will be ignored
-        for section in self.__dict__:
-            if section in d:
-                for key in self.__getattribute__(section).__dict__:
-                    if key in d[section]:
-                        self.__getattribute__(section).__setattr__(key, d[section][key])
-    
-    def read_config_parser(self, cp: configparser.ConfigParser):
-        """
-        Sets the fields based on values from a ConfigParser (not quite the same as a dictionary).
-        """
-        # We only look for the keys that are actually defined in the dataclass, so if the
-        # dictionary contains additional keys, they will be ignored
-        for section in self.__dict__:
-            if section in cp:
-                for key in self.__getattribute__(section).__dict__:
-                    if key in cp[section]:
-                        # We need to use different methods to automatically parse the values into
-                        # the appropriate type
-                        field_type = type(self.__getattribute__(section).__getattribute__(key))
-
-                        if field_type is int:
-                            value = cp.getint(section, key)
-                        elif field_type is float:
-                            value = cp.getfloat(section, key)
-                        elif field_type is bool:
-                            value = cp.getboolean(section, key)
-                        else:
-                            value = cp[section][key]
-
-                        self.__getattribute__(section).__setattr__(key, value)
-
-    def read(self, filename: str):
-        """
-        Reads a Configuration from a file.
-
-        The filepaths for the log files will be read literally from the config file, whether they
-        are absolute or relative paths.  This works fine if one is running LennardJonesium from the
-        same directory where the config file is located.  In other cases, one probably wants a
-        relative path to be interpreted as relative to the location of the config file, rather than
-        from the working directory where Python was launched.  This circumstance will be handled
-        elsewhere.
-        """
-        parser = configparser.ConfigParser()
-        parser.read(filename)
-        self.read_config_parser(parser)
-    
-    def write(self, filename: str):
-        """
-        Writes a Configuration to a file
-        """
-        parser = configparser.ConfigParser()
-
-        for section in self.__dict__:
-            parser.add_section(section)
-            for key in self.__getattribute__(section).__dict__:
-                parser[section][key] = str(self.__getattribute__(section).__getattribute__(key))
-        
-        with open(filename, 'w') as outfile:
-            parser.write(outfile)
