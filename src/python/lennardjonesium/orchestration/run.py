@@ -26,6 +26,7 @@ import pathlib
 from typing import Union, Optional
 from types import FunctionType, BuiltinFunctionType
 from copy import deepcopy
+from inspect import cleandoc
 
 from lennardjonesium.simulation import Configuration, Simulation
 
@@ -79,6 +80,8 @@ def run(
     # Write (or overwrite) the config file with the new random seed
     config_filepath.parent.mkdir(parents=True, exist_ok=True)
     cfg.write(config_filepath)
+
+    if echo_status: _preamble(cfg)
     
     # Change working directory to the directory where the config file is located
     cwd = os.getcwd()
@@ -90,3 +93,44 @@ def run(
 
     # Restore the working directory
     os.chdir(cwd)
+
+    if echo_status: _postamble()
+
+
+def _preamble(cfg: Configuration):
+    """
+    Prints information about the simulation to be run from the given Configuration object
+    """
+
+    print(
+        cleandoc(f"""
+            ==================== Lennard-Jones Simulation ====================
+            
+            Temperature: {cfg.system.temperature}
+            Density: {cfg.system.density}
+            Number of Particles: {cfg.system.particle_count}
+            Time Step: {cfg.system.time_delta}
+            Random Seed: {cfg.system.random_seed}
+
+            Simulation will run in 2 phases:
+            Phase 1: {cfg.equilibration.name}
+            Phase 2: {cfg.observation.name}
+
+            Results to be output to the following files:
+            Events: {cfg.filepaths.event_log}
+            Thermodynamics: {cfg.filepaths.thermodynamic_log}
+            Observations: {cfg.filepaths.observation_log}
+            Snapshots: {cfg.filepaths.snapshot_log}
+
+            Begin Simulation...
+            """
+        ),
+        flush=True
+    )
+
+def _postamble():
+    """
+    Prints information after simulation is finished
+    """
+
+    print("End Simulation", flush=True)
