@@ -26,7 +26,7 @@ import pathlib
 from typing import Union, Optional
 from types import FunctionType, BuiltinFunctionType
 from copy import deepcopy
-from inspect import cleandoc
+import textwrap
 
 from lennardjonesium.simulation import Configuration, Simulation
 
@@ -45,6 +45,9 @@ def run(
         be given, and a config file will be created at this path.  If the config file does exist,
         it will be overwritten, perhaps with a fresh random seed.
     
+    :param echo_status: If True, print information about the running simulation to the console.
+        Otherwise the run will be silent.
+    
     :param random_seed: Can be None, an int, or a function which takes 0 arguments.
         If None, then use the random seed from the config file.
         If an int, then use this random seed.
@@ -57,9 +60,6 @@ def run(
     
     We will always output a config file with the random seed actually used, which will overwrite
     the original config file.
-
-    TODO: Add some preamble that pretty-prints the Configuration data before the run, and
-        congratulates the user when the run is finished.
     """
 
     config_filepath = pathlib.Path(config_file).resolve()
@@ -102,31 +102,28 @@ def _preamble(cfg: Configuration):
     Prints information about the simulation to be run from the given Configuration object
     """
 
-    print(
-        cleandoc(f"""
-            ==================== Lennard-Jones Simulation ====================
-            
-            Temperature: {cfg.system.temperature}
-            Density: {cfg.system.density}
-            Number of Particles: {cfg.system.particle_count}
-            Time Step: {cfg.system.time_delta}
-            Random Seed: {cfg.system.random_seed}
+    preamble = f"""\
+        ==================== Lennard-Jones Simulation ====================
 
-            Simulation will run in 2 phases:
-            Phase 1: {cfg.equilibration.name}
-            Phase 2: {cfg.observation.name}
+        Temperature: {cfg.system.temperature}
+        Density: {cfg.system.density}
+        Number of Particles: {cfg.system.particle_count}
+        Time Step: {cfg.system.time_delta}
+        Random Seed: {cfg.system.random_seed}
 
-            Results to be output to the following files:
-            Events: {cfg.filepaths.event_log}
-            Thermodynamics: {cfg.filepaths.thermodynamic_log}
-            Observations: {cfg.filepaths.observation_log}
-            Snapshots: {cfg.filepaths.snapshot_log}
+        Simulation will run in 2 phases:
+        Phase 1: {cfg.equilibration.name}
+        Phase 2: {cfg.observation.name}
 
-            Begin Simulation...
-            """
-        ),
-        flush=True
-    )
+        Results to be output to the following files:
+        Events: {cfg.filepaths.event_log}
+        Thermodynamics: {cfg.filepaths.thermodynamic_log}
+        Observations: {cfg.filepaths.observation_log}
+        Snapshots: {cfg.filepaths.snapshot_log}
+
+        Begin Simulation..."""
+
+    print(textwrap.dedent(preamble), flush=True)
 
 def _postamble():
     """
