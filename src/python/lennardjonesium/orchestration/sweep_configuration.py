@@ -21,7 +21,7 @@ License along with Lennard-Jonesium.  If not, see
 """
 
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 from lennardjonesium.tools import INIParsable, DictParsable
@@ -39,15 +39,15 @@ class SweepConfiguration(INIParsable, DictParsable):
     class _System:
         """
         These are mostly the same as the Configuration._System parameters, except that the
-        temperature and density parameters describe a range, and we do not provide a random seed.
-        (A random seed will be obtained/stored separately for each run.)
+        temperature and density parameters describe a np.linspace, and we do not provide a random
+        seed.  (A random seed will be obtained/stored separately for each run.)
         """
         temperature_start: float = 0.1
         temperature_stop: float = 1.0
-        temperature_step: float = 0.1
+        temperature_steps: int = 10
         density_start: float = 0.1
         density_stop: float = 1.0
-        density_step: float = 0.1
+        density_steps: int = 10
         particle_count: int = 100
         cutoff_distance: float = 2.5
         time_delta: float = 0.005
@@ -60,6 +60,7 @@ class SweepConfiguration(INIParsable, DictParsable):
         They should be strings with format fields named `temperature`, `density`, and `name`.
         """
         directory: str = 'T{temperature:f}/d{density:f}'
+        run_config_file: str = 'run.ini'
         phase_name: str = 'T={temperature:f}, d={density:f} {name}'
     
     @dataclass
@@ -91,8 +92,9 @@ class SweepConfiguration(INIParsable, DictParsable):
         observation_log: str = 'observations.csv'
         snapshot_log: str = 'snapshots.csv'
     
-    system: _System = _System()
-    templates: _Templates = _Templates()
-    equilibration: _Equilibration = _Equilibration()
-    observation: _Observation = _Observation()
-    filenames: _Filenames = _Filenames()
+    # Since these are mutable, they need to be specified with a default factory
+    system: _System = field(default_factory=_System)
+    templates: _Templates = field(default_factory=_Templates)
+    equilibration: _Equilibration = field(default_factory=_Equilibration)
+    observation: _Observation = field(default_factory=_Observation)
+    filenames: _Filenames = field(default_factory=_Filenames)

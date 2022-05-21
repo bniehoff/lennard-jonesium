@@ -21,7 +21,7 @@ License along with Lennard-Jonesium.  If not, see
 """
 
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from lennardjonesium.tools import INIParsable, DictParsable
 from lennardjonesium.simulation._seed_generator import SeedGenerator
@@ -37,6 +37,9 @@ class Configuration(INIParsable, DictParsable):
     """
     @dataclass
     class _System:
+        """
+        Some docstring
+        """
         temperature: float = 0.8
         density: float = 1.0
         particle_count: int = 100
@@ -68,7 +71,8 @@ class Configuration(INIParsable, DictParsable):
         observation_log: str = 'observations.csv'
         snapshot_log: str = 'snapshots.csv'
     
-    system: _System = _System()
-    equilibration: _Equilibration = _Equilibration()
-    observation: _Observation = _Observation()
-    filepaths: _Filepaths = _Filepaths()
+    # Since these are mutable, they need to be specified with a default factory
+    system: _System = field(default_factory=_System)
+    equilibration: _Equilibration = field(default_factory=_Equilibration)
+    observation: _Observation = field(default_factory=_Observation)
+    filepaths: _Filepaths = field(default_factory=_Filepaths)
