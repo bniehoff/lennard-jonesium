@@ -59,9 +59,9 @@ class SweepConfiguration(INIParsable, DictParsable):
         the specific directories and SimulationPhase names that will be used for each simulation.
         They should be strings with format fields named `temperature`, `density`, and `name`.
         """
-        directory: str = 'T{temperature:f}/d{density:f}'
+        directory: str = 'T_{temperature:f}/d_{density:f}'
         run_config_file: str = 'run.ini'
-        phase_name: str = 'T={temperature:f}, d={density:f} {name}'
+        phase_name: str = '(T={temperature:f}, d={density:f}) {name}'
     
     @dataclass
     class _Equilibration:
