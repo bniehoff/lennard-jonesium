@@ -37,9 +37,6 @@ class Configuration(INIParsable, DictParsable):
     """
     @dataclass
     class _System:
-        """
-        Some docstring
-        """
         temperature: float = 0.8
         density: float = 1.0
         particle_count: int = 100

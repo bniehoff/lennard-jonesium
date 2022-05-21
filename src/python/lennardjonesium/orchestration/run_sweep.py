@@ -21,18 +21,33 @@ License along with Lennard-Jonesium.  If not, see
 """
 
 
+from calendar import c
 import os
 import pathlib
+from dataclasses import dataclass, field
 from typing import Union, Optional, Iterator
 from types import FunctionType, BuiltinFunctionType
 from copy import deepcopy
 import itertools
 import time
+import textwrap
 
 import numpy as np
 
 from lennardjonesium.simulation import Configuration, Simulation, SimulationPool
 from lennardjonesium.orchestration.sweep_configuration import SweepConfiguration
+from lennardjonesium.orchestration.simulation_result import SimulationResult, get_simulation_result
+
+
+@dataclass
+class SweepResult:
+    """
+    A simple dataclass to contain the "result" of a sweep: i.e., out of all the simulations
+    launched, which ones completed successfully, and which ones were aborted for some reason.
+    """
+    completed: list[pathlib.Path] = field(default_factory=list)
+    equilibration_aborted: list[pathlib.Path] = field(default_factory=list)
+    observation_aborted: list[pathlib.Path] = field(default_factory=list)
 
 
 def run_sweep(
@@ -42,7 +57,7 @@ def run_sweep(
     thread_count: int = 4,
     random_seed: Union[None, int, FunctionType, BuiltinFunctionType] = None,
     sweep_config_object: Optional[SweepConfiguration] = None
-):
+) -> SweepResult:
     """
     Wrapper function for running many simulations over a range of parameter space.
 
@@ -107,6 +122,8 @@ def run_sweep(
     simulations = _create_simulations(sweep_cfg, random_seed)
     pool = SimulationPool(thread_count)
 
+    if echo_status: _preamble(sweep_cfg, thread_count)
+
     for simulation in simulations:
         pool.push(simulation)
     
@@ -115,21 +132,97 @@ def run_sweep(
     # Wait for all simulations to finish
     pool.wait()
 
+    sweep_result = _get_sweep_result(sweep_cfg)
+
     # Restore working directory
     os.chdir(cwd)
 
+    if echo_status: _postamble(sweep_result)
 
-def sweep_dirs(sweep_cfg: SweepConfiguration) -> list[pathlib.Path]:
+    return sweep_result
+
+
+def simulation_dirs(sweep_cfg: SweepConfiguration) -> list[pathlib.Path]:
     """
     Returns a list of all simulation (sub)directories that will be used in this sweep.  Useful for
     finding the files afterward.
     """
-    sweep_dirs = []
+    simulation_dirs = []
 
     for temperature, density in _sweep_range(sweep_cfg):
-        sweep_dirs.append(_get_simulation_dir(sweep_cfg, temperature, density))
+        simulation_dirs.append(_get_simulation_dir(sweep_cfg, temperature, density))
     
-    return sweep_dirs
+    return simulation_dirs
+
+
+def _preamble(sweep_cfg: SweepConfiguration, thread_count: int):
+    """
+    Prints information about the sweep before running it
+    """
+    preamble = """\
+        ================= Lennard-Jones Sweep Simulation ==================
+
+        Temperature: {temp_steps} points in the range [{temp_start}, {temp_stop}]
+        Density: {d_steps} points in the range [{d_start}, {d_stop}]
+        
+        Number of Particles: {particle_count}
+        Time Step: {time_step}
+
+        Running {job_count} jobs over {thread_count} threads
+
+        Begin simulation sweep...""".format(
+            temp_start=sweep_cfg.system.temperature_start,
+            temp_stop=sweep_cfg.system.temperature_stop,
+            temp_steps=sweep_cfg.system.temperature_steps,
+            d_start=sweep_cfg.system.density_start,
+            d_stop=sweep_cfg.system.density_stop,
+            d_steps=sweep_cfg.system.density_steps,
+            particle_count=sweep_cfg.system.particle_count,
+            time_step=sweep_cfg.system.time_delta,
+            job_count=sweep_cfg.system.temperature_steps * sweep_cfg.system.density_steps,
+            thread_count=thread_count
+        )
+
+    print(textwrap.dedent(preamble), flush=True)
+
+
+def _postamble(result: SweepResult):
+    """
+    Indicate the status after the sweep is finished
+    """
+    postamble = f"""\
+        End simulation sweep
+        
+        Job status:
+        Completed: {len(result.completed)}
+        Aborted during Equilibration: {len(result.equilibration_aborted)}
+        Aborted during Observation: {len(result.observation_aborted)}"""
+    
+    print(textwrap.dedent(postamble), flush=True)
+
+
+def _get_sweep_result(sweep_cfg: SweepConfiguration) -> SweepResult:
+    """
+    Accumulates the data from the event logs of all of the simulations in the sweep into a
+    SweepResult object.
+    """
+    sweep_result = SweepResult()
+
+    for simulation_dir in simulation_dirs(sweep_cfg):
+        run_config_file = simulation_dir / sweep_cfg.templates.run_config_file
+
+        result = get_simulation_result(run_config_file)
+
+        if result == SimulationResult.completed:
+            category = sweep_result.completed
+        elif result == SimulationResult.equilibration_aborted:
+            category = sweep_result.equilibration_aborted
+        elif result == SimulationResult.observation_aborted:
+            category = sweep_result.observation_aborted
+        
+        category.append(simulation_dir)
+    
+    return sweep_result
 
 
 def _report_pool_status(pool: SimulationPool, job_count: int, polling_interval: float = 0.5):

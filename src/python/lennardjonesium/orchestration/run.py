@@ -121,7 +121,7 @@ def _preamble(cfg: Configuration):
         Observations: {cfg.filepaths.observation_log}
         Snapshots: {cfg.filepaths.snapshot_log}
 
-        Begin Simulation..."""
+        Begin simulation..."""
 
     print(textwrap.dedent(preamble), flush=True)
 
@@ -130,4 +130,4 @@ def _postamble():
     Prints information after simulation is finished
     """
 
-    print("End Simulation", flush=True)
+    print("End simulation", flush=True)
