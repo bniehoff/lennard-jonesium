@@ -22,9 +22,12 @@ License along with Lennard-Jonesium.  If not, see
 
 
 from dataclasses import dataclass, field
+from typing import Iterator
+import itertools
+import pathlib
 
 
-from lennardjonesium.tools import INIParsable, DictParsable
+from lennardjonesium.tools import INIParsable, DictParsable, linspace
 
 
 @dataclass
@@ -98,3 +101,38 @@ class SweepConfiguration(INIParsable, DictParsable):
     equilibration: _Equilibration = field(default_factory=_Equilibration)
     observation: _Observation = field(default_factory=_Observation)
     filenames: _Filenames = field(default_factory=_Filenames)
+
+    def sweep_range(self) -> Iterator[tuple[float, float]]:
+        """
+        Returns an iterator over (temperature, density) pairs for each point in the sweep.
+        """
+        temperatures = linspace(
+            self.system.temperature_start,
+            self.system.temperature_stop,
+            self.system.temperature_steps,
+            endpoint=True
+        )
+
+        densities = linspace(
+            self.system.density_start,
+            self.system.density_stop,
+            self.system.density_steps,
+            endpoint=True
+        )
+        
+        return itertools.product(temperatures, densities)
+    
+    def simulation_dir(self, temperature, density) -> pathlib.Path:
+        """
+        Returns the (relative) simulation directory corresponding to a given temperature and
+        density.
+        """
+        return pathlib.Path(self.templates.directory.format(
+            temperature=temperature, density=density
+        ))
+    
+    def simulation_dir_range(self) -> Iterator[pathlib.Path]:
+        """
+        Returns an iterator over all simulation directories.
+        """
+        return (self.simulation_dir(*td_pair) for td_pair in self.sweep_range())

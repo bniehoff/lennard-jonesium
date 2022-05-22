@@ -1,3 +1,3 @@
 from lennardjonesium.tools.ini_parsable import INIParsable
 from lennardjonesium.tools.dict_parsable import DictParsable
-from lennardjonesium.tools.file_utilities import last_line
+from lennardjonesium.tools.linspace import linspace

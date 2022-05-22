@@ -1,5 +1,5 @@
 """
-file_utilities.py
+linspace.py
 
 Copyright (c) 2021-2022 Benjamin E. Niehoff
 
@@ -21,13 +21,15 @@ License along with Lennard-Jonesium.  If not, see
 """
 
 
-import pathlib
-
-
-def last_line(filepath: pathlib.Path) -> str:
+def linspace(start: float, stop: float, points: int, endpoint: bool = True) -> list[int]:
     """
-    Returns the last line of a file
+    Creates a list of `points` evenly-spaced points in the interval [start, stop] (if endpoint
+    is True), or [start, stop) (if endpoint is False).
+
+    This is the same as Numpy's linspace() function, but this function uses Python's native float
+    type and avoids having a Numpy dependency in the project just to use one function (and not to
+    use any of Numpy's most useful features).
     """
-    with open(filepath, 'r') as file:
-        last_line = file.readlines()[-1]
-    return last_line
+    length = stop - start
+    denominator = (points - 1) if endpoint else points
+    return [start + (count / denominator) * length for count in range(points)]

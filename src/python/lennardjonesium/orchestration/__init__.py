@@ -1,4 +1,4 @@
 from lennardjonesium.orchestration.run import run
 from lennardjonesium.orchestration.sweep_configuration import SweepConfiguration
+from lennardjonesium.orchestration.sweep_result import SweepResult
 from lennardjonesium.orchestration.run_sweep import run_sweep
-from lennardjonesium.orchestration.simulation_result import SimulationResult, get_simulation_result

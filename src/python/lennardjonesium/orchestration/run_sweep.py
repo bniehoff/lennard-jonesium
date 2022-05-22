@@ -21,33 +21,17 @@ License along with Lennard-Jonesium.  If not, see
 """
 
 
-from calendar import c
 import os
 import pathlib
-from dataclasses import dataclass, field
-from typing import Union, Optional, Iterator
+from typing import Union, Optional
 from types import FunctionType, BuiltinFunctionType
 from copy import deepcopy
-import itertools
 import time
 import textwrap
 
-import numpy as np
-
 from lennardjonesium.simulation import Configuration, Simulation, SimulationPool
 from lennardjonesium.orchestration.sweep_configuration import SweepConfiguration
-from lennardjonesium.orchestration.simulation_result import SimulationResult, get_simulation_result
-
-
-@dataclass
-class SweepResult:
-    """
-    A simple dataclass to contain the "result" of a sweep: i.e., out of all the simulations
-    launched, which ones completed successfully, and which ones were aborted for some reason.
-    """
-    completed: list[pathlib.Path] = field(default_factory=list)
-    equilibration_aborted: list[pathlib.Path] = field(default_factory=list)
-    observation_aborted: list[pathlib.Path] = field(default_factory=list)
+from lennardjonesium.orchestration.sweep_result import SweepResult
 
 
 def run_sweep(
@@ -60,8 +44,6 @@ def run_sweep(
 ) -> SweepResult:
     """
     Wrapper function for running many simulations over a range of parameter space.
-
-    TODO: Define some preamble/postamble to print a description of what's happening.
 
     :param sweep_config_file: File path to the sweep config file which describes the simulation
         sweep to be run.  The output sweep config file will be written to the same place (possibly
@@ -132,27 +114,15 @@ def run_sweep(
     # Wait for all simulations to finish
     pool.wait()
 
-    sweep_result = _get_sweep_result(sweep_cfg)
-
     # Restore working directory
     os.chdir(cwd)
+
+    # SweepResult reads back in the config file from the originally-given filepath
+    sweep_result = SweepResult(sweep_config_filepath)
 
     if echo_status: _postamble(sweep_result)
 
     return sweep_result
-
-
-def simulation_dirs(sweep_cfg: SweepConfiguration) -> list[pathlib.Path]:
-    """
-    Returns a list of all simulation (sub)directories that will be used in this sweep.  Useful for
-    finding the files afterward.
-    """
-    simulation_dirs = []
-
-    for temperature, density in _sweep_range(sweep_cfg):
-        simulation_dirs.append(_get_simulation_dir(sweep_cfg, temperature, density))
-    
-    return simulation_dirs
 
 
 def _preamble(sweep_cfg: SweepConfiguration, thread_count: int):
@@ -201,30 +171,6 @@ def _postamble(result: SweepResult):
     print(textwrap.dedent(postamble), flush=True)
 
 
-def _get_sweep_result(sweep_cfg: SweepConfiguration) -> SweepResult:
-    """
-    Accumulates the data from the event logs of all of the simulations in the sweep into a
-    SweepResult object.
-    """
-    sweep_result = SweepResult()
-
-    for simulation_dir in simulation_dirs(sweep_cfg):
-        run_config_file = simulation_dir / sweep_cfg.templates.run_config_file
-
-        result = get_simulation_result(run_config_file)
-
-        if result == SimulationResult.completed:
-            category = sweep_result.completed
-        elif result == SimulationResult.equilibration_aborted:
-            category = sweep_result.equilibration_aborted
-        elif result == SimulationResult.observation_aborted:
-            category = sweep_result.observation_aborted
-        
-        category.append(simulation_dir)
-    
-    return sweep_result
-
-
 def _report_pool_status(pool: SimulationPool, job_count: int, polling_interval: float = 0.5):
     """
     Polls the given SimulationPool and reports its status until all jobs finish.
@@ -262,9 +208,9 @@ def _create_simulations(
     """
     simulations = []
 
-    for temperature, density in _sweep_range(sweep_cfg):
+    for temperature, density in sweep_cfg.sweep_range():
         # Get the directory where the individual simulation will be run
-        simulation_dir = _get_simulation_dir(sweep_cfg, temperature, density)
+        simulation_dir = sweep_cfg.simulation_dir(temperature, density)
         run_config_file = simulation_dir / sweep_cfg.templates.run_config_file
 
         # Create run configuration object (introduces default random seed)
@@ -291,44 +237,6 @@ def _create_simulations(
         simulations.append(Simulation(run_cfg))
     
     return simulations
-
-
-def _sweep_range(sweep_cfg: SweepConfiguration) -> Iterator[tuple[float, float]]:
-    """
-    Returns an iterator over (temperature, density) pairs for each point in the sweep.
-    """
-    # np.array.tolist() not only creates a Python list, but also converts Numpy dtypes to Python
-    # builtin types.  This is necessary as assumptions are made elsewhere about the type of
-    # the temperature, density being Python's `float`.
-
-    temperatures = np.linspace(
-        sweep_cfg.system.temperature_start,
-        sweep_cfg.system.temperature_stop,
-        sweep_cfg.system.temperature_steps,
-        endpoint=True
-    ).tolist()
-
-    densities = np.linspace(
-        sweep_cfg.system.density_start,
-        sweep_cfg.system.density_stop,
-        sweep_cfg.system.density_steps,
-        endpoint=True
-    ).tolist()
-
-    return itertools.product(temperatures, densities)
-
-
-def _get_simulation_dir(
-    sweep_cfg: SweepConfiguration,
-    temperature: float,
-    density: float
-) -> pathlib.Path:
-    """
-    Returns the simulation directory for a corresponding temperature and density.
-    """
-    return pathlib.Path(sweep_cfg.templates.directory.format(
-        temperature=temperature, density=density
-    ))
 
 
 def _prepend_simulation_dir(simulation_dir: pathlib.Path, run_cfg: Configuration):
