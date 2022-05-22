@@ -20,6 +20,7 @@ setup(
         'lennardjonesium',
         'lennardjonesium.tools',
         'lennardjonesium.simulation',
+        'lennardjonesium.postprocessing',
         'lennardjonesium.orchestration',
         ],
     package_dir = {
