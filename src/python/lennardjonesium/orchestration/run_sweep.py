@@ -95,6 +95,8 @@ def run_sweep(
         sweep_cfg = deepcopy(sweep_config_object)
         sweep_config_filepath.parent.mkdir(parents=True, exist_ok=True)
         sweep_cfg.write(sweep_config_filepath)
+
+    if echo_status: _preamble(sweep_cfg, thread_count)
     
     # Change working directory to the directory where the sweep config file is located
     cwd = os.getcwd()
@@ -104,7 +106,7 @@ def run_sweep(
     simulations = _create_simulations(sweep_cfg, random_seed)
     pool = SimulationPool(thread_count)
 
-    if echo_status: _preamble(sweep_cfg, thread_count)
+    start_time = time.perf_counter()
 
     for simulation in simulations:
         pool.push(simulation)
@@ -114,13 +116,15 @@ def run_sweep(
     # Wait for all simulations to finish
     pool.wait()
 
+    end_time = time.perf_counter()
+
     # Restore working directory
     os.chdir(cwd)
 
     # SweepResult reads back in the config file from the originally-given filepath
     sweep_result = SweepResult(sweep_config_filepath)
 
-    if echo_status: _postamble(sweep_result)
+    if echo_status: _postamble(sweep_result, thread_count, end_time - start_time)
 
     return sweep_result
 
@@ -156,17 +160,31 @@ def _preamble(sweep_cfg: SweepConfiguration, thread_count: int):
     print(textwrap.dedent(preamble), flush=True)
 
 
-def _postamble(result: SweepResult):
+def _postamble(result: SweepResult, thread_count: int, elapsed_time: float):
     """
     Indicate the status after the sweep is finished
     """
+    # Get the total number of time steps executed
+    combined_results = result.completed + result.equilibration_aborted + result.observation_aborted
+    time_steps = sum(entry.event_data.total_time_steps for entry in combined_results)
+
+    time_steps_per_thread = time_steps / thread_count
+
+    seconds_per_step = elapsed_time / time_steps_per_thread
+    steps_per_second = time_steps_per_thread / elapsed_time
+    ms_per_step = 1000 * seconds_per_step
+
     postamble = f"""\
         End simulation sweep
         
         Job status:
         Completed: {len(result.completed)}
         Aborted during Equilibration: {len(result.equilibration_aborted)}
-        Aborted during Observation: {len(result.observation_aborted)}"""
+        Aborted during Observation: {len(result.observation_aborted)}
+
+        {time_steps} time steps computed using {thread_count} threads in {elapsed_time:.3f} seconds
+        {seconds_per_step:.3f} thread-seconds per step, or {ms_per_step:.3f} milliseconds
+        Average framerate per thread: {steps_per_second:.3f} fps"""
     
     print(textwrap.dedent(postamble), flush=True)
 
