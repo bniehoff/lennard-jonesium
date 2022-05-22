@@ -32,8 +32,7 @@ import itertools
 import time
 import textwrap
 
-import numpy as np
-
+from lennardjonesium.tools import linspace
 from lennardjonesium.simulation import Configuration, Simulation, SimulationPool
 from lennardjonesium.orchestration.sweep_configuration import SweepConfiguration
 from lennardjonesium.orchestration.simulation_result import SimulationResult, get_simulation_result
@@ -301,20 +300,20 @@ def _sweep_range(sweep_cfg: SweepConfiguration) -> Iterator[tuple[float, float]]
     # builtin types.  This is necessary as assumptions are made elsewhere about the type of
     # the temperature, density being Python's `float`.
 
-    temperatures = np.linspace(
+    temperatures = linspace(
         sweep_cfg.system.temperature_start,
         sweep_cfg.system.temperature_stop,
         sweep_cfg.system.temperature_steps,
         endpoint=True
-    ).tolist()
+    )
 
-    densities = np.linspace(
+    densities = linspace(
         sweep_cfg.system.density_start,
         sweep_cfg.system.density_stop,
         sweep_cfg.system.density_steps,
         endpoint=True
-    ).tolist()
-
+    )
+    
     return itertools.product(temperatures, densities)
 
 
