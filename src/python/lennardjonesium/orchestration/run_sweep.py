@@ -23,8 +23,7 @@ License along with Lennard-Jonesium.  If not, see
 
 import os
 import pathlib
-from dataclasses import dataclass, field
-from typing import Union, Optional, Iterator
+from typing import Union, Optional
 from types import FunctionType, BuiltinFunctionType
 from copy import deepcopy
 import time
@@ -32,18 +31,7 @@ import textwrap
 
 from lennardjonesium.simulation import Configuration, Simulation, SimulationPool
 from lennardjonesium.orchestration.sweep_configuration import SweepConfiguration
-from lennardjonesium.orchestration.simulation_result import SimulationResult, get_simulation_result
-
-
-@dataclass
-class SweepResult:
-    """
-    A simple dataclass to contain the "result" of a sweep: i.e., out of all the simulations
-    launched, which ones completed successfully, and which ones were aborted for some reason.
-    """
-    completed: list[pathlib.Path] = field(default_factory=list)
-    equilibration_aborted: list[pathlib.Path] = field(default_factory=list)
-    observation_aborted: list[pathlib.Path] = field(default_factory=list)
+from lennardjonesium.orchestration.sweep_result import SweepResult
 
 
 def run_sweep(
@@ -126,10 +114,11 @@ def run_sweep(
     # Wait for all simulations to finish
     pool.wait()
 
-    sweep_result = _get_sweep_result(sweep_cfg)
-
     # Restore working directory
     os.chdir(cwd)
+
+    # SweepResult reads back in the config file from the originally-given filepath
+    sweep_result = SweepResult(sweep_config_filepath)
 
     if echo_status: _postamble(sweep_result)
 
@@ -180,30 +169,6 @@ def _postamble(result: SweepResult):
         Aborted during Observation: {len(result.observation_aborted)}"""
     
     print(textwrap.dedent(postamble), flush=True)
-
-
-def _get_sweep_result(sweep_cfg: SweepConfiguration) -> SweepResult:
-    """
-    Accumulates the data from the event logs of all of the simulations in the sweep into a
-    SweepResult object.
-    """
-    sweep_result = SweepResult()
-
-    for simulation_dir in sweep_cfg.simulation_dir_range():
-        run_config_file = simulation_dir / sweep_cfg.templates.run_config_file
-
-        result = get_simulation_result(run_config_file)
-
-        if result == SimulationResult.completed:
-            category = sweep_result.completed
-        elif result == SimulationResult.equilibration_aborted:
-            category = sweep_result.equilibration_aborted
-        elif result == SimulationResult.observation_aborted:
-            category = sweep_result.observation_aborted
-        
-        category.append(simulation_dir)
-    
-    return sweep_result
 
 
 def _report_pool_status(pool: SimulationPool, job_count: int, polling_interval: float = 0.5):
