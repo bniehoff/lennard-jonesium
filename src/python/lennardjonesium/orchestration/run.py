@@ -27,15 +27,17 @@ from typing import Union, Optional
 from types import FunctionType, BuiltinFunctionType
 from copy import deepcopy
 import textwrap
+import time
 
 from lennardjonesium.simulation import Configuration, Simulation
+from lennardjonesium.postprocessing import EventLogParser
 
 def run(
     config_file: Union[str, pathlib.Path],
     echo_status: bool = True,
     random_seed: Union[None, int, FunctionType, BuiltinFunctionType] = None,
     config_object: Optional[Configuration] = None
-):
+) -> EventLogParser:
     """
     Wrapper function for running a single simulation.
 
@@ -89,12 +91,20 @@ def run(
 
     # Create the Simulation object and run the simulation
     sim = Simulation(cfg)
+
+    start_time = time.perf_counter()
     sim.run(echo=echo_status)
+    end_time = time.perf_counter()
 
     # Restore the working directory
     os.chdir(cwd)
 
-    if echo_status: _postamble()
+    # Read results from event log
+    event_data = _get_event_data(config_filepath)
+
+    if echo_status: _postamble(event_data, end_time - start_time)
+
+    return event_data
 
 
 def _preamble(cfg: Configuration):
@@ -125,9 +135,35 @@ def _preamble(cfg: Configuration):
 
     print(textwrap.dedent(preamble), flush=True)
 
-def _postamble():
-    """
-    Prints information after simulation is finished
-    """
 
-    print("End simulation", flush=True)
+def _postamble(event_data: EventLogParser, elapsed_time: float):
+    """
+    Prints information after simulation is finished.
+    """
+    time_steps = event_data.total_time_steps
+
+    seconds_per_step = elapsed_time / time_steps
+    steps_per_second = time_steps / elapsed_time
+
+    postamble = f"""\
+        End simulation
+
+        {time_steps} time steps computed in {elapsed_time:.3f} seconds
+        {seconds_per_step:.3f} seconds per step, or {seconds_per_step * 1000:.3f} milliseconds
+        Framerate: {steps_per_second:.3f} fps"""
+
+    print(textwrap.dedent(postamble), flush=True)
+
+
+def _get_event_data(config_file: pathlib.Path) -> EventLogParser:
+    """
+    Find the event log for the given simulation and obtain the result data for it.
+    """
+    run_dir = config_file.parent
+    cfg = Configuration.from_file(config_file)
+
+    event_log = pathlib.Path(cfg.filepaths.event_log)
+    if not event_log.is_absolute():
+        event_log = run_dir / event_log
+    
+    return EventLogParser(event_log)
