@@ -4,9 +4,12 @@ Microcanonical simulation of the Lennard-Jones substance and analysis of phase t
 Completely rebuilt in Python and modern C++ using object-oriented and functional programming
 principles.
 
-The project is mostly done. The C++ part (which does all the hard work) is working well. The
-Python part has a basic interface which can be used to run simulations from a Jupyter notebook. 
-More features are planned for running many simulations over a range of temperature and density
-parameters.
+The project is finally "done"!  The C++ part (which does all the hard work) is working well, and
+the Python wrapper package finally has a usable interface.  With the Python wrapper, one can easily
+`run()` a single simulation, or `run_sweep()` a whole "sweep" of simulations over parameter space.
+When using `run_sweep()`, everything about the directory structure of the collection of simulations
+is managed automatically.
+
+TODO: Some more detailed instructions about installation and use are needed, of course.
 
 To begin reading and understanding the code, I suggest starting with [design.md](src/design.md).
