@@ -1,0 +1,46 @@
+0: Phase started: (T=0.200000, d=0.600000) Equilibration Phase
+200: Temperature measured at: 0.2861, adjusted to: 0.2
+400: Temperature measured at: 0.3287, adjusted to: 0.2
+600: Temperature measured at: 0.3006, adjusted to: 0.2
+800: Temperature measured at: 0.297, adjusted to: 0.2
+1000: Temperature measured at: 0.2746, adjusted to: 0.2
+1200: Temperature measured at: 0.2633, adjusted to: 0.2
+1400: Temperature measured at: 0.246, adjusted to: 0.2
+1600: Temperature measured at: 0.2405, adjusted to: 0.2
+1800: Temperature measured at: 0.2446, adjusted to: 0.2
+2000: Temperature measured at: 0.2358, adjusted to: 0.2
+2200: Temperature measured at: 0.2166, adjusted to: 0.2
+2400: Temperature measured at: 0.2143, adjusted to: 0.2
+2600: Temperature measured at: 0.2127, adjusted to: 0.2
+2800: Temperature measured at: 0.2102, adjusted to: 0.2
+3000: Temperature measured at: 0.2146, adjusted to: 0.2
+3200: Temperature measured at: 0.2136, adjusted to: 0.2
+4000: Temperature measured at: 0.211, adjusted to: 0.2
+4200: Temperature measured at: 0.2126, adjusted to: 0.2
+5000: Temperature measured at: 0.216, adjusted to: 0.2
+7600: Temperature measured at: 0.2115, adjusted to: 0.2
+8200: Temperature measured at: 0.2106, adjusted to: 0.2
+9400: Temperature measured at: 0.2107, adjusted to: 0.2
+14400: Phase complete: (T=0.200000, d=0.600000) Equilibration Phase
+14400: Phase started: (T=0.200000, d=0.600000) Observation Phase
+14600: Observation recorded
+14800: Observation recorded
+15000: Observation recorded
+15200: Observation recorded
+15400: Observation recorded
+15600: Observation recorded
+15800: Observation recorded
+16000: Observation recorded
+16200: Observation recorded
+16400: Observation recorded
+16600: Observation recorded
+16800: Observation recorded
+17000: Observation recorded
+17200: Observation recorded
+17400: Observation recorded
+17600: Observation recorded
+17800: Observation recorded
+18000: Observation recorded
+18200: Observation recorded
+18400: Observation recorded
+18400: Phase complete: (T=0.200000, d=0.600000) Observation Phase

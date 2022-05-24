@@ -1,0 +1,45 @@
+0: Phase started: (T=0.700000, d=0.400000) Equilibration Phase
+200: Temperature measured at: 0.9735, adjusted to: 0.7
+400: Temperature measured at: 0.8204, adjusted to: 0.7
+600: Temperature measured at: 0.7458, adjusted to: 0.7
+1000: Temperature measured at: 0.7551, adjusted to: 0.7
+1400: Temperature measured at: 0.7545, adjusted to: 0.7
+1600: Temperature measured at: 0.7454, adjusted to: 0.7
+2200: Temperature measured at: 0.7533, adjusted to: 0.7
+3000: Temperature measured at: 0.7413, adjusted to: 0.7
+3400: Temperature measured at: 0.7393, adjusted to: 0.7
+3800: Temperature measured at: 0.7362, adjusted to: 0.7
+4200: Temperature measured at: 0.7426, adjusted to: 0.7
+8200: Temperature measured at: 0.7416, adjusted to: 0.7
+9000: Temperature measured at: 0.7387, adjusted to: 0.7
+11800: Temperature measured at: 0.7559, adjusted to: 0.7
+13800: Temperature measured at: 0.7535, adjusted to: 0.7
+17400: Temperature measured at: 0.7449, adjusted to: 0.7
+21400: Temperature measured at: 0.655, adjusted to: 0.7
+23200: Temperature measured at: 0.6646, adjusted to: 0.7
+24800: Temperature measured at: 0.7358, adjusted to: 0.7
+28200: Temperature measured at: 0.661, adjusted to: 0.7
+30800: Temperature measured at: 0.7374, adjusted to: 0.7
+35800: Phase complete: (T=0.700000, d=0.400000) Equilibration Phase
+35800: Phase started: (T=0.700000, d=0.400000) Observation Phase
+36000: Observation recorded
+36200: Observation recorded
+36400: Observation recorded
+36600: Observation recorded
+36800: Observation recorded
+37000: Observation recorded
+37200: Observation recorded
+37400: Observation recorded
+37600: Observation recorded
+37800: Observation recorded
+38000: Observation recorded
+38200: Observation recorded
+38400: Observation recorded
+38600: Observation recorded
+38800: Observation recorded
+39000: Observation recorded
+39200: Observation recorded
+39400: Observation recorded
+39600: Observation recorded
+39800: Observation recorded
+39800: Phase complete: (T=0.700000, d=0.400000) Observation Phase
