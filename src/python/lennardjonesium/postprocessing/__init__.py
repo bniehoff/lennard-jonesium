@@ -1,1 +1,0 @@
-from lennardjonesium.postprocessing.event_log_parser import SimulationStatus, EventLogParser

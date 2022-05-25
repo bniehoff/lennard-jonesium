@@ -1,5 +1,5 @@
 """
-event_log_parser.py
+run_result.py
 
 Copyright (c) 2021-2022 Benjamin E. Niehoff
 
@@ -25,6 +25,8 @@ from enum import Enum, auto
 from typing import Optional
 import pathlib
 
+from lennardjonesium.simulation import Configuration
+
 
 class SimulationStatus(Enum):
     completed = auto()
@@ -32,9 +34,9 @@ class SimulationStatus(Enum):
     observation_aborted = auto()
 
 
-class EventLogParser:
+class RunResult:
     """
-    EventLogParser reads event log files and gathers information about what happened during a
+    RunResult reads event log files and gathers information about what happened during a
     simulation, such as:
 
         - Whether it completed or failed
@@ -61,11 +63,18 @@ class EventLogParser:
     temperature_adjustments: list[int]
     observations_recorded: list[int]
 
-    def __init__(self, event_log: pathlib.Path) -> None:
+    def __init__(self, config_filepath: pathlib.Path) -> None:
+        # Read the config file and us it to determine the location of the events log file
+        cfg = Configuration.from_file(config_filepath)
+        event_log_path = pathlib.Path(cfg.filepaths.event_log)
+        if not event_log_path.is_absolute():
+            event_log_path = config_filepath.parent / event_log_path
+        
+        # Parse the contents of the event file and fill in information about the run
         self.temperature_adjustments = []
         self.observations_recorded = []
         
-        with open(event_log, 'r') as event_log_file:
+        with open(event_log_path, 'r') as event_log_file:
             self._parse(event_log_file.readlines())
 
     def _parse(self, lines: list[str]):
