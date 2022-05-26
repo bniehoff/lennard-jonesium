@@ -133,9 +133,11 @@ namespace output
     {
         fmt::print(
             destination_,
-            "{},{},{},{},{}\n",
+            "{},{},{},{},{},{},{}\n",
             "TimeStep",
             "Temperature",
+            "Density",
+            "TotalEnergy",
             "Pressure",
             "SpecificHeat",
             "DiffusionCoefficient"
@@ -146,9 +148,11 @@ namespace output
     {
         fmt::print(
             destination_,
-            "{},{},{},{},{}\n",
+            "{},{},{},{},{},{},{}\n",
             time_step,
             message.data.temperature,
+            message.data.density,
+            message.data.total_energy,
             message.data.pressure,
             message.data.specific_heat,
             message.data.diffusion_coefficient

@@ -71,6 +71,8 @@ SCENARIO("Logger sends to correct files")
 
         physics::Observation observation{
             .temperature = 0.5,
+            .density = 0.75,
+            .total_energy = 7.5,
             .pressure = 3.25,
             .specific_heat = 2.5,
             .diffusion_coefficient = 5.25
@@ -160,8 +162,9 @@ SCENARIO("Logger sends to correct files")
             THEN("I get the expected file contents")
             {
                 std::string expected = 
-                    "TimeStep,Temperature,Pressure,SpecificHeat,DiffusionCoefficient\n"
-                    "3,0.5,3.25,2.5,5.25\n";
+                    "TimeStep,Temperature,Density,TotalEnergy,Pressure,"
+                    "SpecificHeat,DiffusionCoefficient\n"
+                    "3,0.5,0.75,7.5,3.25,2.5,5.25\n";
                 
                 REQUIRE(expected == contents.view());
             }

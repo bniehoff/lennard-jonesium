@@ -108,6 +108,7 @@ namespace physics
             ThermodynamicAnalyzer
                 (tools::SystemParameters system_parameters, int sample_size)
                 : temperature_sample_{sample_size},
+                  total_energy_sample_{sample_size},
                   virial_sample_{sample_size},
                   msd_vs_time_sample_{sample_size},
                   system_parameters_{system_parameters},
@@ -116,6 +117,7 @@ namespace physics
         
         private:
             tools::MovingSample<double> temperature_sample_;
+            tools::MovingSample<double> total_energy_sample_;
             tools::MovingSample<double> virial_sample_;
             tools::MovingSample<Eigen::Vector2d> msd_vs_time_sample_;
             tools::SystemParameters system_parameters_;

@@ -37,6 +37,8 @@ namespace physics
          */
 
         double temperature;
+        double density;
+        double total_energy;
         double pressure;
         double specific_heat;
         double diffusion_coefficient;
