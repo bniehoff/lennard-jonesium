@@ -1,8 +1,9 @@
 0: Phase started: (T=1.500000, d=0.200000) Equilibration Phase
-200: Temperature measured at: 1.8, adjusted to: 1.5
-1000: Temperature measured at: 1.606, adjusted to: 1.5
-6000: Phase complete: (T=1.500000, d=0.200000) Equilibration Phase
-6000: Phase started: (T=1.500000, d=0.200000) Observation Phase
+200: Temperature measured at: 1.778, adjusted to: 1.5
+800: Temperature measured at: 1.587, adjusted to: 1.5
+5800: Phase complete: (T=1.500000, d=0.200000) Equilibration Phase
+5800: Phase started: (T=1.500000, d=0.200000) Observation Phase
+6000: Observation recorded
 6200: Observation recorded
 6400: Observation recorded
 6600: Observation recorded
@@ -22,5 +23,4 @@
 9400: Observation recorded
 9600: Observation recorded
 9800: Observation recorded
-10000: Observation recorded
-10000: Phase complete: (T=1.500000, d=0.200000) Observation Phase
+9800: Phase complete: (T=1.500000, d=0.200000) Observation Phase
