@@ -61,6 +61,8 @@ namespace mock
     {
         constexpr physics::Observation mock_observation{
             .temperature = 0.5,
+            .density = 0.75,
+            .total_energy = 7.5,
             .pressure = 3.25,
             .specific_heat = 2.5,
             .diffusion_coefficient = 5.25

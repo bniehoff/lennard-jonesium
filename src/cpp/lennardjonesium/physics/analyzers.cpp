@@ -32,6 +32,7 @@ namespace physics
     void ThermodynamicAnalyzer::collect(const ThermodynamicMeasurement& measurement)
     {
         temperature_sample_.push_back(measurement.result().temperature);
+        total_energy_sample_.push_back(measurement.result().total_energy);
         virial_sample_.push_back(measurement.result().virial);
 
         // The mean square displacement as a function of time will be used for linear regression
@@ -46,11 +47,13 @@ namespace physics
          * Compute physical quantities to package into an Observation.
          */
         auto temperature_statistics = temperature_sample_.statistics();
+        auto total_energy_statistics = total_energy_sample_.statistics();
         auto virial_statistics = virial_sample_.statistics();
         auto msd_vs_time_statistics = msd_vs_time_sample_.statistics();
 
-        // The temperature is simply the mean temperature:
+        // The temperature and energy are simply the mean:
         double temperature = temperature_statistics.mean;
+        double total_energy = total_energy_statistics.mean;
 
         /**
          * The pressure is computed from the virial theorem:
@@ -147,6 +150,8 @@ namespace physics
         // Now assemble the return value
         return {
             temperature,
+            system_parameters_.density,
+            total_energy,
             pressure,
             specific_heat,
             diffusion_coefficient
