@@ -21,9 +21,6 @@ _skbuild/
 # Temp directory (test output files)
 temp/
 
-# Notebooks directory
-notebooks/
-
 # Python .egg-* files/directories
 *.egg-*
 

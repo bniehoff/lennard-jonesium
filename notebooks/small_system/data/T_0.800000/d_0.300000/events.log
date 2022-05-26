@@ -1,0 +1,45 @@
+0: Phase started: (T=0.800000, d=0.300000) Equilibration Phase
+200: Temperature measured at: 1.148, adjusted to: 0.8
+400: Temperature measured at: 0.8893, adjusted to: 0.8
+800: Temperature measured at: 0.878, adjusted to: 0.8
+1200: Temperature measured at: 0.8654, adjusted to: 0.8
+1600: Temperature measured at: 0.8401, adjusted to: 0.8
+2600: Temperature measured at: 0.8494, adjusted to: 0.8
+4600: Temperature measured at: 0.8401, adjusted to: 0.8
+7200: Temperature measured at: 0.844, adjusted to: 0.8
+7800: Temperature measured at: 0.8402, adjusted to: 0.8
+12600: Temperature measured at: 0.7576, adjusted to: 0.8
+13800: Temperature measured at: 0.7453, adjusted to: 0.8
+15600: Temperature measured at: 0.8416, adjusted to: 0.8
+16200: Temperature measured at: 0.7486, adjusted to: 0.8
+19400: Temperature measured at: 0.8486, adjusted to: 0.8
+21600: Temperature measured at: 0.8902, adjusted to: 0.8
+23800: Temperature measured at: 0.85, adjusted to: 0.8
+24800: Temperature measured at: 0.7586, adjusted to: 0.8
+25200: Temperature measured at: 0.75, adjusted to: 0.8
+26200: Temperature measured at: 0.8437, adjusted to: 0.8
+26400: Temperature measured at: 0.8405, adjusted to: 0.8
+27200: Temperature measured at: 0.8516, adjusted to: 0.8
+32200: Phase complete: (T=0.800000, d=0.300000) Equilibration Phase
+32200: Phase started: (T=0.800000, d=0.300000) Observation Phase
+32400: Observation recorded
+32600: Observation recorded
+32800: Observation recorded
+33000: Observation recorded
+33200: Observation recorded
+33400: Observation recorded
+33600: Observation recorded
+33800: Observation recorded
+34000: Observation recorded
+34200: Observation recorded
+34400: Observation recorded
+34600: Observation recorded
+34800: Observation recorded
+35000: Observation recorded
+35200: Observation recorded
+35400: Observation recorded
+35600: Observation recorded
+35800: Observation recorded
+36000: Observation recorded
+36200: Observation recorded
+36200: Phase complete: (T=0.800000, d=0.300000) Observation Phase

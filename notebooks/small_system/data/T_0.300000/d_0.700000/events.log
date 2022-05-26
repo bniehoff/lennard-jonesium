@@ -1,0 +1,50 @@
+0: Phase started: (T=0.300000, d=0.700000) Equilibration Phase
+200: Temperature measured at: 0.2251, adjusted to: 0.3
+600: Temperature measured at: 0.3593, adjusted to: 0.3
+800: Temperature measured at: 0.3671, adjusted to: 0.3
+1000: Temperature measured at: 0.35, adjusted to: 0.3
+1200: Temperature measured at: 0.3272, adjusted to: 0.3
+1400: Temperature measured at: 0.3352, adjusted to: 0.3
+1600: Temperature measured at: 0.324, adjusted to: 0.3
+1800: Temperature measured at: 0.3158, adjusted to: 0.3
+2000: Temperature measured at: 0.3229, adjusted to: 0.3
+2200: Temperature measured at: 0.3184, adjusted to: 0.3
+2600: Temperature measured at: 0.3174, adjusted to: 0.3
+2800: Temperature measured at: 0.3156, adjusted to: 0.3
+4800: Temperature measured at: 0.3192, adjusted to: 0.3
+6800: Temperature measured at: 0.3171, adjusted to: 0.3
+8000: Temperature measured at: 0.3151, adjusted to: 0.3
+11000: Temperature measured at: 0.3151, adjusted to: 0.3
+12800: Temperature measured at: 0.3152, adjusted to: 0.3
+15200: Temperature measured at: 0.3196, adjusted to: 0.3
+18600: Temperature measured at: 0.3182, adjusted to: 0.3
+18800: Temperature measured at: 0.3166, adjusted to: 0.3
+20800: Temperature measured at: 0.3154, adjusted to: 0.3
+21600: Temperature measured at: 0.3247, adjusted to: 0.3
+22600: Temperature measured at: 0.3196, adjusted to: 0.3
+23000: Temperature measured at: 0.3159, adjusted to: 0.3
+23400: Temperature measured at: 0.3229, adjusted to: 0.3
+23800: Temperature measured at: 0.3155, adjusted to: 0.3
+28800: Phase complete: (T=0.300000, d=0.700000) Equilibration Phase
+28800: Phase started: (T=0.300000, d=0.700000) Observation Phase
+29000: Observation recorded
+29200: Observation recorded
+29400: Observation recorded
+29600: Observation recorded
+29800: Observation recorded
+30000: Observation recorded
+30200: Observation recorded
+30400: Observation recorded
+30600: Observation recorded
+30800: Observation recorded
+31000: Observation recorded
+31200: Observation recorded
+31400: Observation recorded
+31600: Observation recorded
+31800: Observation recorded
+32000: Observation recorded
+32200: Observation recorded
+32400: Observation recorded
+32600: Observation recorded
+32800: Observation recorded
+32800: Phase complete: (T=0.300000, d=0.700000) Observation Phase

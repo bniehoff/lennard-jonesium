@@ -30,14 +30,14 @@ import textwrap
 import time
 
 from lennardjonesium.simulation import Configuration, Simulation
-from lennardjonesium.postprocessing import EventLogParser
+from lennardjonesium.orchestration.run_result import RunResult
 
 def run(
     config_file: Union[str, pathlib.Path],
     echo_status: bool = True,
     random_seed: Union[None, int, FunctionType, BuiltinFunctionType] = None,
     config_object: Optional[Configuration] = None
-) -> EventLogParser:
+) -> RunResult:
     """
     Wrapper function for running a single simulation.
 
@@ -100,11 +100,11 @@ def run(
     os.chdir(cwd)
 
     # Read results from event log
-    event_data = _get_event_data(config_filepath)
+    run_result = RunResult(config_filepath)
 
-    if echo_status: _postamble(event_data, end_time - start_time)
+    if echo_status: _postamble(run_result, end_time - start_time)
 
-    return event_data
+    return run_result
 
 
 def _preamble(cfg: Configuration):
@@ -136,7 +136,7 @@ def _preamble(cfg: Configuration):
     print(textwrap.dedent(preamble), flush=True)
 
 
-def _postamble(event_data: EventLogParser, elapsed_time: float):
+def _postamble(event_data: RunResult, elapsed_time: float):
     """
     Prints information after simulation is finished.
     """
@@ -153,17 +153,3 @@ def _postamble(event_data: EventLogParser, elapsed_time: float):
         Framerate: {steps_per_second:.3f} fps"""
 
     print(textwrap.dedent(postamble), flush=True)
-
-
-def _get_event_data(config_file: pathlib.Path) -> EventLogParser:
-    """
-    Find the event log for the given simulation and obtain the result data for it.
-    """
-    run_dir = config_file.parent
-    cfg = Configuration.from_file(config_file)
-
-    event_log = pathlib.Path(cfg.filepaths.event_log)
-    if not event_log.is_absolute():
-        event_log = run_dir / event_log
-    
-    return EventLogParser(event_log)

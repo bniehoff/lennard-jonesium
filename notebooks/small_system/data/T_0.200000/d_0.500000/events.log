@@ -1,0 +1,68 @@
+0: Phase started: (T=0.200000, d=0.500000) Equilibration Phase
+200: Temperature measured at: 0.4148, adjusted to: 0.2
+400: Temperature measured at: 0.3567, adjusted to: 0.2
+600: Temperature measured at: 0.3599, adjusted to: 0.2
+800: Temperature measured at: 0.3376, adjusted to: 0.2
+1000: Temperature measured at: 0.3058, adjusted to: 0.2
+1200: Temperature measured at: 0.2784, adjusted to: 0.2
+1400: Temperature measured at: 0.258, adjusted to: 0.2
+1600: Temperature measured at: 0.2456, adjusted to: 0.2
+1800: Temperature measured at: 0.234, adjusted to: 0.2
+2000: Temperature measured at: 0.2385, adjusted to: 0.2
+2200: Temperature measured at: 0.2236, adjusted to: 0.2
+2400: Temperature measured at: 0.2183, adjusted to: 0.2
+2600: Temperature measured at: 0.2179, adjusted to: 0.2
+2800: Temperature measured at: 0.2111, adjusted to: 0.2
+3000: Temperature measured at: 0.2143, adjusted to: 0.2
+3200: Temperature measured at: 0.2121, adjusted to: 0.2
+3800: Temperature measured at: 0.2114, adjusted to: 0.2
+4000: Temperature measured at: 0.216, adjusted to: 0.2
+5400: Temperature measured at: 0.212, adjusted to: 0.2
+5800: Temperature measured at: 0.2103, adjusted to: 0.2
+6800: Temperature measured at: 0.212, adjusted to: 0.2
+7600: Temperature measured at: 0.2112, adjusted to: 0.2
+10800: Temperature measured at: 0.2103, adjusted to: 0.2
+12400: Temperature measured at: 0.2108, adjusted to: 0.2
+12800: Temperature measured at: 0.2147, adjusted to: 0.2
+14000: Temperature measured at: 0.2131, adjusted to: 0.2
+15200: Temperature measured at: 0.2124, adjusted to: 0.2
+16800: Temperature measured at: 0.2106, adjusted to: 0.2
+18400: Temperature measured at: 0.2107, adjusted to: 0.2
+19400: Temperature measured at: 0.2122, adjusted to: 0.2
+22400: Temperature measured at: 0.211, adjusted to: 0.2
+23200: Temperature measured at: 0.2101, adjusted to: 0.2
+24000: Temperature measured at: 0.2134, adjusted to: 0.2
+25000: Temperature measured at: 0.2115, adjusted to: 0.2
+25800: Temperature measured at: 0.2126, adjusted to: 0.2
+27000: Temperature measured at: 0.2145, adjusted to: 0.2
+27200: Temperature measured at: 0.2149, adjusted to: 0.2
+27600: Temperature measured at: 0.212, adjusted to: 0.2
+27800: Temperature measured at: 0.2106, adjusted to: 0.2
+28400: Temperature measured at: 0.2115, adjusted to: 0.2
+29000: Temperature measured at: 0.2119, adjusted to: 0.2
+29200: Temperature measured at: 0.2116, adjusted to: 0.2
+31000: Temperature measured at: 0.2102, adjusted to: 0.2
+33000: Temperature measured at: 0.2105, adjusted to: 0.2
+38000: Phase complete: (T=0.200000, d=0.500000) Equilibration Phase
+38000: Phase started: (T=0.200000, d=0.500000) Observation Phase
+38200: Observation recorded
+38400: Observation recorded
+38600: Observation recorded
+38800: Observation recorded
+39000: Observation recorded
+39200: Observation recorded
+39400: Observation recorded
+39600: Observation recorded
+39800: Observation recorded
+40000: Observation recorded
+40200: Observation recorded
+40400: Observation recorded
+40600: Observation recorded
+40800: Observation recorded
+41000: Observation recorded
+41200: Observation recorded
+41400: Observation recorded
+41600: Observation recorded
+41800: Observation recorded
+42000: Observation recorded
+42000: Phase complete: (T=0.200000, d=0.500000) Observation Phase

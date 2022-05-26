@@ -26,7 +26,7 @@ import pathlib
 
 
 from lennardjonesium.simulation import Configuration
-from lennardjonesium.postprocessing import SimulationStatus, EventLogParser
+from lennardjonesium.orchestration.run_result import SimulationStatus, RunResult
 from lennardjonesium.orchestration.sweep_configuration import SweepConfiguration
 
 
@@ -40,7 +40,7 @@ class SweepResult:
     @dataclass
     class _SimulationResult:
         simulation_dir: pathlib.Path
-        event_data: EventLogParser
+        event_data: RunResult
     
     completed: list[_SimulationResult]
     equilibration_aborted: list[_SimulationResult]
@@ -62,19 +62,14 @@ class SweepResult:
 
         for simulation_dir in sweep_cfg.simulation_dir_range():
             run_config_file = sweep_dir / simulation_dir / sweep_cfg.templates.run_config_file
-            run_cfg = Configuration.from_file(run_config_file)
-
-            event_log = pathlib.Path(run_cfg.filepaths.event_log)
-            if not event_log.is_absolute():
-                event_log = sweep_dir / simulation_dir / event_log
             
-            event_log_parser = EventLogParser(event_log)
+            run_result = RunResult(run_config_file)
 
-            if event_log_parser.simulation_status == SimulationStatus.completed:
+            if run_result.simulation_status == SimulationStatus.completed:
                 category = self.completed
-            elif event_log_parser.simulation_status == SimulationStatus.equilibration_aborted:
+            elif run_result.simulation_status == SimulationStatus.equilibration_aborted:
                 category = self.equilibration_aborted
-            elif event_log_parser.simulation_status == SimulationStatus.observation_aborted:
+            elif run_result.simulation_status == SimulationStatus.observation_aborted:
                 category = self.observation_aborted
             
-            category.append(self._SimulationResult(simulation_dir, event_log_parser))
+            category.append(self._SimulationResult(simulation_dir, run_result))

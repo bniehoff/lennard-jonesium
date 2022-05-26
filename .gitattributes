@@ -1,1 +1,4 @@
-# *.ipynb linguist-vendored
+# Do not count non-code files for git language statistics
+*.ini linguist-vendored
+*.log linguist-vendored
+*.csv linguist-vendored
