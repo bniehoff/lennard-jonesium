@@ -1,2 +1,5 @@
 # Simulation output data files
 *.csv
+
+# Still working on large system simulation
+large_system/
