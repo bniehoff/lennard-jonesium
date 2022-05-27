@@ -46,21 +46,29 @@ class SweepResult:
     equilibration_aborted: list[_SimulationResult]
     observation_aborted: list[_SimulationResult]
 
-    def __init__(self, sweep_config_file: pathlib.Path) -> None:
+    def __init__(self,
+        sweep_config_file: pathlib.Path,
+        chunk_count: int = 1,
+        chunk_index: int = 0,
+    ) -> None:
         self.completed = []
         self.equilibration_aborted = []
         self.observation_aborted = []
 
-        self._collect_results(sweep_config_file)
+        self._collect_results(sweep_config_file, chunk_count, chunk_index)
     
-    def _collect_results(self, sweep_config_file: pathlib.Path):
+    def _collect_results(self,
+        sweep_config_file: pathlib.Path,
+        chunk_count: int = 1,
+        chunk_index: int = 0,
+    ):
         """
         Collect the results from all the event logs that were generated in this simulation sweep.
         """
         sweep_dir = sweep_config_file.parent
         sweep_cfg = SweepConfiguration.from_file(sweep_config_file)
 
-        for simulation_dir in sweep_cfg.simulation_dir_range():
+        for simulation_dir in sweep_cfg.simulation_dir_range(chunk_count, chunk_index):
             run_config_file = sweep_dir / simulation_dir / sweep_cfg.templates.run_config_file
             
             run_result = RunResult(run_config_file)

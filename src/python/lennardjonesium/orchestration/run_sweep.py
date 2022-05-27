@@ -40,6 +40,8 @@ def run_sweep(
     polling_interval: float = 0.5,
     thread_count: int = 4,
     random_seed: Union[None, int, FunctionType, BuiltinFunctionType] = None,
+    chunk_count: int = 1,
+    chunk_index: int = 0,
     sweep_config_object: Optional[SweepConfiguration] = None
 ) -> SweepResult:
     """
@@ -74,6 +76,13 @@ def run_sweep(
         If a function, then call this function to obtain an individual random seed for each
             simulation in the sweep.
     
+    :param chunk_count: Instead of processing all the simulations in the sweep at the same time,
+        one can divide them into a number of "chunks" given by this parameter.  This is useful
+        on simulation sweeps of large systems that may take a long time.
+    
+    :param chunk_index: The index of the chunk to process on this run.  Must in the range
+        0 <= chunk_index < chunk_count, as it is a list index.
+    
     :param sweep_config_object: An optional SweepConfiguration object.  If this is given, then it
         will be used in preference over the sweep_config_file, and the sweep_config_file will be
         overwritten with the data provided by the sweep_config_object.
@@ -95,23 +104,24 @@ def run_sweep(
         sweep_cfg = deepcopy(sweep_config_object)
         sweep_config_filepath.parent.mkdir(parents=True, exist_ok=True)
         sweep_cfg.write(sweep_config_filepath)
-
-    if echo_status: _preamble(sweep_cfg, thread_count)
     
     # Change working directory to the directory where the sweep config file is located
     cwd = os.getcwd()
     os.chdir(sweep_config_filepath.parent)
 
     # Get the simulations and push them onto a SimulationPool to run them
-    simulations = _create_simulations(sweep_cfg, random_seed)
+    simulations = _create_simulations(sweep_cfg, random_seed, chunk_count, chunk_index)
     pool = SimulationPool(thread_count)
+    job_count = len(simulations)
+
+    if echo_status: _preamble(sweep_cfg, job_count, thread_count, chunk_count, chunk_index)
 
     start_time = time.perf_counter()
 
     for simulation in simulations:
         pool.push(simulation)
     
-    if echo_status: _report_pool_status(pool, len(simulations), polling_interval)
+    if echo_status: _report_pool_status(pool, job_count, polling_interval)
     
     # Wait for all simulations to finish
     pool.wait()
@@ -122,14 +132,20 @@ def run_sweep(
     os.chdir(cwd)
 
     # SweepResult reads back in the config file from the originally-given filepath
-    sweep_result = SweepResult(sweep_config_filepath)
+    sweep_result = SweepResult(sweep_config_filepath, chunk_count, chunk_index)
 
     if echo_status: _postamble(sweep_result, thread_count, end_time - start_time)
 
     return sweep_result
 
 
-def _preamble(sweep_cfg: SweepConfiguration, thread_count: int):
+def _preamble(
+    sweep_cfg: SweepConfiguration,
+    job_count: int,
+    thread_count: int,
+    chunk_count: int,
+    chunk_index: int
+):
     """
     Prints information about the sweep before running it
     """
@@ -142,6 +158,7 @@ def _preamble(sweep_cfg: SweepConfiguration, thread_count: int):
         Number of Particles: {particle_count}
         Time Step: {time_step}
 
+        Chunk index: {chunk_index}, Chunk count: {chunk_count}
         Running {job_count} jobs over {thread_count} threads
 
         Begin simulation sweep...""".format(
@@ -153,7 +170,8 @@ def _preamble(sweep_cfg: SweepConfiguration, thread_count: int):
             d_steps=sweep_cfg.system.density_steps,
             particle_count=sweep_cfg.system.particle_count,
             time_step=sweep_cfg.system.time_delta,
-            job_count=sweep_cfg.system.temperature_steps * sweep_cfg.system.density_steps,
+            chunk_index=chunk_index,
+            chunk_count=chunk_count,            job_count=job_count,
             thread_count=thread_count
         )
 
@@ -214,6 +232,8 @@ def _report_pool_status(pool: SimulationPool, job_count: int, polling_interval: 
 def _create_simulations(
     sweep_cfg: SweepConfiguration,
     random_seed: Union[None, int, FunctionType, BuiltinFunctionType] = None,
+    chunk_count: int = 1,
+    chunk_index: int = 0,
 ) -> list[Simulation]:
     """
     Creates a list of Simulation objects for each (temperature, density) pair in the sweep.
@@ -226,7 +246,7 @@ def _create_simulations(
     """
     simulations = []
 
-    for temperature, density in sweep_cfg.sweep_range():
+    for temperature, density in sweep_cfg.sweep_range(chunk_count, chunk_index):
         # Get the directory where the individual simulation will be run
         simulation_dir = sweep_cfg.simulation_dir(temperature, density)
         run_config_file = simulation_dir / sweep_cfg.templates.run_config_file
