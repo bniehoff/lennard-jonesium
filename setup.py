@@ -12,7 +12,7 @@ setup_requires = pytest_runner
 
 setup(
     name="lennardjonesium",
-    version="0.3.0",
+    version="0.3.1",
     description="A simulator for the Lennard-Jones substance",
     author='Ben Niehoff',
     license="GPL v3.0",

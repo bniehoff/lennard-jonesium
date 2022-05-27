@@ -1,0 +1,45 @@
+0: Phase started: (T=0.500000, d=0.250000) Equilibration Phase
+200: Temperature measured at: 0.8227, adjusted to: 0.5
+400: Temperature measured at: 0.5889, adjusted to: 0.5
+600: Temperature measured at: 0.5527, adjusted to: 0.5
+800: Temperature measured at: 0.5518, adjusted to: 0.5
+1000: Temperature measured at: 0.5274, adjusted to: 0.5
+1400: Temperature measured at: 0.5599, adjusted to: 0.5
+1800: Temperature measured at: 0.5408, adjusted to: 0.5
+2000: Temperature measured at: 0.5309, adjusted to: 0.5
+2200: Temperature measured at: 0.5352, adjusted to: 0.5
+2400: Temperature measured at: 0.5294, adjusted to: 0.5
+2600: Temperature measured at: 0.5324, adjusted to: 0.5
+2800: Temperature measured at: 0.5359, adjusted to: 0.5
+3400: Temperature measured at: 0.5253, adjusted to: 0.5
+3600: Temperature measured at: 0.5368, adjusted to: 0.5
+3800: Temperature measured at: 0.5332, adjusted to: 0.5
+4000: Temperature measured at: 0.529, adjusted to: 0.5
+4800: Temperature measured at: 0.5255, adjusted to: 0.5
+5600: Temperature measured at: 0.5317, adjusted to: 0.5
+6600: Temperature measured at: 0.5388, adjusted to: 0.5
+7400: Temperature measured at: 0.5264, adjusted to: 0.5
+8200: Temperature measured at: 0.5298, adjusted to: 0.5
+13200: Phase complete: (T=0.500000, d=0.250000) Equilibration Phase
+13200: Phase started: (T=0.500000, d=0.250000) Observation Phase
+13400: Observation recorded
+13600: Observation recorded
+13800: Observation recorded
+14000: Observation recorded
+14200: Observation recorded
+14400: Observation recorded
+14600: Observation recorded
+14800: Observation recorded
+15000: Observation recorded
+15200: Observation recorded
+15400: Observation recorded
+15600: Observation recorded
+15800: Observation recorded
+16000: Observation recorded
+16200: Observation recorded
+16400: Observation recorded
+16600: Observation recorded
+16800: Observation recorded
+17000: Observation recorded
+17200: Observation recorded
+17200: Phase complete: (T=0.500000, d=0.250000) Observation Phase

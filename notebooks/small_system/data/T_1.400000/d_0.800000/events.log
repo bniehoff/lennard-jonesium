@@ -1,7 +1,7 @@
 0: Phase started: (T=1.400000, d=0.800000) Equilibration Phase
-200: Temperature measured at: 0.786, adjusted to: 1.4
-400: Temperature measured at: 1.178, adjusted to: 1.4
-600: Temperature measured at: 1.32, adjusted to: 1.4
+200: Temperature measured at: 0.7824, adjusted to: 1.4
+400: Temperature measured at: 1.157, adjusted to: 1.4
+600: Temperature measured at: 1.328, adjusted to: 1.4
 5600: Phase complete: (T=1.400000, d=0.800000) Equilibration Phase
 5600: Phase started: (T=1.400000, d=0.800000) Observation Phase
 5800: Observation recorded

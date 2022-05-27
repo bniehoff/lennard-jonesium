@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.18)
 
 project(lennardjonesium
-    VERSION 0.3.0
+    VERSION 0.3.1
     DESCRIPTION "A Python C++ extension package for simulating Lennard-Jones particles"
 )
 

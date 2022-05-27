@@ -26,6 +26,7 @@ from typing import Iterator
 import itertools
 import pathlib
 
+from more_itertools import divide
 
 from lennardjonesium.tools import INIParsable, DictParsable, linspace
 
@@ -102,9 +103,19 @@ class SweepConfiguration(INIParsable, DictParsable):
     observation: _Observation = field(default_factory=_Observation)
     filenames: _Filenames = field(default_factory=_Filenames)
 
-    def sweep_range(self) -> Iterator[tuple[float, float]]:
+    def sweep_range(self,
+        chunk_count: int = 1,
+        chunk_index: int = 0,
+    ) -> Iterator[tuple[float, float]]:
         """
         Returns an iterator over (temperature, density) pairs for each point in the sweep.
+    
+        :param chunk_count: Instead of processing all the simulations in the sweep at the same time,
+            one can divide them into a number of "chunks" given by this parameter.  This is useful
+            on simulation sweeps of large systems that may take a long time.
+        
+        :param chunk_index: The index of the chunk to process on this run.  Must in the range
+            0 <= chunk_index < chunk_count, as it is a list index.
         """
         temperatures = linspace(
             self.system.temperature_start,
@@ -119,8 +130,10 @@ class SweepConfiguration(INIParsable, DictParsable):
             self.system.density_steps,
             endpoint=True
         )
-        
-        return itertools.product(temperatures, densities)
+
+        yield from list(
+            divide(chunk_count, itertools.product(temperatures, densities))
+        )[chunk_index]
     
     def simulation_dir(self, temperature, density) -> pathlib.Path:
         """
@@ -131,8 +144,19 @@ class SweepConfiguration(INIParsable, DictParsable):
             temperature=temperature, density=density
         ))
     
-    def simulation_dir_range(self) -> Iterator[pathlib.Path]:
+    def simulation_dir_range(self,
+        chunk_count: int = 1,
+        chunk_index: int = 0,
+    ) -> Iterator[pathlib.Path]:
         """
         Returns an iterator over all simulation directories.
+    
+        :param chunk_count: Instead of processing all the simulations in the sweep at the same time,
+            one can divide them into a number of "chunks" given by this parameter.  This is useful
+            on simulation sweeps of large systems that may take a long time.
+        
+        :param chunk_index: The index of the chunk to process on this run.  Must in the range
+            0 <= chunk_index < chunk_count, as it is a list index.
         """
-        return (self.simulation_dir(*td_pair) for td_pair in self.sweep_range())
+        return (self.simulation_dir(*td_pair)
+                for td_pair in self.sweep_range(chunk_count, chunk_index))
