@@ -2,8 +2,6 @@
 
 Microcanonical simulation of the Lennard-Jones substance and analysis of phase transitions.Completely rebuilt in Python and modern C++ using object-oriented and functional programming principles.
 
-The project is finally "done"!  The C++ part (which does all the hard work) is working well, and the Python wrapper package finally has a usable interface.  With the Python wrapper, one can easily `run()` a single simulation, or `run_sweep()` a whole "sweep" of simulations over parameter space. When using `run_sweep()`, everything about the directory structure of the collection of simulations is managed automatically.
-
 ## Design notes
 
 The codebase is a bit large to just dive into (there are approximately 14000 lines of code).  It is split into two parts: a C++ library which implements all of the details of the simulations, and a Python package which provides a user interface to the C++ library, which is convenient to use from a Jupyter notebook.
@@ -36,7 +34,7 @@ import lennardjonesium as lj
 
 to import the Python package.  It provides the functions `run()` for running a single simulation, and `run_sweep()` for automatically running many simulations over a range of temperatures and densities.  For some examples of usage, see
 
-- [](notebooks/quick_demo/run.ipynb) for a single `run()`
-- [](notebooks/small_system/run_experiment.ipynb) for a `run_sweep()`
+- [Quick demo](notebooks/quick_demo/run.ipynb) for a single `run()`
+- [Small system](notebooks/small_system/run_experiment.ipynb) for a `run_sweep()`
 
 In the future, I will consider writing more complete documentation about what all the parameters to these functions mean, but it is not hard to play around with them.
