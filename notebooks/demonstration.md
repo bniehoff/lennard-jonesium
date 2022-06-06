@@ -64,15 +64,15 @@ The internal simulation runs using dimensionless units, which allows the results
 
 $$
 \begin{align}
-&\text{Length} : \sigma = 3.405 \times 10^{-10} \, \mathrm{m}, & &\text{Time} : \tau = \sqrt{\frac{m_\text{Ar} \sigma^2}{\epsilon}} = 2.15 \times 10^{-12} \, \mathrm{s}, \\
-&\text{Energy} : \epsilon = 1.65 \times 10^{-21} \, \mathrm{J}, & &\text{Temperature} : \frac{\epsilon}{k_\text{B}} = 120 \, \mathrm{K}, \\
-&\text{Mass} : m_\text{Ar} = 6.63 \times 10^{-26} \, \mathrm{kg}, & &\text{Entropy} : k_\text{B} = 1.38 \times 10^{-23} \, \mathrm{J} / \mathrm{K},
+&\text{Length} : \sigma = 3.405 \times 10^{-10} ~ \mathrm{m}, & &\text{Time} : \tau = \sqrt{\frac{m_\text{Ar} \sigma^2}{\epsilon}} = 2.15 \times 10^{-12} ~ \mathrm{s}, \\
+&\text{Energy} : \epsilon = 1.65 \times 10^{-21} ~ \mathrm{J}, & &\text{Temperature} : \frac{\epsilon}{k_\text{B}} = 120 ~ \mathrm{K}, \\
+&\text{Mass} : m_\text{Ar} = 6.63 \times 10^{-26} ~ \mathrm{kg}, & &\text{Entropy} : k_\text{B} = 1.38 \times 10^{-23} ~ \mathrm{J} / \mathrm{K},
 \end{align}
 $$
 
 Here $m_\text{Ar}$ is the atomic mass of Argon, and $k_\text{B}$ is Boltzmann's constant.  The simulations use a time step of $0.005 \tau$, so that 200 time steps make up one unit of time.
 
-In sweep simulations, we will investigate a range of temperatures from $0.1$ to $2.0$ and densities from $0.1$ to $1.4$.  This corresponds to a temperature range of $12 \; \text{K} = -261 \; {}^\circ \text{C}$ to $240 \; \text{K} = -33 \; {}^\circ \text{C}$, and a density range of $2.5$ to $35$ particles per cubic nanometer.
+In sweep simulations, we will investigate a range of temperatures from $0.1$ to $2.0$ and densities from $0.1$ to $1.4$.  This corresponds to a temperature range of $12 ~ \mathrm{K} = -261 ~ {}^\circ \mathrm{C}$ to $240 ~ \mathrm{K} = -33 ~ {}^\circ \mathrm{C}$, and a density range of $2.5$ to $35$ particles per cubic nanometer.
 
 ## Simulations
 
