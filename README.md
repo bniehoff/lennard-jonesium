@@ -40,6 +40,6 @@ import lennardjonesium as lj
 to import the Python package.  It provides the functions `run()` for running a single simulation, and `run_sweep()` for automatically running many simulations over a range of temperatures and densities.  For some examples of usage, see
 
 - [Simple run](notebooks/simple_run/simple_run.pdf) for a single `run()`
-- [Small system](notebooks/small_system/experiment.ipynb) for a `run_sweep()`
+- [Small system](notebooks/small_system/small_system.pdf) for a `run_sweep()`
 
 In the future, I will consider writing more complete documentation about what all the parameters to these functions mean, but it is not hard to play around with them.
