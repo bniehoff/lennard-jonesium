@@ -2,6 +2,10 @@
 
 Microcanonical simulation of the Lennard-Jones substance and analysis of phase transitions.Completely rebuilt in Python and modern C++ using object-oriented and functional programming principles.
 
+## Demonstration
+
+Read [demonstration.md](notebooks/demonstration.md) for an explanation of the Lennard-Jones model which is simulated by this library.  That document also contains further links on the specific simulations performed in the `notebooks/` directory.
+
 ## Design notes
 
 The codebase is a bit large to just dive into (there are approximately 14000 lines of code).  It is split into two parts: a C++ library which implements all of the details of the simulations, and a Python package which provides a user interface to the C++ library, which is convenient to use from a Jupyter notebook.
@@ -10,8 +14,9 @@ As a guide to the C++ codebase, I have written some design notes to here: [desig
 
 ## Installation
 
-To compile the C++ library, you will need the following libraries (all available in the Ubuntu 21.10 package repository, except for Eigen 3.4 which must be installed manually):
+To compile the C++ library, you will need the following dependencies (all available in the Ubuntu 21.10 package repository, except for Eigen 3.4 which must be installed manually):
 
+- GCC 11.2.0 or higher (for C++20 features)
 - [CMake v3.18](https://cmake.org/) or higher
 - [Boost 1.74](https://www.boost.org/) or higher
 - [Eigen 3.4](https://eigen.tuxfamily.org/index.php?title=Main_Page) or higher
@@ -34,7 +39,7 @@ import lennardjonesium as lj
 
 to import the Python package.  It provides the functions `run()` for running a single simulation, and `run_sweep()` for automatically running many simulations over a range of temperatures and densities.  For some examples of usage, see
 
-- [Quick demo](notebooks/quick_demo/run.ipynb) for a single `run()`
-- [Small system](notebooks/small_system/run_experiment.ipynb) for a `run_sweep()`
+- [Simple run](notebooks/simple_run/simple_run.pdf) for a single `run()`
+- [Small system](notebooks/small_system/experiment.ipynb) for a `run_sweep()`
 
 In the future, I will consider writing more complete documentation about what all the parameters to these functions mean, but it is not hard to play around with them.

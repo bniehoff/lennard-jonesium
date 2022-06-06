@@ -2,3 +2,4 @@
 *.ini linguist-vendored
 *.log linguist-vendored
 *.csv linguist-vendored
+*.pdf linguist-vendored
