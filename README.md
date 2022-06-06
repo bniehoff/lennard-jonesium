@@ -16,7 +16,7 @@ As a guide to the C++ codebase, I have written some design notes to here: [desig
 
 To compile the C++ library, you will need the following dependencies (all available in the Ubuntu 21.10 package repository, except for Eigen 3.4 which must be installed manually):
 
-- GCC 11.2.0 or higher (for C++20 features)
+- [GCC 11.2.0](https://gcc.gnu.org/gcc-11/) or higher (for C++20 features)
 - [CMake v3.18](https://cmake.org/) or higher
 - [Boost 1.74](https://www.boost.org/) or higher
 - [Eigen 3.4](https://eigen.tuxfamily.org/index.php?title=Main_Page) or higher
