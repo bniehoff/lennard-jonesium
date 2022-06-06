@@ -80,7 +80,7 @@ In this folder, we run the following simulations, with further information in th
 
 - [Single run demo](simple_run/simple_run.pdf) (500 particles)
 - [Small size experiment](small_system/small_system.pdf) (500 particles)
-- [Medium size experiment](medium_system/experiment.ipynb) (2000 particles)
+- [Medium size experiment](medium_system/analysis.pdf) (2000 particles)
 - [Large size experiment](large_system/analysis.ipynb) (10000 particles)
 
-TODO: Upload Medium and Large size experiments, and write more details in Jupyter notebooks.
+TODO: Finish collecting data for Large size experiment and write up commentary.
