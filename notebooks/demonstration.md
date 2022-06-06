@@ -78,7 +78,7 @@ In sweep simulations, we will investigate a range of temperatures from $0.1$ to 
 
 In this folder, we run the following simulations, with further information in the notebooks at these links:
 
-- [Single run demo](simple_run/simple_run.ipynb) (500 particles)
+- [Single run demo](simple_run/simple_run.pdf) (500 particles)
 - [Small size experiment](small_system/experiment.ipynb) (500 particles)
 - [Medium size experiment](medium_system/experiment.ipynb) (2000 particles)
 - [Large size experiment](large_system/analysis.ipynb) (10000 particles)
