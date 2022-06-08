@@ -1,0 +1,47 @@
+0: Phase started: (T=0.500000, d=0.250000) Equilibration Phase
+200: Temperature measured at: 0.8321, adjusted to: 0.5
+400: Temperature measured at: 0.5923, adjusted to: 0.5
+600: Temperature measured at: 0.5569, adjusted to: 0.5
+800: Temperature measured at: 0.5414, adjusted to: 0.5
+1000: Temperature measured at: 0.5401, adjusted to: 0.5
+1400: Temperature measured at: 0.5656, adjusted to: 0.5
+1600: Temperature measured at: 0.5365, adjusted to: 0.5
+1800: Temperature measured at: 0.5345, adjusted to: 0.5
+2200: Temperature measured at: 0.5531, adjusted to: 0.5
+2600: Temperature measured at: 0.565, adjusted to: 0.5
+2800: Temperature measured at: 0.5295, adjusted to: 0.5
+3000: Temperature measured at: 0.5319, adjusted to: 0.5
+3400: Temperature measured at: 0.5338, adjusted to: 0.5
+4000: Temperature measured at: 0.5447, adjusted to: 0.5
+5000: Temperature measured at: 0.5297, adjusted to: 0.5
+6200: Temperature measured at: 0.5315, adjusted to: 0.5
+7200: Temperature measured at: 0.537, adjusted to: 0.5
+7800: Temperature measured at: 0.5429, adjusted to: 0.5
+8400: Temperature measured at: 0.5349, adjusted to: 0.5
+9400: Temperature measured at: 0.5319, adjusted to: 0.5
+10400: Temperature measured at: 0.5257, adjusted to: 0.5
+10800: Temperature measured at: 0.4741, adjusted to: 0.5
+11000: Temperature measured at: 0.5252, adjusted to: 0.5
+16000: Phase complete: (T=0.500000, d=0.250000) Equilibration Phase
+16000: Phase started: (T=0.500000, d=0.250000) Observation Phase
+16200: Observation recorded
+16400: Observation recorded
+16600: Observation recorded
+16800: Observation recorded
+17000: Observation recorded
+17200: Observation recorded
+17400: Observation recorded
+17600: Observation recorded
+17800: Observation recorded
+18000: Observation recorded
+18200: Observation recorded
+18400: Observation recorded
+18600: Observation recorded
+18800: Observation recorded
+19000: Observation recorded
+19200: Observation recorded
+19400: Observation recorded
+19600: Observation recorded
+19800: Observation recorded
+20000: Observation recorded
+20000: Phase complete: (T=0.500000, d=0.250000) Observation Phase

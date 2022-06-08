@@ -1,0 +1,57 @@
+0: Phase started: (T=0.200000, d=0.450000) Equilibration Phase
+200: Temperature measured at: 0.4432, adjusted to: 0.2
+400: Temperature measured at: 0.3553, adjusted to: 0.2
+600: Temperature measured at: 0.319, adjusted to: 0.2
+800: Temperature measured at: 0.2935, adjusted to: 0.2
+1000: Temperature measured at: 0.2946, adjusted to: 0.2
+1200: Temperature measured at: 0.2758, adjusted to: 0.2
+1400: Temperature measured at: 0.2529, adjusted to: 0.2
+1600: Temperature measured at: 0.2435, adjusted to: 0.2
+1800: Temperature measured at: 0.2484, adjusted to: 0.2
+2000: Temperature measured at: 0.2352, adjusted to: 0.2
+2200: Temperature measured at: 0.2331, adjusted to: 0.2
+2400: Temperature measured at: 0.2298, adjusted to: 0.2
+2600: Temperature measured at: 0.2249, adjusted to: 0.2
+2800: Temperature measured at: 0.213, adjusted to: 0.2
+3000: Temperature measured at: 0.2188, adjusted to: 0.2
+3200: Temperature measured at: 0.2105, adjusted to: 0.2
+3800: Temperature measured at: 0.2133, adjusted to: 0.2
+4000: Temperature measured at: 0.2125, adjusted to: 0.2
+4400: Temperature measured at: 0.2165, adjusted to: 0.2
+5200: Temperature measured at: 0.2131, adjusted to: 0.2
+5400: Temperature measured at: 0.2104, adjusted to: 0.2
+6200: Temperature measured at: 0.2133, adjusted to: 0.2
+6600: Temperature measured at: 0.2122, adjusted to: 0.2
+7600: Temperature measured at: 0.2101, adjusted to: 0.2
+8600: Temperature measured at: 0.2134, adjusted to: 0.2
+10400: Temperature measured at: 0.2104, adjusted to: 0.2
+13800: Temperature measured at: 0.2113, adjusted to: 0.2
+15200: Temperature measured at: 0.2138, adjusted to: 0.2
+18600: Temperature measured at: 0.2117, adjusted to: 0.2
+22000: Temperature measured at: 0.2105, adjusted to: 0.2
+23000: Temperature measured at: 0.2104, adjusted to: 0.2
+26000: Temperature measured at: 0.2105, adjusted to: 0.2
+27200: Temperature measured at: 0.2109, adjusted to: 0.2
+32200: Phase complete: (T=0.200000, d=0.450000) Equilibration Phase
+32200: Phase started: (T=0.200000, d=0.450000) Observation Phase
+32400: Observation recorded
+32600: Observation recorded
+32800: Observation recorded
+33000: Observation recorded
+33200: Observation recorded
+33400: Observation recorded
+33600: Observation recorded
+33800: Observation recorded
+34000: Observation recorded
+34200: Observation recorded
+34400: Observation recorded
+34600: Observation recorded
+34800: Observation recorded
+35000: Observation recorded
+35200: Observation recorded
+35400: Observation recorded
+35600: Observation recorded
+35800: Observation recorded
+36000: Observation recorded
+36200: Observation recorded
+36200: Phase complete: (T=0.200000, d=0.450000) Observation Phase

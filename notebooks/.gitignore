@@ -3,3 +3,8 @@
 
 # Still working on large system simulation
 large_system/
+
+# Ignore experiment folders until they're ready
+experiment_small/
+experiment_medium/
+experiment_large/
