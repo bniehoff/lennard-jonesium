@@ -121,7 +121,7 @@ def run_sweep(
     for simulation in simulations:
         pool.push(simulation)
     
-    if echo_status: _report_pool_status(pool, job_count, polling_interval)
+    if echo_status: _report_pool_status(pool, job_count, start_time, polling_interval)
     
     # Wait for all simulations to finish
     pool.wait()
@@ -158,7 +158,7 @@ def _preamble(
         Number of Particles: {particle_count}
         Time Step: {time_step}
 
-        Chunk index: {chunk_index}, Chunk count: {chunk_count}
+        Chunk {chunk_number} of {chunk_count} (index {chunk_index})
         Running {job_count} jobs over {thread_count} threads
 
         Begin simulation sweep...""".format(
@@ -170,8 +170,10 @@ def _preamble(
             d_steps=sweep_cfg.system.density_steps,
             particle_count=sweep_cfg.system.particle_count,
             time_step=sweep_cfg.system.time_delta,
+            chunk_number=chunk_index + 1,
+            chunk_count=chunk_count,
             chunk_index=chunk_index,
-            chunk_count=chunk_count,            job_count=job_count,
+            job_count=job_count,
             thread_count=thread_count
         )
 
@@ -207,15 +209,21 @@ def _postamble(result: SweepResult, thread_count: int, elapsed_time: float):
     print(textwrap.dedent(postamble), flush=True)
 
 
-def _report_pool_status(pool: SimulationPool, job_count: int, polling_interval: float = 0.5):
+def _report_pool_status(
+    pool: SimulationPool,
+    job_count: int,
+    start_time: float,
+    polling_interval: float
+):
     """
     Polls the given SimulationPool and reports its status until all jobs finish.
     """
     while True:
         status = pool.status()
+        elapsed_time = time.perf_counter() - start_time
         print(
-            'Jobs queued: {}, Running: {}, Completed: {}             '.format(
-                status.waiting, status.running, status.completed
+            'Jobs queued: {}, Running: {}, Completed: {}, Elapsed time: {:.2f} seconds     '.format(
+                status.waiting, status.running, status.completed, elapsed_time
             ),
             flush=True,
             end='\r'

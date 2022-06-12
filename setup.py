@@ -12,7 +12,7 @@ setup_requires = pytest_runner
 
 setup(
     name="lennardjonesium",
-    version="0.3.1",
+    version="0.3.2",
     description="A simulator for the Lennard-Jones substance",
     author='Ben Niehoff',
     license="GPL v3.0",
@@ -25,6 +25,7 @@ setup(
     package_dir = {
         '': 'src/python',
         },
+    scripts=['src/python/lennardjonesium/scripts/experiment.py'],
     install_requires=['cython'],
     tests_require=['pytest'],
     setup_requires=setup_requires,
