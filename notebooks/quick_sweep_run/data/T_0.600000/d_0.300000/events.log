@@ -1,0 +1,48 @@
+0: Phase started: (T=0.600000, d=0.300000) Equilibration Phase
+200: Temperature measured at: 0.9472, adjusted to: 0.6
+400: Temperature measured at: 0.6852, adjusted to: 0.6
+600: Temperature measured at: 0.6466, adjusted to: 0.6
+1000: Temperature measured at: 0.6489, adjusted to: 0.6
+1800: Temperature measured at: 0.6552, adjusted to: 0.6
+2200: Temperature measured at: 0.64, adjusted to: 0.6
+3800: Temperature measured at: 0.6536, adjusted to: 0.6
+4200: Temperature measured at: 0.5638, adjusted to: 0.6
+5600: Temperature measured at: 0.6307, adjusted to: 0.6
+7200: Temperature measured at: 0.6433, adjusted to: 0.6
+8400: Temperature measured at: 0.6402, adjusted to: 0.6
+8800: Temperature measured at: 0.6396, adjusted to: 0.6
+13400: Temperature measured at: 0.6392, adjusted to: 0.6
+16200: Temperature measured at: 0.5694, adjusted to: 0.6
+19800: Temperature measured at: 0.6337, adjusted to: 0.6
+20200: Temperature measured at: 0.6306, adjusted to: 0.6
+22000: Temperature measured at: 0.6343, adjusted to: 0.6
+25200: Temperature measured at: 0.5465, adjusted to: 0.6
+26400: Temperature measured at: 0.642, adjusted to: 0.6
+29200: Temperature measured at: 0.564, adjusted to: 0.6
+31600: Temperature measured at: 0.635, adjusted to: 0.6
+32400: Temperature measured at: 0.6415, adjusted to: 0.6
+33400: Temperature measured at: 0.635, adjusted to: 0.6
+37600: Temperature measured at: 0.5633, adjusted to: 0.6
+42600: Phase complete: (T=0.600000, d=0.300000) Equilibration Phase
+42600: Phase started: (T=0.600000, d=0.300000) Observation Phase
+42800: Observation recorded
+43000: Observation recorded
+43200: Observation recorded
+43400: Observation recorded
+43600: Observation recorded
+43800: Observation recorded
+44000: Observation recorded
+44200: Observation recorded
+44400: Observation recorded
+44600: Observation recorded
+44800: Observation recorded
+45000: Observation recorded
+45200: Observation recorded
+45400: Observation recorded
+45600: Observation recorded
+45800: Observation recorded
+46000: Observation recorded
+46200: Observation recorded
+46400: Observation recorded
+46600: Observation recorded
+46600: Phase complete: (T=0.600000, d=0.300000) Observation Phase

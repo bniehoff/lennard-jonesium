@@ -1,0 +1,46 @@
+0: Phase started: (T=0.300000, d=0.550000) Equilibration Phase
+200: Temperature measured at: 0.4218, adjusted to: 0.3
+400: Temperature measured at: 0.3855, adjusted to: 0.3
+600: Temperature measured at: 0.3596, adjusted to: 0.3
+800: Temperature measured at: 0.3634, adjusted to: 0.3
+1000: Temperature measured at: 0.3665, adjusted to: 0.3
+1200: Temperature measured at: 0.3563, adjusted to: 0.3
+1400: Temperature measured at: 0.3364, adjusted to: 0.3
+1600: Temperature measured at: 0.3282, adjusted to: 0.3
+1800: Temperature measured at: 0.3355, adjusted to: 0.3
+2000: Temperature measured at: 0.3228, adjusted to: 0.3
+2200: Temperature measured at: 0.3184, adjusted to: 0.3
+2400: Temperature measured at: 0.3162, adjusted to: 0.3
+2600: Temperature measured at: 0.3183, adjusted to: 0.3
+3400: Temperature measured at: 0.3254, adjusted to: 0.3
+4200: Temperature measured at: 0.3176, adjusted to: 0.3
+4800: Temperature measured at: 0.3164, adjusted to: 0.3
+5600: Temperature measured at: 0.3187, adjusted to: 0.3
+5800: Temperature measured at: 0.3217, adjusted to: 0.3
+9600: Temperature measured at: 0.3175, adjusted to: 0.3
+11200: Temperature measured at: 0.3184, adjusted to: 0.3
+14200: Temperature measured at: 0.3156, adjusted to: 0.3
+18400: Temperature measured at: 0.315, adjusted to: 0.3
+23400: Phase complete: (T=0.300000, d=0.550000) Equilibration Phase
+23400: Phase started: (T=0.300000, d=0.550000) Observation Phase
+23600: Observation recorded
+23800: Observation recorded
+24000: Observation recorded
+24200: Observation recorded
+24400: Observation recorded
+24600: Observation recorded
+24800: Observation recorded
+25000: Observation recorded
+25200: Observation recorded
+25400: Observation recorded
+25600: Observation recorded
+25800: Observation recorded
+26000: Observation recorded
+26200: Observation recorded
+26400: Observation recorded
+26600: Observation recorded
+26800: Observation recorded
+27000: Observation recorded
+27200: Observation recorded
+27400: Observation recorded
+27400: Phase complete: (T=0.300000, d=0.550000) Observation Phase

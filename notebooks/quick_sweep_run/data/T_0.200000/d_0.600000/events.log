@@ -1,0 +1,49 @@
+0: Phase started: (T=0.200000, d=0.600000) Equilibration Phase
+200: Temperature measured at: 0.2722, adjusted to: 0.2
+400: Temperature measured at: 0.302, adjusted to: 0.2
+600: Temperature measured at: 0.2719, adjusted to: 0.2
+800: Temperature measured at: 0.2562, adjusted to: 0.2
+1000: Temperature measured at: 0.2446, adjusted to: 0.2
+1200: Temperature measured at: 0.2411, adjusted to: 0.2
+1400: Temperature measured at: 0.2316, adjusted to: 0.2
+1600: Temperature measured at: 0.2312, adjusted to: 0.2
+1800: Temperature measured at: 0.2335, adjusted to: 0.2
+2000: Temperature measured at: 0.2224, adjusted to: 0.2
+2200: Temperature measured at: 0.2179, adjusted to: 0.2
+2400: Temperature measured at: 0.2162, adjusted to: 0.2
+2800: Temperature measured at: 0.2141, adjusted to: 0.2
+3200: Temperature measured at: 0.2118, adjusted to: 0.2
+3400: Temperature measured at: 0.2104, adjusted to: 0.2
+3800: Temperature measured at: 0.2118, adjusted to: 0.2
+4800: Temperature measured at: 0.2121, adjusted to: 0.2
+5600: Temperature measured at: 0.214, adjusted to: 0.2
+6400: Temperature measured at: 0.2143, adjusted to: 0.2
+7800: Temperature measured at: 0.2146, adjusted to: 0.2
+11600: Temperature measured at: 0.2119, adjusted to: 0.2
+12000: Temperature measured at: 0.2115, adjusted to: 0.2
+15800: Temperature measured at: 0.2125, adjusted to: 0.2
+17800: Temperature measured at: 0.2136, adjusted to: 0.2
+19000: Temperature measured at: 0.2104, adjusted to: 0.2
+24000: Phase complete: (T=0.200000, d=0.600000) Equilibration Phase
+24000: Phase started: (T=0.200000, d=0.600000) Observation Phase
+24200: Observation recorded
+24400: Observation recorded
+24600: Observation recorded
+24800: Observation recorded
+25000: Observation recorded
+25200: Observation recorded
+25400: Observation recorded
+25600: Observation recorded
+25800: Observation recorded
+26000: Observation recorded
+26200: Observation recorded
+26400: Observation recorded
+26600: Observation recorded
+26800: Observation recorded
+27000: Observation recorded
+27200: Observation recorded
+27400: Observation recorded
+27600: Observation recorded
+27800: Observation recorded
+28000: Observation recorded
+28000: Phase complete: (T=0.200000, d=0.600000) Observation Phase
