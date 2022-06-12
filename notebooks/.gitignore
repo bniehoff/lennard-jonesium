@@ -5,6 +5,7 @@
 large_system/
 
 # Ignore experiment folders until they're ready
-experiment_small/
-experiment_medium/
-experiment_large/
+experiment_500/
+experiment_2000/
+experiment_10000/
+experiment_50000/
