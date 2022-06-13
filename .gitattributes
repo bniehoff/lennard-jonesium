@@ -3,3 +3,6 @@
 *.log linguist-vendored
 *.csv linguist-vendored
 *.pdf linguist-vendored
+
+# Ignore notebooks
+*.ipynb
