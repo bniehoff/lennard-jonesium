@@ -5,4 +5,4 @@
 *.pdf linguist-vendored
 
 # Ignore notebooks
-*.ipynb
+*.ipynb linguist-vendored
